@@ -4,7 +4,6 @@ import inject as inject
 from flask.views import View
 
 from src.domain.infrastructure import UnitOfWorkManager
-from src.domain.model import Player
 
 
 class PlayerView(View):

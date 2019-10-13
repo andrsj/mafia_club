@@ -1,6 +1,7 @@
 from functools import partial
 
 import inject
+
 import src.domain.infrastructure as ports
 from src import config
 from src.adapters import orm

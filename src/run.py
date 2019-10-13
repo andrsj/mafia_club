@@ -1,12 +1,12 @@
-from flask import Flask, render_template
+import os
 
-app = Flask(__name__)
+from src import create_app
+from src.adapters.bootstrap import bootstrap
 
-
-@app.route("/")
-def home():
-    return render_template('index.html')
+cfg = os.environ.copy()
+bootstrap(cfg)
+app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(host='0.0.0.0', port=8080)

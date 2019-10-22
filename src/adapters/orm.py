@@ -1,88 +1,17 @@
-import retrying
 import sqlalchemy
-import sqlalchemy.exc
-import sqlalchemy.orm.exc
-from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData
+from sqlalchemy import (
+    Table,
+    Column,
+    String,
+    create_engine,
+    MetaData,
+    ForeignKey, Enum, Integer)
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 
-from src.domain.infrastructure import UnitOfWork, UnitOfWorkManager
+from src.adapters.unit_of_work import SqlAlchemyUnitOfWorkManager
 from src.domain.model import Player
-
-
-def isretryable(exn):
-    """
-    Return true is this is a retryable sqlalchemy error.
-    Right now we retry connection issues and concurrent modification problems.
-    Integrity errors, data errors etc. are not recoverable, so we return false.
-    """
-
-    if (
-            isinstance(exn, sqlalchemy.exc.DisconnectionError)
-            or isinstance(exn, sqlalchemy.exc.TimeoutError)
-            or isinstance(exn, sqlalchemy.orm.exc.ConcurrentModificationError)
-    ):
-        # logging.warn("Retrying retryable error %s", exn)
-        return True
-    # logging.error("Can't retry %s error %s", type(exn), exn)
-    return False
-
-
-class SqlAlchemyUnitOfWork(UnitOfWork):
-    def __init__(self, session_factory):
-        self.session_factory = session_factory
-
-    def __enter__(self):
-        self.session = self.session_factory()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.session.close()
-
-    @retrying.retry(
-        wait_exponential_multiplier=200,
-        wait_exponential_max=3000,
-        stop_max_delay=15000,
-        retry_on_exception=isretryable,
-    )
-    def commit(self):
-        self.session.commit()
-
-    def rollback(self):
-        self.session.rollback()
-
-    def flush(self):
-        self.session.flush()
-
-    @property
-    def players(self):
-        return PlayerRepository(self.session)
-
-
-class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
-
-    def __init__(self, session_maker):
-        self.session_maker = session_maker
-
-    def start(self):
-        return SqlAlchemyUnitOfWork(self.session_maker)
-
-
-class PlayerRepository:
-
-    def __init__(self, session):
-        self._session = session
-
-    def get_default_player(self):
-        return Player("Lutik", "Denis", "Zlo")
-
-    def get_by_nickname(self, nick):
-        return self._session.query(Player).filter_by(nickname=nick).first()
-
-    def get_by_id(self, player_id):
-        return self._session.query(Player).filter_by(id=player_id).first()
-
-    def add(self, player):
-        self._session.add(player)
+from src.domain.types import Role
 
 
 class DatabaseSchema:
@@ -94,6 +23,9 @@ class DatabaseSchema:
         assert self._configured
         self._metadata.create_all()
 
+    def get_meta(self):
+        return self._metadata
+
     def configure(self, metadata):
         assert not self._configured
         self._configured = True
@@ -101,10 +33,105 @@ class DatabaseSchema:
         self.players = Table(
             "players",
             self._metadata,
-            Column("id", Integer, primary_key=True),
-            Column("nickname", String(40), unique=True),
+            Column(
+                "player_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("nickname", String(40), unique=True, nullable=False),
             Column("name", String(40)),
-            Column("club", String(40)),
+            Column("club", String(40))
+        )
+
+        self.positions = Table(
+            "positions",
+            self._metadata,
+            Column(
+                "position_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", String(50), nullable=False),
+            Column("player_id", UUID(as_uuid=True), ForeignKey("players.id"), nullable=False),
+            Column("role", Enum(Role), nullable=False),
+            Column("position", Integer, nullable=False)
+        )
+
+        self.votes = Table(
+            "votes",
+            self._metadata,
+            Column(
+                "vote_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", String(50), nullable=False),
+            Column("day", Integer, nullable=False, default=1),
+            Column("revote", Integer, nullable=False, default=0),
+            Column("source_pos", UUID(as_uuid=True), ForeignKey("positions.id"), nullable=False),
+            Column("target_pos", UUID(as_uuid=True), ForeignKey("positions.id"), nullable=False)
+        )
+
+        self.votes_exposes = Table(
+            "votes_exposes",
+            self._metadata,
+            Column(
+                "vote_expose_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", String(50), nullable=False),
+            Column("day", Integer, nullable=False, default=1),
+            Column("revote", Integer, nullable=False, default=0),
+            Column("source_pos", UUID(as_uuid=True), ForeignKey("positions.id"), nullable=False),
+            Column("target_pos", UUID(as_uuid=True), ForeignKey("positions.id"), nullable=False)
+        )
+
+        self.sheriff_checks = Table(
+            "sheriff_checks",
+            self._metadata,
+            Column(
+                "sheriff_check_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", String(50), nullable=False),
+            Column("night", Integer, nullable=False, default=2),
+            Column("target", UUID(as_uuid=True), ForeignKey("positions.id"))
+        )
+
+        self.don_checks = Table(
+            "don_checks",
+            self._metadata,
+            Column(
+                "vote_expose_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", String(50), nullable=False),
+            Column("night", Integer, nullable=False, default=2),
+            Column("target", UUID(as_uuid=True), ForeignKey("positions.id"))
+        )
+
+        self.shots = Table(
+            "shots",
+            self._metadata,
+            Column(
+                "shot_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", String(50), nullable=False),
+            Column("night", Integer, nullable=False, default=2),
+            Column("shooter", UUID(as_uuid=True), ForeignKey("positions.id"), nullable=False),
+            Column("target", UUID(as_uuid=True), ForeignKey("positions.id"), nullable=False)
         )
 
 

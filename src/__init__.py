@@ -18,8 +18,6 @@ def create_app():
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object('config.Config')
 
-    # app.db = init_db()
-
     with app.app_context():
         # Include our Routes
         from . routes import index_blueprint

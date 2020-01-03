@@ -5,8 +5,8 @@ import sqlalchemy.orm.exc
 from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 
-from src.domain.infrastructure import UnitOfWork, UnitOfWorkManager
-from src.domain.model import Player
+from src.zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
+from src.zlo.domain.model import Player
 
 
 def isretryable(exn):
@@ -21,9 +21,7 @@ def isretryable(exn):
             or isinstance(exn, sqlalchemy.exc.TimeoutError)
             or isinstance(exn, sqlalchemy.orm.exc.ConcurrentModificationError)
     ):
-        # logging.warn("Retrying retryable error %s", exn)
         return True
-    # logging.error("Can't retry %s error %s", type(exn), exn)
     return False
 
 
@@ -105,6 +103,12 @@ class DatabaseSchema:
             Column("nickname", String(40), unique=True),
             Column("name", String(40)),
             Column("club", String(40)),
+        )
+
+        self.checks = Table(
+            "cheks",
+            self._metadata,
+            Column("id", Integer, primary_key=True)
         )
 
 

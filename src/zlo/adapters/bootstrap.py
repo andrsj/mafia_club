@@ -2,9 +2,9 @@ from functools import partial
 
 import inject
 
-import src.domain.infrastructure as ports
-from src import config
-from src.adapters import orm
+import src.zlo.domain.infrastructure as ports
+from src.zlo import config
+from src.zlo.adapters import orm
 
 
 def bootstrap(env):

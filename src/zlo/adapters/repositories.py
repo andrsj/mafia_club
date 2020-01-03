@@ -1,4 +1,4 @@
-from src.domain.model import Player
+from src.zlo.domain.model import Player
 
 
 class PlayerRepository:

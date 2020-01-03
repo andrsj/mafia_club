@@ -2,8 +2,8 @@ import retrying
 import sqlalchemy.exc
 import sqlalchemy.orm
 
-from src.adapters.repositories import PlayerRepository
-from src.domain.infrastructure import UnitOfWork, UnitOfWorkManager
+from src.zlo.adapters.repositories import PlayerRepository
+from src.zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
 
 
 def isretryable(exn):
@@ -18,9 +18,7 @@ def isretryable(exn):
             or isinstance(exn, sqlalchemy.exc.TimeoutError)
             or isinstance(exn, sqlalchemy.orm.exc.ConcurrentModificationError)
     ):
-        # logging.warn("Retrying retryable error %s", exn)
         return True
-    # logging.error("Can't retry %s error %s", type(exn), exn)
     return False
 
 

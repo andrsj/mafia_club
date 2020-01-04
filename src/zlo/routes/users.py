@@ -3,7 +3,7 @@ import logging
 import inject as inject
 from flask.views import View
 
-from src.domain.infrastructure import UnitOfWorkManager
+from src.zlo.domain.infrastructure import UnitOfWorkManager
 
 
 class PlayerView(View):

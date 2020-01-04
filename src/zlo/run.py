@@ -1,7 +1,7 @@
 import os
 
 from src import create_app
-from src.adapters.bootstrap import bootstrap
+from src.zlo.adapters.bootstrap import bootstrap
 
 cfg = os.environ.copy()
 bootstrap(cfg)

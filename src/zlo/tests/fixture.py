@@ -1,9 +1,10 @@
+import datetime
 import random
 import uuid
 from typing import List
 
-from zlo.domain.model import Player, House
-from zlo.domain.types import ClassicRole, HouseID
+from zlo.domain.model import Player, House, Game
+from zlo.domain.types import ClassicRole, HouseID, GameResult
 
 # This is default players to test some basic logic
 DEFAULT_PLAYERS = [
@@ -86,3 +87,26 @@ def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
         houses[roles[2]].role = ClassicRole.mafia
         houses[roles[3]].role = ClassicRole.mafia
     return houses
+
+
+def prepare_game(uow,
+                 date=None,
+                 heading_player=None,
+                 game_id=None,
+                 table=0, club="ZloMafiaClub",
+                 result=GameResult.unfinished) -> Game:
+    print(id(uow))
+    if heading_player is None:
+        heading_player = Player(nickname="Nata", name="Katya", club="ZloMafiaClub")
+        uow.players.add(heading_player)
+    game = Game(
+        date=date if date else datetime.datetime.utcnow(),
+        id=game_id if game_id is not None else str(uuid.uuid4()),
+        heading=heading_player.id,
+        club=club,
+        result=result,
+        table=table
+    )
+
+    uow.games.add(game)
+    return game

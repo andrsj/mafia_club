@@ -25,10 +25,8 @@ def generate_statistic_by_date(uowm, start_date: datetime.datetime, end_date: da
     result = {}
     with uowm.start() as tx:
         games = tx.games.get_by_datetime_range(start_date, end_date)
-        print(len(games))
         for game in games:
             game_stats = generate_statistic_for_game(tx, game)
-            print(game_stats)
             for player_nick, mark in game_stats.items():
                 if player_nick in result:
                     result[player_nick] += mark

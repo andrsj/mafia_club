@@ -37,7 +37,7 @@ def generate_statistic_by_date(uowm, start_date: datetime.datetime, end_date: da
 
 def generate_statistic_for_game(uow: SqlAlchemyUnitOfWork, game: Game):
     result = {}
-    houses = uow.houses.get_by_game_id(game.id)
+    houses = uow.houses.get_by_game_id(game.game_id)
     for house in houses:
         player: Player = uow.players.get_by_id(house.player_id)
         if check_winner(game.result, house.role):

@@ -19,7 +19,7 @@ class When_statistic_calculated_for_one_game:
 
         self.game = prepare_game(self.uowm.sess, result=GameResult.mafia)
 
-        self.houses = generate_ten_slots_for_game(self.game.id)
+        self.houses = generate_ten_slots_for_game(self.game.game_id)
 
         self.houses[0].role = ClassicRole.don
         self.houses[1].role = ClassicRole.mafia
@@ -63,8 +63,8 @@ class When_statistic_calculated_for_more_than_one_game:
         self.game_two = prepare_game(self.uowm.sess, result=GameResult.mafia)
 
         # for each game generate 10 houses with citizen roles
-        self.houses_game_one = generate_ten_slots_for_game(self.game_one.id)
-        self.houses_game_two = generate_ten_slots_for_game(self.game_two.id)
+        self.houses_game_one = generate_ten_slots_for_game(self.game_one.game_id)
+        self.houses_game_two = generate_ten_slots_for_game(self.game_two.game_id)
 
         # Prepare roles for first game
         self.houses_game_one[0].role = ClassicRole.don

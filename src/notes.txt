@@ -1,0 +1,49 @@
+    # op.create_table('don_checks',
+    # sa.Column('vote_expose_id', postgresql.UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    # sa.Column('game_id', sa.String(length=50), nullable=False),
+    # sa.Column('night', sa.Integer(), nullable=False),
+    # sa.Column('target', postgresql.UUID(as_uuid=True), nullable=True),
+    # sa.ForeignKeyConstraint(['target'], ['positions.position_id'], ),
+    # sa.PrimaryKeyConstraint('vote_expose_id')
+    # )
+    # op.create_table('sheriff_checks',
+    # sa.Column('sheriff_check_id', postgresql.UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    # sa.Column('game_id', sa.String(length=50), nullable=False),
+    # sa.Column('night', sa.Integer(), nullable=False),
+    # sa.Column('target', postgresql.UUID(as_uuid=True), nullable=True),
+    # sa.ForeignKeyConstraint(['target'], ['positions.position_id'], ),
+    # sa.PrimaryKeyConstraint('sheriff_check_id')
+    # )
+    # op.create_table('shots',
+    # sa.Column('shot_id', postgresql.UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    # sa.Column('game_id', sa.String(length=50), nullable=False),
+    # sa.Column('night', sa.Integer(), nullable=False),
+    # sa.Column('shooter', postgresql.UUID(as_uuid=True), nullable=False),
+    # sa.Column('target', postgresql.UUID(as_uuid=True), nullable=False),
+    # sa.ForeignKeyConstraint(['shooter'], ['positions.position_id'], ),
+    # sa.ForeignKeyConstraint(['target'], ['positions.position_id'], ),
+    # sa.PrimaryKeyConstraint('shot_id')
+    # )
+    # op.create_table('votes',
+    # sa.Column('vote_id', postgresql.UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    # sa.Column('game_id', sa.String(length=50), nullable=False),
+    # sa.Column('day', sa.Integer(), nullable=False),
+    # sa.Column('revote', sa.Integer(), nullable=False),
+    # sa.Column('source_pos', postgresql.UUID(as_uuid=True), nullable=False),
+    # sa.Column('target_pos', postgresql.UUID(as_uuid=True), nullable=False),
+    # sa.ForeignKeyConstraint(['source_pos'], ['positions.position_id'], ),
+    # sa.ForeignKeyConstraint(['target_pos'], ['positions.position_id'], ),
+    # sa.PrimaryKeyConstraint('vote_id')
+    # )
+    # op.create_table('votes_exposes',
+    # sa.Column('vote_expose_id', postgresql.UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    # sa.Column('game_id', sa.String(length=50), nullable=False),
+    # sa.Column('day', sa.Integer(), nullable=False),
+    # sa.Column('revote', sa.Integer(), nullable=False),
+    # sa.Column('source_pos', postgresql.UUID(as_uuid=True), nullable=False),
+    # sa.Column('target_pos', postgresql.UUID(as_uuid=True), nullable=False),
+    # sa.ForeignKeyConstraint(['source_pos'], ['positions.position_id'], ),
+    # sa.ForeignKeyConstraint(['target_pos'], ['positions.position_id'], ),
+    # sa.PrimaryKeyConstraint('vote_expose_id')
+    # )
+    # ### end Alembic commands ###

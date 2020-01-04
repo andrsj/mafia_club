@@ -3,7 +3,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID
+from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID
 
 
 class Player:
@@ -20,11 +20,12 @@ class Player:
 
 @dataclass
 class Game:
-    id: GameID
+    game_id: GameID
     date: datetime.datetime
     result: Optional[GameResult]
     club: Optional[ClubID]
     table: Optional[int]
+    tournament: Optional[TournamentID]
     heading: Player
 
     def update_game_result(self, result):
@@ -33,7 +34,7 @@ class Game:
 
 @dataclass
 class House:
-    id: HouseID
+    house_id: HouseID
     player_id: PlayerID
     role: ClassicRole
     slot: int

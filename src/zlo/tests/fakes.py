@@ -34,7 +34,7 @@ class FakeGameRepo:
 
     def get_by_game_id(self, game_id):
         for game in self.games:
-            if game.id == game_id:
+            if game.game_id == game_id:
                 return game
         return None
 
@@ -51,7 +51,7 @@ class FakeHouseRepo:
 
     def get_by_house_id(self, house_id: HouseID):
         for house in self.houses:
-            if house.id == house_id:
+            if house.house_id == house_id:
                 return house
         return None
 

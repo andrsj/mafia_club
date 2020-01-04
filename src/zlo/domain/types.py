@@ -4,6 +4,7 @@ HouseID = str
 GameID = str
 PlayerID = str
 ClubID = str
+TournamentID = str
 
 
 class ClassicRole(enum.Enum):

@@ -17,7 +17,9 @@ class When_Game_is_creating:
             id=str(uuid.uuid4()),
             date=self.datetime,
             heading=self.heading,
-            result=None
+            result=None,
+            table=0,
+            club="ZloMafiaClub"
         )
 
     def test_it_should_store_correct_values(self):

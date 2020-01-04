@@ -6,7 +6,7 @@ from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 
 from src.zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
-from src.zlo.domain.model import Player
+from src.zlo.domain.model import Player, Game, House
 
 
 def isretryable(exn):
@@ -55,6 +55,14 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
     def players(self):
         return PlayerRepository(self.session)
 
+    @property
+    def houses(self):
+        return HouseRepository(self.session)
+
+    @property
+    def games(self):
+        return GameRepository(self.session)
+
 
 class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
 
@@ -83,6 +91,33 @@ class PlayerRepository:
         self._session.add(player)
 
 
+class GameRepository:
+
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_id(self, game_id):
+        return self._session.query(Game).filter_by(id=game_id).first()
+
+    def add(self, player):
+        self._session.add(player)
+
+
+class HouseRepository:
+
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_id(self, slot_id):
+        return self._session.query(House).filter_by(id=slot_id).first()
+
+    def get_by_game_id(self, game_id):
+        return self._session.query(House).filter_by(game_id=game_id).all()
+
+    def add(self, slot):
+        self._session.add(slot)
+
+
 class DatabaseSchema:
 
     def __init__(self):
@@ -105,11 +140,11 @@ class DatabaseSchema:
             Column("club", String(40)),
         )
 
-        self.checks = Table(
-            "cheks",
-            self._metadata,
-            Column("id", Integer, primary_key=True)
-        )
+        # self.checks = Table(
+        #     "cheks",
+        #     self._metadata,
+        #     Column("id", Integer, primary_key=True)
+        # )
 
 
 def _configure_mappings(metadata):

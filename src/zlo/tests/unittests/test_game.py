@@ -14,12 +14,13 @@ class When_Game_is_creating:
 
     def because_game_is_creating(self):
         self.game = Game(
-            id=str(uuid.uuid4()),
+            game_id=str(uuid.uuid4()),
             date=self.datetime,
             heading=self.heading,
             result=None,
             table=0,
-            club="ZloMafiaClub"
+            club="ZloMafiaClub",
+            tournament=None
         )
 
     def test_it_should_store_correct_values(self):

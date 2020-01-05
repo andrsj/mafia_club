@@ -15,9 +15,9 @@ class ClassicRole(enum.Enum):
 
 
 class GameResult(enum.Enum):
-    citizen = 0
-    mafia = 1
-    unfinished = 2
+    unfinished = 0
+    citizen = 1
+    mafia = 2
 
 
 class Fouls(enum.Enum):

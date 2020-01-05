@@ -1,13 +1,14 @@
 import logging
 
 import inject as inject
-from flask.views import View
-
+from flask import request, Response
+from flask.views import MethodView
 from src.zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.model import Player
 
 
-class PlayerView(View):
-    methods = ['GET']
+class PlayerView(MethodView):
+    methods = ['GET', 'POST']
 
     @inject.params(
         uow=UnitOfWorkManager,
@@ -16,11 +17,32 @@ class PlayerView(View):
         self.uow = uow
         self._log = logging.getLogger(__name__)
 
-    def dispatch_request(self, p_id):
+    def get(self):
+        nickname = request.json["nickname"]
         with self.uow.start() as tx:
-            player = tx.players.get_by_id(p_id)
+            player = tx.players.get_by_nickname(nickname)
             if player:
-                return f"ID {player.id}, Nickname {player.nickname}," \
-                       f" Name {player.name}, Club {player.club}"
+                # return jsonify(player)
+                # todo why jsonify dont work
+                return {"nickname": player.nickname, "name": player.name, "club": player.club}
             else:
-                return "No such player found"
+                return {}
+
+    def post(self):
+        data = request.json
+        try:
+            with self.uow.start() as tx:
+                new_player = {
+                    "nickname": data["nickname"],
+                    "name": data["name"],
+                    "club": data["club"]
+                }
+                player = Player(**new_player)
+                tx.players.add(player)
+                tx.commit()
+        except KeyError as e:
+            logging.error(e)
+            return Response(status=403)
+        else:
+            logging.info(f"Create new player with attributes {new_player}")
+        return Response(status=200)

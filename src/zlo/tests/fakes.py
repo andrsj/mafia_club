@@ -39,7 +39,6 @@ class FakeGameRepo:
         return None
 
     def get_by_datetime_range(self, start_date: datetime.datetime, end_date: datetime.datetime):
-        print(self.games)
         return [game for game in self.games if start_date < game.date < end_date]
 
 

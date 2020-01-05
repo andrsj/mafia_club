@@ -3,7 +3,7 @@ import os
 from flask import Flask
 from src.zlo.adapters.orm import make_sqlalchemy
 from src.zlo.config import get_postgres_url
-from zlo.routes.game import GameView
+from zlo.routes.games import GamesView
 from zlo.routes.users import PlayerView
 
 
@@ -23,6 +23,7 @@ def create_app():
         from src.zlo.routes import index_blueprint
 
         app.register_blueprint(index_blueprint)
-        app.add_url_rule('/player/<p_id>', view_func=PlayerView.as_view('player'))
-        app.add_url_rule('/game/', view_func=GameView.as_view('game'))
+        app.add_url_rule('/player/', view_func=PlayerView.as_view('player'))
+        # app.add_url_rule('/player/', view_func=PlayerView.as_view('player'))
+        app.add_url_rule('/game/', view_func=GamesView.as_view('game'))
         return app

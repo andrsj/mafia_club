@@ -2,11 +2,12 @@ import retrying
 import sqlalchemy
 import sqlalchemy.exc
 import sqlalchemy.orm.exc
-from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData
+from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData, DateTime, func, ForeignKey
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
-
+from sqlalchemy.dialects.postgresql import UUID
 from src.zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
 from src.zlo.domain.model import Player, Game, House
+from zlo.adapters.repositories import PlayerRepository, HouseRepository, GameRepository
 
 
 def isretryable(exn):
@@ -73,51 +74,6 @@ class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
         return SqlAlchemyUnitOfWork(self.session_maker)
 
 
-class PlayerRepository:
-
-    def __init__(self, session):
-        self._session = session
-
-    def get_default_player(self):
-        return Player("Lutik", "Denis", "Zlo")
-
-    def get_by_nickname(self, nick):
-        return self._session.query(Player).filter_by(nickname=nick).first()
-
-    def get_by_id(self, player_id):
-        return self._session.query(Player).filter_by(id=player_id).first()
-
-    def add(self, player):
-        self._session.add(player)
-
-
-class GameRepository:
-
-    def __init__(self, session):
-        self._session = session
-
-    def get_by_id(self, game_id):
-        return self._session.query(Game).filter_by(id=game_id).first()
-
-    def add(self, player):
-        self._session.add(player)
-
-
-class HouseRepository:
-
-    def __init__(self, session):
-        self._session = session
-
-    def get_by_id(self, slot_id):
-        return self._session.query(House).filter_by(id=slot_id).first()
-
-    def get_by_game_id(self, game_id):
-        return self._session.query(House).filter_by(game_id=game_id).all()
-
-    def add(self, slot):
-        self._session.add(slot)
-
-
 class DatabaseSchema:
 
     def __init__(self):
@@ -134,17 +90,31 @@ class DatabaseSchema:
         self.players = Table(
             "players",
             self._metadata,
-            Column("id", Integer, primary_key=True),
-            Column("nickname", String(40), unique=True),
+            Column("player_id", String(40), primary_key=True),
+            Column("nickname", String(40), unique=True, nullable=False),
             Column("name", String(40)),
             Column("club", String(40)),
         )
-
-        # self.checks = Table(
-        #     "cheks",
-        #     self._metadata,
-        #     Column("id", Integer, primary_key=True)
-        # )
+        self.games = Table(
+            "games",
+            self._metadata,
+            Column("game_id", String(40), primary_key=True),
+            Column("date", DateTime, default=func.now()),
+            Column("result", Integer, default=0),
+            Column("club", String(40)),
+            Column("table", Integer, default=None),
+            Column("heading", ForeignKey("players.player_id")),
+            Column("tournament", String(40))
+        )
+        self.houses = Table(
+            "houses",
+            self._metadata,
+            Column("house_id", String(40), primary_key=True),
+            Column("player_id", ForeignKey("players.player_id")),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("slot", Integer),
+            Column("role", Integer)
+        )
 
 
 def _configure_mappings(metadata):
@@ -152,6 +122,8 @@ def _configure_mappings(metadata):
     meta.configure(metadata)
 
     mapper(Player, meta.players)
+    mapper(Game, meta.games)
+    mapper(House, meta.houses)
 
     return metadata
 

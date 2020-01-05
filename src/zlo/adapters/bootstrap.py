@@ -22,10 +22,11 @@ def configure_binder(env, binder):
     dal.configure_mappings()
     binder.bind(ports.UnitOfWorkManager, dal.unit_of_work_manager())
     binder.bind("orm", dal)
-    # uowm = dal.unit_of_work_manager()
-    # with uowm.start() as tx:
-    #     player = Player(nickname="Дюймовочка2", name="Dima", club="ZLO")
-    #     tx.players.add(player)
-    #     tx.commit()
+    uowm = dal.unit_of_work_manager()
+    # debug code remove after fix bug
+    with uowm.start() as tx:
+        player = Player(nickname="Дюймовочка2", name="Dima", club="ZLO")
+        tx.players.add(player)
+        tx.commit()
 
 

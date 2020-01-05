@@ -12,7 +12,7 @@ class PlayerRepository:
     def get_by_id(self, player_id):
         return self._session.query(Player).filter_by(player_id=player_id).first()
 
-    def add(self, player):
+    def add(self, player: Player):
         self._session.add(player)
 
 

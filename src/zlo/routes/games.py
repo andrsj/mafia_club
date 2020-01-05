@@ -5,7 +5,7 @@ import uuid
 import inject as inject
 from flask import json, Response, jsonify, request
 from flask.views import MethodView
-from src.zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.model import Game
 
 from dateutil import parser

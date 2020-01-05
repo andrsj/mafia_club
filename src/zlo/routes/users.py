@@ -3,7 +3,7 @@ import logging
 import inject as inject
 from flask import request, Response
 from flask.views import MethodView
-from src.zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.model import Player
 
 

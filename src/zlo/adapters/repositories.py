@@ -1,4 +1,4 @@
-from src.zlo.domain.model import Player, House, Game
+from zlo.domain.model import Player, House, Game
 
 
 class PlayerRepository:
@@ -6,7 +6,7 @@ class PlayerRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_nickname(self, nick):
+    def get_by_nickname(self, nick: str):
         return self._session.query(Player).filter_by(nickname=nick).first()
 
     def get_by_id(self, player_id):
@@ -44,6 +44,9 @@ class HouseRepository:
 
     def get_by_game_id(self, game_id):
         return self._session.query(House).filter_by(game_id=game_id).all()
+
+    def get_by_game_id_and_player_id(self, game_id, player_id):
+        return self._session.query(House).filter_by(game_id=game_id).filter_by(player_id=player_id).first()
 
     def add(self, house):
         self._session.add(house)

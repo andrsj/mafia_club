@@ -6,7 +6,6 @@ from typing import Optional
 from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID
 
 
-@dataclass
 class Player:
 
     def __init__(self, nickname: str, name: str, club: str, player_id: PlayerID = None):

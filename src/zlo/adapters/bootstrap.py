@@ -1,12 +1,9 @@
-import uuid
 from functools import partial
 
 import inject
-
-import src.zlo.domain.infrastructure as ports
-from src.zlo import config
-from src.zlo.adapters import orm
-from zlo.domain.model import Player
+import zlo.domain.infrastructure as ports
+from zlo import config
+from zlo.adapters import orm
 
 
 def bootstrap(env):
@@ -22,11 +19,3 @@ def configure_binder(env, binder):
     dal.configure_mappings()
     binder.bind(ports.UnitOfWorkManager, dal.unit_of_work_manager())
     binder.bind("orm", dal)
-    uowm = dal.unit_of_work_manager()
-    # debug code remove after fix bug
-    with uowm.start() as tx:
-        player = Player(nickname="Дюймовочка2", name="Dima", club="ZLO")
-        tx.players.add(player)
-        tx.commit()
-
-

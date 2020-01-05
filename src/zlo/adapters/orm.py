@@ -5,8 +5,8 @@ import sqlalchemy.orm.exc
 from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData, DateTime, func, ForeignKey
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
-from src.zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
-from src.zlo.domain.model import Player, Game, House
+from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
+from zlo.domain.model import Player, Game, House
 from zlo.adapters.repositories import PlayerRepository, HouseRepository, GameRepository
 
 
@@ -90,7 +90,12 @@ class DatabaseSchema:
         self.players = Table(
             "players",
             self._metadata,
-            Column("player_id", String(40), primary_key=True),
+            Column(
+                "player_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
             Column("nickname", String(40), unique=True, nullable=False),
             Column("name", String(40)),
             Column("club", String(40)),
@@ -98,7 +103,12 @@ class DatabaseSchema:
         self.games = Table(
             "games",
             self._metadata,
-            Column("game_id", String(40), primary_key=True),
+            Column(
+                "game_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
             Column("date", DateTime, default=func.now()),
             Column("result", Integer, default=0),
             Column("club", String(40)),
@@ -109,7 +119,12 @@ class DatabaseSchema:
         self.houses = Table(
             "houses",
             self._metadata,
-            Column("house_id", String(40), primary_key=True),
+            Column(
+                "house_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
             Column("player_id", ForeignKey("players.player_id")),
             Column("game_id", ForeignKey("games.game_id")),
             Column("slot", Integer),
@@ -122,6 +137,7 @@ def _configure_mappings(metadata):
     meta.configure(metadata)
 
     mapper(Player, meta.players)
+
     mapper(Game, meta.games)
     mapper(House, meta.houses)
 

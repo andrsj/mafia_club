@@ -130,6 +130,21 @@ class DatabaseSchema:
             Column("slot", Integer),
             Column("role", Integer)
         )
+        self.best_moves = Table(
+            "best_moves",
+            self._metadata,
+            Column(
+                "best_move_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id"), unique=True),
+            Column("killed_house", ForeignKey("houses.house_id")),
+            Column("best_1", ForeignKey("houses.house_id")),
+            Column("best_2", ForeignKey("houses.house_id")),
+            Column("best_3", ForeignKey("houses.house_id")),
+        )
 
 
 def _configure_mappings(metadata):

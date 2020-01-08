@@ -3,7 +3,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID
+from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID, BestMoveID
 
 
 class Player:
@@ -44,3 +44,13 @@ class House:
 
     def update_bonus_mark(self, bonus_mark: float):
         self.bonus_mark = bonus_mark
+
+
+@dataclass
+class BestMove:
+    best_move_id: BestMoveID
+    game_id: GameID
+    killed_house: HouseID
+    best_1: Optional[HouseID]
+    best_2: Optional[HouseID]
+    best_3: Optional[HouseID]

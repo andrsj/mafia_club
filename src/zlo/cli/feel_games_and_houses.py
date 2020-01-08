@@ -9,9 +9,10 @@ from zlo.adapters.bootstrap import bootstrap
 from zlo.cli.auth import auth
 from zlo.cli.exceptions import UnknownPlayer
 from zlo.domain.infrastructure import UnitOfWorkManager
-from zlo.domain.model import Game, House
+from zlo.domain.model import Game, House, BestMove
 from zlo.domain.types import GameResult, ClassicRole
 from dateutil import parser
+import argparse
 
 
 def parse_game(work_sheet):
@@ -45,9 +46,19 @@ def parse_game(work_sheet):
     return game_data
 
 
-def parse_worksheet_for_game_data(work_sheet):
-    game = parse_game(work_sheet)
-    return game
+def parse_best_moves(work_sheet):
+    best_move_data = {
+        "killed_player": None,
+        "best_1": None,
+        "best_2": None,
+        "best_3": None
+    }
+    killed_player = work_sheet.cell(20, 4).value
+    if killed_player not in [str(i) for i in range(1, 11)]:
+        return best_move_data
+    else:
+        best_move_data["killed_player"] = killed_player
+    return
 
 
 def get_role(role_short_name: str) -> ClassicRole:
@@ -63,10 +74,8 @@ def get_role(role_short_name: str) -> ClassicRole:
     return role
 
 
-@inject.params(
-    uowm=UnitOfWorkManager
-)
-def save_game_and_house(uowm, game_data: dict, houses_datas: List[dict]):
+def save_game(game_data):
+    uowm = inject.instance(UnitOfWorkManager)
 
     with uowm.start() as tx:
         # Create ot update game
@@ -75,21 +84,47 @@ def save_game_and_house(uowm, game_data: dict, houses_datas: List[dict]):
         game = tx.games.get_by_id(game_data["game_id"])
         if game is None:
             game = Game(**game_data)
+            tx.games.add(game)
         else:
             game.tournament = game_data["tournament"]
             game.heading = game_data["heading"]
             game.date = game_data["date"]
             game.club = game_data["club"]
             game.result = game_data["result"]
-
-        tx.games.add(game)
         tx.commit()
 
+
+def save_best_move(game_id, best_move_data):
+    uowm = inject.instance(UnitOfWorkManager)
+    with uowm.start() as tx:
+        best_move = tx.best_moves.get_by_game_id(game_id)
+        if best_move:
+            best_move.killed = best_move_data["killed"]
+            best_move.best_1 = best_move_data["best_1"]
+            best_move.best_2 = best_move_data["best_2"]
+            best_move.best_3 = best_move_data["best_3"]
+        else:
+            best_move = BestMove(
+                best_move_id=str(uuid.uuid4()),
+                game_id=game_id,
+                killed_house=best_move_data["killed_house"],
+                best_1=best_move_data["best_1"],
+                best_2=best_move_data["best_2"],
+                best_3=best_move_data["best_3"]
+            )
+        tx.best_moves.add(best_move)
+
+
+@inject.params(
+    uowm=UnitOfWorkManager
+)
+def save_houses(uowm, game_id, houses_datas: List[dict]):
+    with uowm.start() as tx:
         for house_data in houses_datas:
             player = tx.players.get_by_nickname(house_data["nickname"])
             if not player:
                 raise UnknownPlayer(f"Could not find acc for this nickname {house_data['nickname']}")
-            house = tx.houses.get_by_game_id_and_player_id(game.game_id, player.player_id)
+            house = tx.houses.get_by_game_id_and_player_id(game_id, player.player_id)
             if house:
                 house.bonus_mark = house_data["bonus_mark"]
                 house.slot = house_data["slot"]
@@ -98,7 +133,7 @@ def save_game_and_house(uowm, game_data: dict, houses_datas: List[dict]):
             else:
                 house = House(
                     house_id=str(uuid.uuid4()),
-                    game_id=game.game_id,
+                    game_id=game_id,
                     player_id=player.player_id,
                     slot=house_data["slot"],
                     fouls=house_data["fouls"],
@@ -125,23 +160,50 @@ def parse_houses_from_sheet(work_sheet):
 
 if __name__ == "__main__":
 
+    my_parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
+    my_parser.add_argument('spreadsheet_title',
+                           metavar='spreadsheet_title',
+                           type=str,
+                           help='')
+    my_parser.add_argument('--games',
+                           default=False,
+                           type=bool,
+                           help="Parse and update game info"
+                           )
+    my_parser.add_argument('--houses',
+                           default=False,
+                           type=bool,
+                           help="Parse and update houses info; Slot number. PLayer nick fouls and bonus marks"
+                           )
+    my_parser.add_argument("--best_moves",
+                           default=False,
+                           type=bool,
+                           help="Parse and update best moves"
+                           )
+
+    args = my_parser.parse_args()
+
     cfg = os.environ.copy()
     bootstrap(cfg)
 
     client = auth()
     sheet = client.open('20/09/2019')
 
-    results = []
     for work_sheet in sheet.worksheets():
         game_data = parse_game(work_sheet)
-        houses = parse_houses_from_sheet(work_sheet)
+        if args.games:
+            save_game(game_data)
         try:
-            save_game_and_house(game_data=game_data, houses_datas=houses)
+            if args.houses:
+                houses = parse_houses_from_sheet(work_sheet)
+                save_houses(game_id=game_data["game_id"], houses_datas=houses)
         except UnknownPlayer as e:
             logging.error(f"Could not save game {game_data} player unknown player; {e}")
             continue
         except Exception as e:
-            logging.error(f"Some shit happens; Take care of that game -> {game_data}")
-            raise e
+                logging.error(f"Some shit happens; Take care of that game -> {game_data}")
+                raise e
+        if args.best_moves:
+            best_moves = parse_best_moves(work_sheet)
         print("Successfully create game ", game_data)
         time.sleep(20)

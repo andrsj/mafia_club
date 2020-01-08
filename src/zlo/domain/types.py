@@ -5,6 +5,7 @@ GameID = str
 PlayerID = str
 ClubID = str
 TournamentID = str
+BestMoveID = str
 
 
 class ClassicRole(enum.Enum):

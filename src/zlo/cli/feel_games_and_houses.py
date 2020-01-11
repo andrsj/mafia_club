@@ -27,7 +27,11 @@ def parse_game(work_sheet):
 
     heading_nickname = work_sheet.cell(4, 11).value
     table = work_sheet.cell(5, 13).value
-    date = parser.parse(work_sheet.cell(2, 17).value)
+    date = work_sheet.cell(2, 17).value
+    if not date:
+        logging.warning(f"Not valid date in {work_sheet.id}")
+    else:
+        date = parser.parse(date)
     club = "ZLO" if work_sheet.cell(4, 22).value else "ZLO_CORPORATION"
     tournament = work_sheet.cell(5, 26).value
     game_id = work_sheet.cell(27, 4).value
@@ -47,6 +51,10 @@ def parse_game(work_sheet):
 
 
 def parse_best_moves(work_sheet):
+
+    def is_value_player_number(value):
+        return value is not None and value.strip() in [str(i) for i in range(1, 11)]
+
     best_move_data = {
         "killed_player": None,
         "best_1": None,
@@ -54,11 +62,25 @@ def parse_best_moves(work_sheet):
         "best_3": None
     }
     killed_player = work_sheet.cell(20, 4).value
+    best_move_1 = work_sheet.cell(20, 8).value
+    best_move_2 = work_sheet.cell(20, 9).value
+    best_move_3 = work_sheet.cell(20, 10).value
+
     if killed_player not in [str(i) for i in range(1, 11)]:
         return best_move_data
     else:
         best_move_data["killed_player"] = killed_player
-    return
+
+    if is_value_player_number(best_move_1):
+        best_move_data["best_1"] = best_move_1
+
+    if is_value_player_number(best_move_2):
+        best_move_data["best_2"] = best_move_2
+
+    if is_value_player_number(best_move_3):
+        best_move_data["best_3"] = best_move_3
+
+    return best_move_data
 
 
 def get_role(role_short_name: str) -> ClassicRole:
@@ -98,21 +120,27 @@ def save_best_move(game_id, best_move_data):
     uowm = inject.instance(UnitOfWorkManager)
     with uowm.start() as tx:
         best_move = tx.best_moves.get_by_game_id(game_id)
+        best_move_killed = tx.houses.get_by_game_id_and_slot(game_id, best_move_data["killed_player"])
+        best_move_1_player = tx.houses.get_by_game_id_and_slot(game_id, best_move_data["best_1"])
+        best_move_2_player = tx.houses.get_by_game_id_and_slot(game_id, best_move_data["best_2"])
+        best_move_3_player = tx.houses.get_by_game_id_and_slot(game_id, best_move_data["best_3"])
+
         if best_move:
-            best_move.killed = best_move_data["killed"]
-            best_move.best_1 = best_move_data["best_1"]
-            best_move.best_2 = best_move_data["best_2"]
-            best_move.best_3 = best_move_data["best_3"]
+            best_move.killed = best_move_killed.house_id if best_move_killed is not None else None
+            best_move.best_1 = best_move_1_player.house_id if best_move_1_player is not None else None
+            best_move.best_2 = best_move_2_player.house_id if best_move_2_player is not None else None
+            best_move.best_3 = best_move_3_player.house_id if best_move_3_player is not None else None
         else:
             best_move = BestMove(
                 best_move_id=str(uuid.uuid4()),
                 game_id=game_id,
-                killed_house=best_move_data["killed_house"],
-                best_1=best_move_data["best_1"],
-                best_2=best_move_data["best_2"],
-                best_3=best_move_data["best_3"]
+                killed_house=best_move_killed.house_id if best_move_killed is not None else None,
+                best_1=best_move_1_player.house_id if best_move_1_player is not None else None,
+                best_2=best_move_2_player.house_id if best_move_2_player is not None else None,
+                best_3=best_move_3_player.house_id if best_move_3_player is not None else None
             )
         tx.best_moves.add(best_move)
+        tx.commit()
 
 
 @inject.params(
@@ -161,25 +189,26 @@ def parse_houses_from_sheet(work_sheet):
 if __name__ == "__main__":
 
     my_parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
-    my_parser.add_argument('spreadsheet_title',
-                           metavar='spreadsheet_title',
-                           type=str,
+    my_parser.add_argument('--spreadsheet_title',
+                           dest='spreadsheet_title',
+                           action='store_true',
+                           required=False,
                            help='')
     my_parser.add_argument('--games',
                            default=False,
-                           type=bool,
+                           dest='games',
+                           action='store_true',
+                           required=False,
                            help="Parse and update game info"
                            )
     my_parser.add_argument('--houses',
                            default=False,
-                           type=bool,
+                           dest='houses',
+                           action='store_true',
+                           required=False,
                            help="Parse and update houses info; Slot number. PLayer nick fouls and bonus marks"
                            )
-    my_parser.add_argument("--best_moves",
-                           default=False,
-                           type=bool,
-                           help="Parse and update best moves"
-                           )
+    my_parser.add_argument("--best_moves", dest='best_moves', action='store_true', required=False, help="Parse and update best moves")
 
     args = my_parser.parse_args()
 
@@ -205,5 +234,5 @@ if __name__ == "__main__":
                 raise e
         if args.best_moves:
             best_moves = parse_best_moves(work_sheet)
-        print("Successfully create game ", game_data)
-        time.sleep(20)
+            save_best_move(game_data["game_id"], best_moves)
+        time.sleep(10)

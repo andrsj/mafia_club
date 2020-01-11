@@ -1,4 +1,4 @@
-from zlo.domain.model import Player, House, Game
+from zlo.domain.model import Player, House, Game, BestMove
 
 
 class PlayerRepository:
@@ -48,14 +48,20 @@ class HouseRepository:
     def get_by_game_id_and_player_id(self, game_id, player_id):
         return self._session.query(House).filter_by(game_id=game_id).filter_by(player_id=player_id).first()
 
+    def get_by_game_id_and_slot(self, game_id, slot):
+        return self._session.query(House).filter_by(game_id=game_id).filter_by(slot=slot).first()
+
     def add(self, house):
         self._session.add(house)
 
 
-class BestMove:
+class BestMoveRepository:
 
     def __init__(self, session):
         self._session = session
 
     def get_by_game_id(self, game_id):
         return self._session.query(BestMove).filter_by(game_id=game_id).first()
+
+    def add(self, best_move):
+        self._session.add(best_move)

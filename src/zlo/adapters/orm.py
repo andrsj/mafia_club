@@ -7,7 +7,7 @@ from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
 from zlo.domain.model import Player, Game, House
-from zlo.adapters.repositories import PlayerRepository, HouseRepository, GameRepository
+from zlo.adapters.repositories import PlayerRepository, HouseRepository, GameRepository, BestMove, BestMoveRepository
 
 
 def isretryable(exn):
@@ -63,6 +63,10 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
     @property
     def games(self):
         return GameRepository(self.session)
+
+    @property
+    def best_moves(self):
+        return BestMoveRepository(self.session)
 
 
 class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
@@ -155,6 +159,7 @@ def _configure_mappings(metadata):
 
     mapper(Game, meta.games)
     mapper(House, meta.houses)
+    mapper(BestMove, meta.best_moves)
 
     return metadata
 

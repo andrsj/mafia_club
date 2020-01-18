@@ -2,12 +2,14 @@ import logging
 import os
 import time
 import uuid
+from pprint import pprint
 from typing import List
 
 import inject
 from zlo.adapters.bootstrap import bootstrap
 from zlo.cli.auth import auth
 from zlo.cli.exceptions import UnknownPlayer
+from zlo.cli.zlo_logger import get_logger
 from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.model import Game, House, BestMove
 from zlo.domain.types import GameResult, ClassicRole
@@ -25,7 +27,7 @@ def parse_game(work_sheet):
 
     game_result = game_result.value
 
-    heading_nickname = work_sheet.cell(4, 11).value
+    heading_nickname = work_sheet.cell(4, 11).value.strip()
     table = work_sheet.cell(5, 13).value
     date = work_sheet.cell(2, 17).value
     if not date:
@@ -105,9 +107,11 @@ def save_game(game_data):
         game_data["heading"] = player.player_id
         game = tx.games.get_by_id(game_data["game_id"])
         if game is None:
+            logger.info(f"Create new game {game_data}")
             game = Game(**game_data)
             tx.games.add(game)
         else:
+            logger.info(f"Update existing game {game_data}")
             game.tournament = game_data["tournament"]
             game.heading = game_data["heading"]
             game.date = game_data["date"]
@@ -151,14 +155,17 @@ def save_houses(uowm, game_id, houses_datas: List[dict]):
         for house_data in houses_datas:
             player = tx.players.get_by_nickname(house_data["nickname"])
             if not player:
+                logging.error(f"Could not find acc for this nickname {house_data['nickname']}")
                 raise UnknownPlayer(f"Could not find acc for this nickname {house_data['nickname']}")
             house = tx.houses.get_by_game_id_and_player_id(game_id, player.player_id)
             if house:
+                logger.info(f"Update existing house {house.house_id}; with values {house_data}")
                 house.bonus_mark = house_data["bonus_mark"]
                 house.slot = house_data["slot"]
                 house.fouls = house_data["fouls"]
                 house.role = house_data["role"].value
             else:
+                logger.info(f"Create new house with data {house_data}")
                 house = House(
                     house_id=str(uuid.uuid4()),
                     game_id=game_id,
@@ -172,13 +179,38 @@ def save_houses(uowm, game_id, houses_datas: List[dict]):
         tx.commit()
 
 
+def parse_sheet(sheet):
+    for i, work_sheet in enumerate(sheet.worksheets(), start=1):
+        if i <= 4:
+            continue
+        print(f" {i} Worksheet {work_sheet.title}")
+        game_data = parse_game(work_sheet)
+        time.sleep(10)
+        if args.games:
+            save_game(game_data)
+        try:
+            if args.houses:
+                houses = parse_houses_from_sheet(work_sheet)
+                save_houses(game_id=game_data["game_id"], houses_datas=houses)
+        except UnknownPlayer as e:
+            logger.error(f"Could not save game {game_data} player unknown player; {e}")
+            raise UnknownPlayer
+        except Exception as e:
+                logger.error(f"Some shit happens; Take care of that game -> {game_data}")
+                raise e
+        if args.best_moves:
+            best_moves = parse_best_moves(work_sheet)
+            save_best_move(game_data["game_id"], best_moves)
+        time.sleep(10)
+    logger.info(f"Successfuly download {sheet_title}")
+
 def parse_houses_from_sheet(work_sheet):
     houses = []
     for i in range(1, 11):
         house_row = [c.value for c in work_sheet.range("B{row}:L{row}".format(row=i + 7))]
         houses.append({
             "role": get_role(house_row[6]),
-            "nickname": house_row[1],
+            "nickname": house_row[1].strip(),
             "slot": int(house_row[0]),
             "fouls": sum([bool(f) for f in house_row[2:5]]),
             "bonus_mark": float(house_row[9].replace(",", ".") or 0),
@@ -216,23 +248,34 @@ if __name__ == "__main__":
     bootstrap(cfg)
 
     client = auth()
-    sheet = client.open('20/09/2019')
+    # time.sleep(40)
+    sheets = [
+        # '13/12/2019',
+        # '14/08/2019',
+        # '15/08/2019',
+        # '15/10/2019',
+        # '15/11/2019',
+        # '16/08/2019',
+        # '18/10/2019',
+        # '19/11/2019',
+        # '20/09/2019',
+        # '20/12/2019',
+        # '22/10/2019',
+        # '22/11/2019',
+        # '24.12.2019',
+        # '25/10/2019',
+        # '26/12/2019',
+        # '27.12.2019',
+        # '27/12/2019',
+        # '29/11/2019',
+        # '30/11/2019',
+    ]
+    for i, sheet_title in enumerate(sheets, start=1):
+        print(f" {i} Sheet  {sheet_title}")
+        sheet = client.open(sheet_title)
+        logger = get_logger(sheet_title)
+        parse_sheet(sheet)
+        print(f" {i} Finish Sheet  {sheet_title}")
 
-    for work_sheet in sheet.worksheets():
-        game_data = parse_game(work_sheet)
-        if args.games:
-            save_game(game_data)
-        try:
-            if args.houses:
-                houses = parse_houses_from_sheet(work_sheet)
-                save_houses(game_id=game_data["game_id"], houses_datas=houses)
-        except UnknownPlayer as e:
-            logging.error(f"Could not save game {game_data} player unknown player; {e}")
-            continue
-        except Exception as e:
-                logging.error(f"Some shit happens; Take care of that game -> {game_data}")
-                raise e
-        if args.best_moves:
-            best_moves = parse_best_moves(work_sheet)
-            save_best_move(game_data["game_id"], best_moves)
-        time.sleep(10)
+        time.sleep(15)
+

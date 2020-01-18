@@ -60,7 +60,7 @@ class BestMoveRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_game_id(self, game_id):
+    def get_by_game_id(self, game_id) -> BestMove:
         return self._session.query(BestMove).filter_by(game_id=game_id).first()
 
     def add(self, best_move):

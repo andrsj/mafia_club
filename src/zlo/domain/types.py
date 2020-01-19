@@ -9,6 +9,8 @@ PlayerID = str
 ClubID = str
 TournamentID = str
 BestMoveID = str
+DeviseID = str
+HandOfMafiaID = str
 
 
 class ClassicRole(enum.Enum):
@@ -22,6 +24,14 @@ class GameResult(enum.Enum):
     unfinished = 0
     citizen = 1
     mafia = 2
+
+
+class AdvancedGameResult(enum.Enum):
+    three_on_three = 1
+    two_on_two = 2
+    one_on_one = 3
+    clear_citizen = 4
+    guessing_game = 5
 
 
 class Fouls(enum.Enum):

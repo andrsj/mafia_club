@@ -115,6 +115,7 @@ class DatabaseSchema:
             ),
             Column("date", DateTime, default=func.now()),
             Column("result", Integer, default=0),
+            Column('advance_result', Integer, nullable=True),
             Column("club", String(40)),
             Column("table", Integer, default=None),
             Column("heading", ForeignKey("players.player_id")),

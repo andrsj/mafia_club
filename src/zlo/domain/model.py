@@ -3,7 +3,8 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID, BestMoveID
+from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID, BestMoveID, \
+    DeviseID, HandOfMafiaID
 
 
 class Player:
@@ -22,11 +23,12 @@ class Player:
 class Game:
     game_id: GameID
     date: datetime.datetime
-    result: Optional[GameResult]
+    result: int
     club: Optional[ClubID]
     table: Optional[int]
     tournament: Optional[TournamentID]
     heading: Player
+    advance_result: int
 
     def update_game_result(self, result):
         self.result = result
@@ -54,3 +56,66 @@ class BestMove:
     best_1: Optional[HouseID]
     best_2: Optional[HouseID]
     best_3: Optional[HouseID]
+
+
+@dataclass
+class Devise:
+    devise_id: DeviseID
+    game_id: GameID
+    killed_house: HouseID
+    house_1: Optional[HouseID]
+    house_2: Optional[HouseID]
+    house_3: Optional[HouseID]
+
+
+@dataclass
+class HandOfMafia:
+    hand_of_mafia_id: HandOfMafiaID
+    game_id: GameID
+    house_hand_id: HouseID
+    victim_id: Optional[HouseID]
+
+
+@dataclass
+class BonusPointsFromPlayers:
+    bonus_point_id: str
+    game_id: GameID
+    house_from_id: HouseID
+    house_to_id: HouseID
+
+
+@dataclass
+class BonusTolerantPointFromPlayers:
+    bonus_tolerant_point_id: str
+    game_id: GameID
+    house_from_id: HouseID
+    house_to_id: HouseID
+
+
+@dataclass
+class Kills:
+    kill_id: str
+    game_id: GameID
+    killed_house_id: HouseID
+    circle_number: int
+
+
+@dataclass
+class Voted:
+    voted_id: str
+    game_id: GameID
+    voted_house_id: HouseID
+
+
+@dataclass
+class SheriffChecks:
+    game_id: GameID
+    checked_house_id: Optional[HouseID]
+    circle_number: int
+
+
+@dataclass
+class DonChecks:
+    game_id: GameID
+    checked_house_id: Optional[HouseID]
+    circle_number: int

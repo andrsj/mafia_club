@@ -3,6 +3,7 @@ import os
 import sqlalchemy as sa
 from alembic import context
 
+from zlo.adapters import orm
 
 def get_postgres_url(env):
     return "postgresql://{user}:{password}@{host}:{port}/{db_name}".format(**get_postgres_config(env))
@@ -18,6 +19,11 @@ def get_postgres_config(env):
     }
 
 
+def get_current_metadata(env):
+    dal = orm.make_sqlalchemy(get_postgres_url(env))
+    return dal.configure_mappings()
+
+
 def run_migrations_online():
     """Run migrations in 'online' mode.
 
@@ -27,7 +33,7 @@ def run_migrations_online():
     """
     postgres_url = get_postgres_url(os.environ)
     engine = sa.create_engine(postgres_url)
-    metadata = sa.MetaData(engine)
+    metadata = get_current_metadata(os.environ)
 
     with engine.connect() as connection:
         context.configure(

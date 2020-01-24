@@ -22,11 +22,9 @@ if __name__ == "__main__":
         player_result.calculate_win_rate()
 
     players_results = list(result.values())
-    players_results = sorted(players_results, key=lambda x: x.games_number, reverse=True)
+    players_results_by_game = sorted(players_results, key=lambda x: x.games_number, reverse=True)
 
     for player_result in players_results:
-        # if player_result.nickname == "Ред":
-        #     print("egc")
         print(player_result.get_repr_of_stats())
 
 

@@ -1,22 +1,9 @@
-from gspread import Worksheet
-from zlo.domain.types import GameResult, AdvancedGameResult
-import numpy
-import logging
-import os
-import time
 import uuid
-from pprint import pprint
-from typing import List
 
-import inject
-from zlo.adapters.bootstrap import bootstrap
-from zlo.cli.auth import auth
-from zlo.cli.exceptions import UnknownPlayer
-from zlo.cli.zlo_logger import get_logger
-from zlo.domain.infrastructure import UnitOfWorkManager
-from zlo.domain.model import Game, House, BestMove
-from zlo.domain.types import GameResult, ClassicRole
-from dateutil import parser
+from zlo.domain.events import CreateOrUpdateGame
+from zlo.domain.types import AdvancedGameResult
+
+from zlo.domain.types import GameResult
 
 
 class NotFinishedBlank(Exception):
@@ -24,10 +11,8 @@ class NotFinishedBlank(Exception):
 
 
 class BlankParser:
-    def __init__(self, work_sheet: Worksheet):
-        self._ws = work_sheet
-        self._game_data = self._ws.range('B2:K46')
-        self._matrix = numpy.asarray(self._game_data).reshape(45, 10)
+    def __init__(self, matrix):
+        self._matrix = matrix
 
     def parse_game_result(self):
         """
@@ -59,20 +44,31 @@ class BlankParser:
 
         return game_result, advanced_game_result
 
-    def parse_game_info(self):
+    def parse_game_info(self) -> CreateOrUpdateGame:
         """
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
-        return {
-            "heading": self._matrix[1][1].value,
-            "date": self._matrix[0][1].value,
-            "club": self._matrix[3][1].value,
-            "tournament": self._matrix[4][1].value,
-            "table": self._matrix[4][4].value,
-            "game_result": game_result,
-            "game_result_advanced": advanced_game_result
-        }
+        game_id = self._matrix[6][1].value or uuid.uuid4()
+        return CreateOrUpdateGame(
+            game_id=game_id,
+            heading=self._matrix[1][1].value,
+            date=self._matrix[0][1].value,
+            club=self._matrix[3][1].value,
+            tournament=self._matrix[4][1].value,
+            table=self._matrix[4][4].value,
+            result=game_result.value,
+            advance_result=advanced_game_result.value
+        )
+        # return {
+        #     "heading": self._matrix[1][1].value,
+        #     "date": self._matrix[0][1].value,
+        #     "club": self._matrix[3][1].value,
+        #     "tournament": self._matrix[4][1].value,
+        #     "table": self._matrix[4][4].value,
+        #     "game_result": game_result,
+        #     "game_result_advanced": advanced_game_result
+        # }
 
     def parse_houses(self):
         pass
@@ -90,9 +86,6 @@ class BlankParser:
         pass
 
     def get_bonus_tolerant_points_from_houses_data(self, houses_data=None):
-        pass
-
-    def parse_game_info(self):
         pass
 
     def parse_hand_of_mafia(self):

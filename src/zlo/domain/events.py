@@ -12,3 +12,7 @@ class CreateOrUpdateGame:
     tournament: str
     heading: str
     advance_result: int
+#
+# @dataclass
+# class BestMove:
+#     game_id:

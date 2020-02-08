@@ -4,7 +4,7 @@ import os
 import inject
 from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.tests.integretional import fixtures
+from zlo.tests import fixtures
 
 if __name__ == "__main__":
     cfg = os.environ.copy()

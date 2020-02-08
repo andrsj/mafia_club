@@ -1,23 +1,26 @@
+import json
+import os
+
 import contexts
 from expects import expect, equal
-from zlo.cli.auth import auth
 from zlo.domain.types import GameResult, AdvancedGameResult
 from zlo.sheet_parser.blank_version_2 import BlankParser
+from zlo.tests import fixtures
 
 
 class BlankParserMixin:
-
-    def given_sheet_client(self):
-        self.client = auth()
-        self.sheet = self.client.open("ТестовийБланкНеДляПротоколуІРейтингу")
+    def get_matrix_data(self, file_name):
+        file_path = os.path.join(os.path.dirname(fixtures.__file__), file_name + '.json')
+        with open(file_path, 'r') as f:
+            matrix = json.load(f)
+        return matrix
 
 
 class WhenGameDataParsedAndCitizenWin(BlankParserMixin):
 
     def given_blank_parser(self):
-        self.worksheet = self.sheet.get_worksheet(1)
-        expect(self.worksheet.title).to(equal('ПеремогаМирних'))
-        self.blank_parser = BlankParser(self.worksheet)
+        matrix = self.get_matrix_data('ПеремогаМирних')
+        self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
         self.game_result, self.advanced_game_result = self.blank_parser.parse_game_result()
@@ -30,9 +33,8 @@ class WhenGameDataParsedAndCitizenWin(BlankParserMixin):
 class WhenGameDataParsedAndCitizenClearWin(BlankParserMixin):
 
     def given_blank_parser(self):
-        self.worksheet = self.sheet.get_worksheet(0)
-        expect(self.worksheet.title).to(equal('СухаПеремогаМирних'))
-        self.blank_parser = BlankParser(self.worksheet)
+        matrix = self.get_matrix_data('СухаПеремогаМирних')
+        self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
         self.game_result, self.advanced_game_result = self.blank_parser.parse_game_result()
@@ -45,9 +47,8 @@ class WhenGameDataParsedAndCitizenClearWin(BlankParserMixin):
 class WhenGameDataParsedAndMafia3x3Win(BlankParserMixin):
 
     def given_blank_parser(self):
-        self.worksheet = self.sheet.get_worksheet(2)
-        expect(self.worksheet.title).to(equal('ПеремогаМафії3в3'))
-        self.blank_parser = BlankParser(self.worksheet)
+        matrix = self.get_matrix_data('ПеремогаМафії3в3')
+        self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
         self.game_result, self.advanced_game_result = self.blank_parser.parse_game_result()
@@ -60,9 +61,8 @@ class WhenGameDataParsedAndMafia3x3Win(BlankParserMixin):
 class WhenGameDataParsedAndMafia2x2Win(BlankParserMixin):
 
     def given_blank_parser(self):
-        self.worksheet = self.sheet.get_worksheet(3)
-        expect(self.worksheet.title).to(equal('ПеремогаМафії2в2'))
-        self.blank_parser = BlankParser(self.worksheet)
+        matrix = self.get_matrix_data('ПеремогаМафії2в2')
+        self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
         self.game_result, self.advanced_game_result = self.blank_parser.parse_game_result()
@@ -75,9 +75,8 @@ class WhenGameDataParsedAndMafia2x2Win(BlankParserMixin):
 class WhenGameDataParsedAndMafia1x1Win(BlankParserMixin):
 
     def given_blank_parser(self):
-        self.worksheet = self.sheet.get_worksheet(4)
-        expect(self.worksheet.title).to(equal('ПеремогаМафії1в1'))
-        self.blank_parser = BlankParser(self.worksheet)
+        matrix = self.get_matrix_data('ПеремогаМафії1в1')
+        self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
         self.game_result, self.advanced_game_result = self.blank_parser.parse_game_result()

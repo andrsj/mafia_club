@@ -14,3 +14,6 @@ up:
 run-migrations:
 	docker-compose up -d test_zlo_db
 	sh migrations/run.sh
+
+unit-tests:
+	run-contexts src/zlo/tests/unittests/

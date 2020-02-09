@@ -3,10 +3,11 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from zlo.domain.types import GameResult, GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID, BestMoveID, \
+from zlo.domain.types import GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID, BestMoveID, \
     DeviseID, HandOfMafiaID
 
 
+@dataclass
 class Player:
 
     def __init__(self, nickname: str, name: str, club: str, player_id: PlayerID = None):

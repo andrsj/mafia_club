@@ -4,7 +4,9 @@ import inject
 import zlo.domain.infrastructure as ports
 from zlo import config
 from zlo.adapters import orm
+from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.client import SpreadSheetClient
+from zlo.domain.config import map_handlers
 
 
 def bootstrap(env):
@@ -23,3 +25,8 @@ def configure_binder(env, binder):
 
     client = SpreadSheetClient()
     binder.bind(SpreadSheetClient, client)
+
+    bus = MessageBus()
+    map_handlers(bus)
+
+    binder.bind(MessageBus, bus)

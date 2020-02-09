@@ -22,22 +22,22 @@ class BlankParser:
         :return: tuple(GameResult, AdvancedGameResult)
         """
 
-        if self._matrix[1][8]:
+        if self._matrix[1][9]:
             game_result = GameResult.mafia
-        elif self._matrix[0][8]:
+        elif self._matrix[0][9]:
             game_result = GameResult.citizen
         else:
             raise NotFinishedBlank
 
         if game_result == GameResult.mafia:
-            if self._matrix[4][6]:
+            if self._matrix[4][7]:
                 advanced_game_result = AdvancedGameResult.three_on_three
-            elif self._matrix[4][7]:
+            elif self._matrix[4][8]:
                 advanced_game_result = AdvancedGameResult.two_on_two
             else:
                 advanced_game_result = AdvancedGameResult.one_on_one
         else:
-            if self._matrix[4][9]:
+            if self._matrix[4][10]:
                 advanced_game_result = AdvancedGameResult.clear_citizen
             else:
                 advanced_game_result = AdvancedGameResult.guessing_game
@@ -49,14 +49,14 @@ class BlankParser:
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
-        game_id = self._matrix[6][1] or uuid.uuid4()
+        game_id = self._matrix[6][2]
         return CreateOrUpdateGame(
             game_id=game_id,
-            heading=self._matrix[1][1],
-            date=self._matrix[0][1],
-            club=self._matrix[3][1],
-            tournament=self._matrix[4][1],
-            table=self._matrix[4][4],
+            heading=self._matrix[1][2],
+            date=self._matrix[0][2],
+            club=self._matrix[3][2],
+            tournament=self._matrix[4][2] or None,
+            table=self._matrix[4][5],
             result=game_result.value,
             advance_result=advanced_game_result.value
         )

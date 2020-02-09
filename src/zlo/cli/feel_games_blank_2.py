@@ -1,16 +1,32 @@
 import argparse
 import os
+import uuid
 
+import inject
 from zlo.adapters.bootstrap import bootstrap
-from zlo.cli.auth import auth
+from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.blank_version_2 import BlankParser
+from zlo.sheet_parser.client import SpreadSheetClient
+from zlo.cli.setup_env_for_test import setup_env_with_test_database
+
+
+def update_game_id(worksheet, game_id):
+    worksheet.update_cell(8, 4, game_id)
 
 
 if __name__ == "__main__":
     cfg = os.environ.copy()
+    """
+        return {
+        'host': env.get('DB_HOST', 'localhost'),
+        'port': env.get('DB_PORT', 5432),
+        'user': env.get('SECRET_DB_USER', 'test_zlo'),
+        'password': env.get('SECRET_DB_PASSWORD', 'test_zlo'),
+        'db_name': env.get('DB_NAME', 'test_zlo'),
+    }
+    """
+    setup_env_with_test_database(cfg)
     bootstrap(cfg)
-
-    client = auth()
 
     my_parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
     my_parser.add_argument(
@@ -46,13 +62,20 @@ if __name__ == "__main__":
 
     args = my_parser.parse_args()
 
-    sheet = client.open(args.sheet_title)
+    client = inject.instance(SpreadSheetClient)
+    bus = inject.instance(MessageBus)
+    sheet = client.client.open(args.sheet_title)
     for work_sheet in sheet.worksheets():
-        blank_parser = BlankParser(work_sheet)
-        game_data = work_sheet.range('A2:K46')
+        matrix = client.parse_worksheet(work_sheet)
+        blank_parser = BlankParser(matrix)
+        game_info = blank_parser.parse_game_info()
+        if not game_info.game_id:
+            game_info.game_id = str(uuid.uuid4())
+            update_game_id(work_sheet, game_info.game_id)
+        if args.games:
+            bus.publish(game_info)
         # game_data = blank_parser.parse_game_info()
-        print(game_data)
-
+        break
     # game_data = blank_parser
 
 

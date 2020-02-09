@@ -1,4 +1,4 @@
 #!/bin/sh
-cd migrations
+cd src/zlo/migrations
 python3 migrations.py
-cd ..
+cd ../../..

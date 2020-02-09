@@ -25,13 +25,14 @@ class CreateOrUpdateGameHandler:
             if game is None:
                 self._log.info(f"Create new game {evt}")
                 game = Game(
-                    game_id=str(uuid.uuid4()),
+                    game_id=evt.game_id,
                     tournament=evt.tournament,
                     heading=player.player_id,
                     date=evt.date,
                     club=evt.club,
                     result=evt.result,
-                    table=evt.table
+                    table=evt.table,
+                    advance_result=evt.advance_result
                 )
                 tx.games.add(game)
             else:
@@ -41,4 +42,6 @@ class CreateOrUpdateGameHandler:
                 game.date = evt.date
                 game.club = evt.club
                 game.result = evt.result
+                game.advance_result = evt.advance_result
+                game.table = evt.table
             tx.commit()

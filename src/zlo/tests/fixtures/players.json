@@ -1,0 +1,1376 @@
+[
+    {
+        "player_id": "80594d4a-ff33-44b9-8f63-5332abe2efc9",
+        "name": null,
+        "nickname": "\u0410\u0431\u0440\u0430\u043a\u0430\u0434\u0430\u0431\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "9723d48e-5874-45a0-a7d7-5d6683c9512c",
+        "name": null,
+        "nickname": "\u0410\u0439\u0432\u0430\u043d",
+        "club": null
+    },
+    {
+        "player_id": "7cce8cf5-b985-4092-90c5-d395032bafef",
+        "name": null,
+        "nickname": "\u0410\u0439\u0441\u0442\u0440\u0430\u0432\u0456\u0442\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "ed4c3608-36a0-44fc-b2bb-58472fa4badd",
+        "name": null,
+        "nickname": "\u0410\u043b\u0456\u043d\u0437\u0430",
+        "club": null
+    },
+    {
+        "player_id": "c9e77d18-8fcd-431c-a069-54febd03b095",
+        "name": null,
+        "nickname": "\u0410\u043b\u0443\u043a\u0430\u0440\u0434",
+        "club": null
+    },
+    {
+        "player_id": "360d03e9-2ee7-4f51-a2b2-5c44724b9ea5",
+        "name": null,
+        "nickname": "\u0410\u043c\u0431\u0440\u043e\u0441\u0456\u043d\u0456",
+        "club": null
+    },
+    {
+        "player_id": "3a3a69a5-96c6-45c2-b3d6-d354a6b8719c",
+        "name": null,
+        "nickname": "\u0410\u043c\u0456\u0434\u0430\u043b\u0430",
+        "club": null
+    },
+    {
+        "player_id": "0411f87d-9fae-4fcf-94e5-d76c7e774ddd",
+        "name": null,
+        "nickname": "\u0410\u043d\u0434\u0440\u0435\u0430\u0441",
+        "club": null
+    },
+    {
+        "player_id": "6d3e3ebe-bec0-4784-8fc4-97481b13a459",
+        "name": null,
+        "nickname": "\u0411\u0430\u0431\u0430\u0439",
+        "club": null
+    },
+    {
+        "player_id": "e5f8df7b-cd99-4225-adb2-d045eab3fbbc",
+        "name": null,
+        "nickname": "\u0411\u0430\u0440\u0456\u0411\u0430\u0441\u0442\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "c882294b-b2cf-45a2-b37b-20425145f581",
+        "name": null,
+        "nickname": "\u0411\u0430\u0440\u0441\u0435\u043b\u043e\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "baf4e51a-c52d-4328-9e66-74cd26dc08b6",
+        "name": null,
+        "nickname": "\u0411\u0430\u0442\u044f\u0440",
+        "club": null
+    },
+    {
+        "player_id": "6d7b05f1-0b0d-4dd4-b4f9-99950eda168d",
+        "name": null,
+        "nickname": "\u0411\u0434\u0436\u0456\u043b\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "8c057713-9a52-4e9e-8855-48e78936bcd9",
+        "name": null,
+        "nickname": "\u0411\u0454\u043b\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "a4dd5bb3-d54e-444e-9739-39ff34a1eff2",
+        "name": null,
+        "nickname": "\u0411\u0435\u043c\u0431\u0456",
+        "club": null
+    },
+    {
+        "player_id": "a23cc12a-125f-4b68-b574-6242b62ebd4c",
+        "name": null,
+        "nickname": "\u0411\u0435\u0442\u0430",
+        "club": null
+    },
+    {
+        "player_id": "cd5dad8a-07c9-441b-9192-92dd80872e67",
+        "name": null,
+        "nickname": "\u0411\u0456\u0437\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "61ec39e0-2c13-4417-89b5-7740a4de33ae",
+        "name": null,
+        "nickname": "\u0411\u0456\u043b\u0438\u0439\u0412\u043e\u0436\u0434\u044c",
+        "club": null
+    },
+    {
+        "player_id": "6f08e570-9546-4aca-b753-a672de776e21",
+        "name": null,
+        "nickname": "\u0411\u0456\u043b\u043b\u0456\u0414\u0456\u043d",
+        "club": null
+    },
+    {
+        "player_id": "4844b595-55dc-491a-bf11-e65922044c6d",
+        "name": null,
+        "nickname": "\u0411\u043e\u0440\u0436\u043e\u043c\u0456",
+        "club": null
+    },
+    {
+        "player_id": "161a1ad6-9196-4b2a-bb3b-d7490a80967d",
+        "name": null,
+        "nickname": "\u0411\u043e\u0440\u043e\u0432\u0438\u043a",
+        "club": null
+    },
+    {
+        "player_id": "22d73941-98ed-4dc1-8ae5-91eeb34733e3",
+        "name": null,
+        "nickname": "\u0411\u0440\u0438\u0442\u0430\u043d\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "03165a13-b1ee-4431-9638-cd16f01c51b3",
+        "name": null,
+        "nickname": "\u0411\u044c\u043e\u0440\u043d",
+        "club": null
+    },
+    {
+        "player_id": "18e863ed-bd54-4c29-8329-3454256e6795",
+        "name": null,
+        "nickname": "\u0412\u0430\u0437\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "bb19b1d3-2ae4-4226-845b-3c6c6b48ccb9",
+        "name": null,
+        "nickname": "\u0412\u0430\u0440\u0456\u043e\u0440",
+        "club": null
+    },
+    {
+        "player_id": "5f7e5331-3761-485d-979b-43ac1dd1bf64",
+        "name": null,
+        "nickname": "\u0412\u0456\u0434\u0447\u0430\u0439\u0434\u0443\u0445\u0430",
+        "club": null
+    },
+    {
+        "player_id": "dfa209ca-1f31-4c24-a669-71d9c41c118c",
+        "name": null,
+        "nickname": "\u0412\u0456\u043b\u044c\u043d\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "362f3467-f81d-4ffc-a6c6-51ade9d0f4c9",
+        "name": null,
+        "nickname": "\u0412\u0456\u043d\u044f",
+        "club": null
+    },
+    {
+        "player_id": "7730d68c-561b-4e0d-aacf-510a8a0b3024",
+        "name": null,
+        "nickname": "\u0412\u0456\u043a\u0442\u043e\u0440\u0456",
+        "club": null
+    },
+    {
+        "player_id": "b9757a10-7cda-42a7-8178-b656242bf386",
+        "name": null,
+        "nickname": "\u0412\u0456\u0441\u0456\u043c",
+        "club": null
+    },
+    {
+        "player_id": "8f1e62b9-4f03-4dec-b5fd-f3cfdd7d3c74",
+        "name": null,
+        "nickname": "\u0412\u043b\u0430\u0434\u0456\u043c\u0456\u0440\u0421\u043a\u0440\u043e\u043c\u043d\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "da911e56-969d-479d-a38a-8ab540190b7e",
+        "name": null,
+        "nickname": "\u0413\u0430\u043b\u0443\u0431\u0454\u0446",
+        "club": null
+    },
+    {
+        "player_id": "7223b759-8246-42a7-823f-0978753b411d",
+        "name": null,
+        "nickname": "\u0413\u0430\u0440\u0440\u0456",
+        "club": null
+    },
+    {
+        "player_id": "7d379d09-dc96-4b84-a654-01eae4371bc3",
+        "name": null,
+        "nickname": "\u0413\u0435\u043a\u0441\u043b\u0456",
+        "club": null
+    },
+    {
+        "player_id": "0723b3b4-8021-4ee2-871f-e478a5116a85",
+        "name": null,
+        "nickname": "\u0413\u0443\u0446\u0443\u043b",
+        "club": null
+    },
+    {
+        "player_id": "a42b45b3-6f50-4a77-9a30-93439bc0ce65",
+        "name": null,
+        "nickname": "\u0414\u0435\u0434\u043f\u0443\u043b",
+        "club": null
+    },
+    {
+        "player_id": "b2b79de7-12b7-49a2-9ea0-078b78bbb838",
+        "name": null,
+        "nickname": "\u0414\u0435\u041c\u0430\u0440\u043a\u043e",
+        "club": null
+    },
+    {
+        "player_id": "ca7b27be-ff22-4eb9-a17c-27591df66025",
+        "name": null,
+        "nickname": "\u0414\u0436\u0435\u043d\u0442\u043b\u044c\u043c\u0435\u043d",
+        "club": null
+    },
+    {
+        "player_id": "27961455-d822-4ed3-ba57-8ec3626072a5",
+        "name": null,
+        "nickname": "\u0414\u0436\u0438\u043d\u0434\u0436\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "d614bc78-b341-4540-8764-6cc2a8d4113f",
+        "name": null,
+        "nickname": "\u0414\u0436\u043e\u043a\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "49d9f85b-782f-4300-9acf-44b32514d010",
+        "name": null,
+        "nickname": "\u0414\u0436\u043e\u043d\u0456",
+        "club": null
+    },
+    {
+        "player_id": "211fe791-7c4e-4c10-8b53-30b8ebec44fb",
+        "name": null,
+        "nickname": "\u0414\u0437\u044e",
+        "club": null
+    },
+    {
+        "player_id": "cca84673-a04d-40ea-8537-af6fc1f4a8ef",
+        "name": null,
+        "nickname": "\u0414\u0456\u043c\u043a\u0430-\u043f\u0435\u0440\u0435\u0434\u043e\u0437",
+        "club": null
+    },
+    {
+        "player_id": "714f92f2-f13d-4128-93bb-368e10632c41",
+        "name": null,
+        "nickname": "\u0414\u043e\u043a\u0442\u043e\u0440",
+        "club": null
+    },
+    {
+        "player_id": "2677ec03-25df-4d8f-aa5a-e76f0e1f533e",
+        "name": null,
+        "nickname": "\u0414\u043e\u043a\u0442\u043e\u0440\u0425\u0430\u0443\u0441",
+        "club": null
+    },
+    {
+        "player_id": "3ac6bf1d-cddb-4b23-bf79-cc18e5467aa5",
+        "name": null,
+        "nickname": "\u0414\u0440\u0443\u0433",
+        "club": null
+    },
+    {
+        "player_id": "0e696fe9-2dd6-4334-96aa-5ce467ffa49e",
+        "name": null,
+        "nickname": "\u0414\u044e\u0439\u043c\u043e\u0432\u043e\u0447\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "f386e33d-6afd-4fec-a818-3f2302d7d487",
+        "name": null,
+        "nickname": "\u0414\u044f\u0434\u044c\u043a\u043e",
+        "club": null
+    },
+    {
+        "player_id": "a3308ae0-ca5d-403c-a7db-247e7f3a256e",
+        "name": null,
+        "nickname": "\u0404\u0436\u0435\u0432\u0456\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "08460866-bda3-4315-8502-5516982caada",
+        "name": null,
+        "nickname": "\u0415\u043a\u0441\u043a\u044e\u0437\u043c\u0456",
+        "club": null
+    },
+    {
+        "player_id": "ea7581c6-f473-4144-b389-b02f8a9c4063",
+        "name": null,
+        "nickname": "\u0415\u043c\u043e\u0440\u0456",
+        "club": null
+    },
+    {
+        "player_id": "1199559d-dfb8-4b1c-bff8-21f0b5b437dc",
+        "name": null,
+        "nickname": "\u0415\u043d\u0440\u0456\u043a\u043e",
+        "club": null
+    },
+    {
+        "player_id": "3e2a3c91-e633-423a-ae67-8f103dd63a71",
+        "name": null,
+        "nickname": "\u0404\u043d\u043e\u0442",
+        "club": null
+    },
+    {
+        "player_id": "d01f1c96-6905-42ae-85e4-78de996949b3",
+        "name": null,
+        "nickname": "\u0404\u043d\u043e\u0442\u0456\u043a",
+        "club": null
+    },
+    {
+        "player_id": "e364878b-8c87-4de9-b696-ab97ed0e1ac0",
+        "name": null,
+        "nickname": "\u0404\u0441\u0454\u043d\u0456\u043d",
+        "club": null
+    },
+    {
+        "player_id": "81431cd6-53e1-4fe2-9580-f95db224af6e",
+        "name": null,
+        "nickname": "\u0416\u0438\u0440\u0430\u0444\u0430",
+        "club": null
+    },
+    {
+        "player_id": "d78213f5-0074-443d-92fe-c33c56d90f37",
+        "name": null,
+        "nickname": "\u0417\u0435\u0431\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "7b70be74-50ab-46a1-a67b-da9b3376551c",
+        "name": null,
+        "nickname": "\u0417\u0435\u043d",
+        "club": null
+    },
+    {
+        "player_id": "28ace06b-c8c3-47a9-a387-57ccf4240dfd",
+        "name": null,
+        "nickname": "\u0417\u043b\u043e",
+        "club": null
+    },
+    {
+        "player_id": "b0737c25-6928-4225-9c8d-533ce4303f91",
+        "name": null,
+        "nickname": "\u0417\u043e\u0434\u0456\u0430\u043a",
+        "club": null
+    },
+    {
+        "player_id": "ec3b3984-9f80-4f59-9349-2008b48b80f6",
+        "name": null,
+        "nickname": "\u0417\u043e\u043b\u043e\u0442\u043a\u043e",
+        "club": null
+    },
+    {
+        "player_id": "51593658-0c67-45e4-856a-1169df31095a",
+        "name": null,
+        "nickname": "\u0417\u043e\u0440\u0440\u043e",
+        "club": null
+    },
+    {
+        "player_id": "e8172513-65a0-4ab3-85e3-4531d7d945d7",
+        "name": null,
+        "nickname": "\u04061",
+        "club": null
+    },
+    {
+        "player_id": "755073fc-7f50-4d0c-9577-38d01d9c4b20",
+        "name": null,
+        "nickname": "\u0406\u043b\u044e\u0437\u0456\u044f",
+        "club": null
+    },
+    {
+        "player_id": "09be0f98-3cd5-433d-ad57-e9e18528e737",
+        "name": null,
+        "nickname": "\u0406\u043d\u0436\u0438\u043d\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "f314b94d-2e67-4cf6-8274-c79f29ec2b8a",
+        "name": null,
+        "nickname": "\u0406\u043d\u043a\u0432\u0456\u0437\u0438\u0442\u043e\u0440",
+        "club": null
+    },
+    {
+        "player_id": "79404ded-352a-453c-996e-0cda199ffd8d",
+        "name": null,
+        "nickname": "\u0406\u043d\u043a\u043e\u0433\u043d\u0456\u0442\u043e",
+        "club": null
+    },
+    {
+        "player_id": "b08216f6-5e20-4808-a132-645656b8fe2b",
+        "name": null,
+        "nickname": "\u0406\u0440\u0438\u0441\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "7cd806f3-4bf3-43a4-b640-a368eeb2d4a1",
+        "name": null,
+        "nickname": "\u0419\u043e\u0436\u0438\u043a",
+        "club": null
+    },
+    {
+        "player_id": "d579803b-54c0-47bb-9119-900070093eec",
+        "name": null,
+        "nickname": "\u041a\u0430\u043c\u0430\u0437",
+        "club": null
+    },
+    {
+        "player_id": "429cb925-8e59-4779-a48a-7ba28b9e8dd0",
+        "name": null,
+        "nickname": "\u041a\u0430\u043d\u0434\u0456",
+        "club": null
+    },
+    {
+        "player_id": "54dddaaa-a4e3-4faf-859c-64cc3fa5c3bd",
+        "name": null,
+        "nickname": "\u041a\u0430\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "f16bdff5-40ae-4853-9947-ee0fd318de61",
+        "name": null,
+        "nickname": "\u041a\u0438\u043d\u0433",
+        "club": null
+    },
+    {
+        "player_id": "5e2e2fab-c19e-48d2-9c6b-8ecc8c3d81ce",
+        "name": null,
+        "nickname": "\u041a\u0456\u0442",
+        "club": null
+    },
+    {
+        "player_id": "6a5f8e9e-721c-4fb6-b6d6-a8bd1ca6f322",
+        "name": null,
+        "nickname": "\u041a\u0456\u0444\u043b\u0438\u043a",
+        "club": null
+    },
+    {
+        "player_id": "1458990e-781f-40ce-9e5f-281733680fa2",
+        "name": null,
+        "nickname": "\u041a\u0456\u0442\u0442\u0456",
+        "club": null
+    },
+    {
+        "player_id": "43a945ec-997b-4d9d-b883-66125971d2a9",
+        "name": null,
+        "nickname": "\u041a\u043e\u0437\u0430",
+        "club": null
+    },
+    {
+        "player_id": "48a5c62c-f992-4cae-b3fc-b88935ecd8a8",
+        "name": null,
+        "nickname": "\u041a\u043e\u043b\u0434\u0440\u0456\u0432\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "70130be0-c014-4660-b179-55e602a9f8c2",
+        "name": null,
+        "nickname": "\u041a\u043e\u0440\u0438\u0446\u044f",
+        "club": null
+    },
+    {
+        "player_id": "365f86dc-f1d5-4ba1-aa89-1bcc48d7f453",
+        "name": null,
+        "nickname": "\u041a\u0440\u0435\u0441\u0442\u043d\u0438\u0439\u041e\u0442\u0435\u0446",
+        "club": null
+    },
+    {
+        "player_id": "49fbdefa-a5aa-4b72-9378-cd0322c4841b",
+        "name": null,
+        "nickname": "\u041a\u0440\u043e\u0443\u0444\u043e\u0440\u0434",
+        "club": null
+    },
+    {
+        "player_id": "4fd74ca7-a0e5-4245-9d89-917c62791709",
+        "name": null,
+        "nickname": "\u041a\u0440\u0443\u0436\u0435\u0447\u043e\u043a",
+        "club": null
+    },
+    {
+        "player_id": "f009bf56-8ed7-47d2-b26d-9a93c8a49189",
+        "name": null,
+        "nickname": "\u041a\u0441\u044e",
+        "club": null
+    },
+    {
+        "player_id": "d22b0611-6288-4780-b376-ada3dd2fa999",
+        "name": null,
+        "nickname": "\u041b\u0430\u0432\u0435",
+        "club": null
+    },
+    {
+        "player_id": "82ccc532-8859-421c-a36c-563ed2526780",
+        "name": null,
+        "nickname": "\u041b\u0430\u043a\u0456",
+        "club": null
+    },
+    {
+        "player_id": "84b4e6e3-6372-499c-ba10-5b4924054790",
+        "name": null,
+        "nickname": "\u041b\u0435\u0433\u043e",
+        "club": null
+    },
+    {
+        "player_id": "6702ba29-2469-40cd-9b70-95f837c04ac3",
+        "name": null,
+        "nickname": "\u041b\u0456\u0430\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "a6d88a81-31ed-40ce-bee4-1c703684b769",
+        "name": null,
+        "nickname": "\u041b\u0456\u0432\u0430\u0440\u043e",
+        "club": null
+    },
+    {
+        "player_id": "89718770-d269-45b3-b593-8ee1745fe27a",
+        "name": null,
+        "nickname": "\u041b\u0456\u0432\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "07e92602-7f6b-4c53-847d-e3508405629b",
+        "name": null,
+        "nickname": "\u041b\u0456\u0437\u0430",
+        "club": null
+    },
+    {
+        "player_id": "da80a7c0-b453-42ab-8f2f-4672ac755303",
+        "name": null,
+        "nickname": "\u041b\u0456\u043b\u0456\u0442",
+        "club": null
+    },
+    {
+        "player_id": "1014b471-b9e9-4d05-a231-a3e1067a4859",
+        "name": null,
+        "nickname": "\u041b\u0456\u0441\u044c\u043e\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "bdf773e0-e834-4965-a7e3-f0c09642e77c",
+        "name": null,
+        "nickname": "\u041b\u0456\u0444\u0435\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "ee6ac598-da90-4682-bdbd-4e60d9d0fcd9",
+        "name": null,
+        "nickname": "\u041b\u043e\u043a\u0456",
+        "club": null
+    },
+    {
+        "player_id": "a39646a0-ee65-4083-b7c0-d7fa815324f9",
+        "name": null,
+        "nickname": "\u041b\u043e\u043b",
+        "club": null
+    },
+    {
+        "player_id": "5c3c6e47-a809-46c7-96ce-68042f99c619",
+        "name": null,
+        "nickname": "\u041b\u044e\u0431\u043e\u0432\u0456\u0442",
+        "club": null
+    },
+    {
+        "player_id": "3ed0bc74-f965-476d-8fcc-8f13388e0e47",
+        "name": null,
+        "nickname": "\u041b\u044e\u0442\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "61ad4320-a1dd-4c2c-bd0d-b20ea5dac246",
+        "name": null,
+        "nickname": "\u041c",
+        "club": null
+    },
+    {
+        "player_id": "2c3eda71-5aee-4a37-928b-02013b16e9bb",
+        "name": null,
+        "nickname": "\u041c\u0456\u0441\u0442\u0435\u0440\u0420\u043e\u0431\u043e\u0442",
+        "club": null
+    },
+    {
+        "player_id": "b7758584-23c6-461d-a641-e4e36a7b1c1c",
+        "name": null,
+        "nickname": "\u041c\u0430\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "f5763e77-c995-45ae-ad64-675f843f0859",
+        "name": null,
+        "nickname": "\u041c\u0430\u0440\u0456",
+        "club": null
+    },
+    {
+        "player_id": "f37f8b1a-80cc-48ae-845e-4ed7465ec05c",
+        "name": null,
+        "nickname": "\u041c\u0430\u0440\u0456\u043d\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "4fde4be8-e2fe-4230-9813-535b1f306f3d",
+        "name": null,
+        "nickname": "\u041c\u0430\u0440\u0441\u0430\u043b\u0430",
+        "club": null
+    },
+    {
+        "player_id": "9840891c-2736-4513-bb09-ee7e062db45e",
+        "name": null,
+        "nickname": "\u041c\u0430\u0441\u0430\u043d\u0434\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "e952027c-66d9-46b0-a2ab-0d44ae55c836",
+        "name": null,
+        "nickname": "\u041c\u0435\u043b\u0456\u0441\u0430",
+        "club": null
+    },
+    {
+        "player_id": "b178083c-9488-4d96-8449-f21cdbe9f1b2",
+        "name": null,
+        "nickname": "\u041c\u0435\u0440\u043b\u0456\u043d",
+        "club": null
+    },
+    {
+        "player_id": "3665b3e5-6dd5-4b52-8d62-95210a1a32a6",
+        "name": null,
+        "nickname": "\u041c\u0435\u0440\u0444\u0456",
+        "club": null
+    },
+    {
+        "player_id": "bbf7fd25-d033-4d17-8c35-f4bd2d6ba450",
+        "name": null,
+        "nickname": "\u041c\u0456\u043a",
+        "club": null
+    },
+    {
+        "player_id": "d5c4033f-310a-4779-90da-e51603ac09fd",
+        "name": null,
+        "nickname": "\u041c\u043e\u0439\u0441\u0435\u0439",
+        "club": null
+    },
+    {
+        "player_id": "83ff7bcd-e7ff-41cf-aaa7-f6fb34db483c",
+        "name": null,
+        "nickname": "\u041c\u043e\u043d\u0456\u0441\u0442",
+        "club": null
+    },
+    {
+        "player_id": "e637a7c7-3a7d-43e3-89b3-10fccbe861d2",
+        "name": null,
+        "nickname": "\u041c\u043e\u0440\u0456\u0430\u0440\u0442\u0456",
+        "club": null
+    },
+    {
+        "player_id": "db95cd20-8c26-42e2-bc70-e9c3b87083fa",
+        "name": null,
+        "nickname": "\u041d\u0430\u043a\u0430\u043d",
+        "club": null
+    },
+    {
+        "player_id": "b41c12c6-96a0-455a-b1f5-9e1e7f6e355c",
+        "name": null,
+        "nickname": "\u041d\u0430\u0442\u0430",
+        "club": null
+    },
+    {
+        "player_id": "858ca8fe-d263-4ae3-9d5b-e6130e7919af",
+        "name": null,
+        "nickname": "\u041d\u0430\u0442\u0435\u043b\u043b\u0430",
+        "club": null
+    },
+    {
+        "player_id": "9fa29dcc-a406-42e5-a867-7b61cf517f2a",
+        "name": null,
+        "nickname": "\u041d\u0435\u043e",
+        "club": null
+    },
+    {
+        "player_id": "e99cd05b-c785-49a7-8aba-832a176be0b8",
+        "name": null,
+        "nickname": "\u041d\u0435\u0449\u0430\u0434\u043d\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "888b727b-def4-44df-a613-8ea401f160c9",
+        "name": null,
+        "nickname": "\u041d\u0456\u043a\u043e\u043b\u0435\u0442\u0442\u0430",
+        "club": null
+    },
+    {
+        "player_id": "ec0c1a74-c567-48aa-86df-ce96af4ceea3",
+        "name": null,
+        "nickname": "\u041d\u0456\u0448\u0442\u044f\u043a",
+        "club": null
+    },
+    {
+        "player_id": "76ed136b-7108-44a8-bca1-9e7ef65ee5aa",
+        "name": null,
+        "nickname": "\u041d\u0456\u0432\u0435\u0430",
+        "club": null
+    },
+    {
+        "player_id": "20013170-7a85-4b3b-aa4d-8bace58c04db",
+        "name": null,
+        "nickname": "\u041d\u043e\u043c\u0435\u04405",
+        "club": null
+    },
+    {
+        "player_id": "d8a1ac2e-ae67-4a8d-aec4-de06a597c779",
+        "name": null,
+        "nickname": "\u041d\u044f\u0448\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "f075c347-301b-43e0-a8b0-1d3e3a472478",
+        "name": null,
+        "nickname": "\u041e\u0431\u0438\u0447\u043d\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "78e85ef4-f631-48e3-b737-3d3c89d3adab",
+        "name": null,
+        "nickname": "\u041e\u043b\u0435\u0433\u0430\u0442\u043e\u0440",
+        "club": null
+    },
+    {
+        "player_id": "0aa1018a-51ec-40e3-9270-087b1c9c0eb3",
+        "name": null,
+        "nickname": "\u041e\u0447\u0430\u0440\u043e\u0432\u0430\u0448\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "4022f88a-1000-470d-b906-c3e50da11adf",
+        "name": null,
+        "nickname": "\u041f\u0430\u043d\u0442\u0435\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "61998daa-321b-48e2-b3fa-eacc5a72d32f",
+        "name": null,
+        "nickname": "\u041f\u0456\u0442\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "d03698cc-5eec-486e-85e5-05f13c7774b8",
+        "name": null,
+        "nickname": "\u041f\u043e\u043a\u0435\u043c\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "300915de-2dca-4caa-a7a4-9f1e026cee47",
+        "name": null,
+        "nickname": "\u041f\u0440\u0430\u0432\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "38f5320a-945c-4c74-a214-1ce8be81eed6",
+        "name": null,
+        "nickname": "\u041f\u0440\u043e\u0432\u043e\u043a\u0430\u0442\u043e\u0440",
+        "club": null
+    },
+    {
+        "player_id": "b11f6d58-55a1-495e-ac2a-d5ed6bfa529c",
+        "name": null,
+        "nickname": "\u0420\u0435\u0434\u041d\u0435\u043a",
+        "club": null
+    },
+    {
+        "player_id": "035e11b1-19a0-4d4a-92ea-cd62337195b6",
+        "name": null,
+        "nickname": "\u0420\u0435\u0434",
+        "club": null
+    },
+    {
+        "player_id": "93755df0-656b-4aee-b031-2892b1e3368e",
+        "name": null,
+        "nickname": "\u0420\u0438\u0431\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "577b7d26-ab68-4177-9088-eaf23a0f3d36",
+        "name": null,
+        "nickname": "\u0420\u043e\u043a\u0441\u043e\u043b\u0430\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "66e0a781-ef35-48ba-9259-5dddef0718dd",
+        "name": null,
+        "nickname": "\u0420\u0443\u0434\u0456",
+        "club": null
+    },
+    {
+        "player_id": "d40ef634-0e03-465e-9b9c-4c1fe7d28570",
+        "name": null,
+        "nickname": "\u0420\u044f\u0441\u043d\u0435",
+        "club": null
+    },
+    {
+        "player_id": "ea5ef775-00a5-4a73-933e-0124ab51c565",
+        "name": null,
+        "nickname": "\u0421\u0430\u043c\u0443\u0440\u0430\u0439",
+        "club": null
+    },
+    {
+        "player_id": "b655373d-287e-4384-a411-810fbaeb227f",
+        "name": null,
+        "nickname": "\u0421\u0430\u0442\u0430\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "f7b920b8-806a-468a-9001-47b79d245ba2",
+        "name": null,
+        "nickname": "\u0421\u0435\u0432\u0435\u043d",
+        "club": null
+    },
+    {
+        "player_id": "5f96d574-efe8-4d5d-b666-b24fa4245e22",
+        "name": null,
+        "nickname": "\u0421\u0438\u043d\u041b\u0435\u043e\u043d\u0456\u0434\u0430",
+        "club": null
+    },
+    {
+        "player_id": "c97b7f2a-1c07-48b3-b2c5-4ed1770406cf",
+        "name": null,
+        "nickname": "\u0421\u0438\u043d\u0456\u041f\u0440\u0438\u043b\u0443\u043a\u0438",
+        "club": null
+    },
+    {
+        "player_id": "2f4d58ca-8baf-4f4a-b432-1292d57f212b",
+        "name": null,
+        "nickname": "\u0421\u043a\u0430\u0440\u043b\u0435\u0442",
+        "club": null
+    },
+    {
+        "player_id": "a225c49f-2d6c-4471-aef0-90adbe46dd4b",
+        "name": null,
+        "nickname": "\u0421\u043b\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "05f3b9c7-3495-4f5b-8bbe-9550380d6975",
+        "name": null,
+        "nickname": "\u0421\u043c\u0430\u0439\u043b",
+        "club": null
+    },
+    {
+        "player_id": "d64c5b8a-28d8-43c1-86e2-bc9648b5dea5",
+        "name": null,
+        "nickname": "\u0421\u043d\u0443\u043f\u0456",
+        "club": null
+    },
+    {
+        "player_id": "2a36a9b7-ca25-44c3-b7e9-205e372d1663",
+        "name": null,
+        "nickname": "\u0421\u043e\u0437\u0456\u043a",
+        "club": null
+    },
+    {
+        "player_id": "bba665a2-1f42-458f-8e78-0975dd84a26d",
+        "name": null,
+        "nickname": "\u0421\u043e\u043b\u0456\u0441",
+        "club": null
+    },
+    {
+        "player_id": "1824ceb6-3cde-4405-a145-7db0ed1376ce",
+        "name": null,
+        "nickname": "\u0421\u043e\u0440\u043e\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "e376dedb-c96f-432b-aa6d-2b22b0be8d53",
+        "name": null,
+        "nickname": "\u0421\u043e\u0444\u0430",
+        "club": null
+    },
+    {
+        "player_id": "61a4286e-69a0-48d5-9867-031a895213ae",
+        "name": null,
+        "nickname": "\u0421\u043f\u0430\u0439",
+        "club": null
+    },
+    {
+        "player_id": "f9f2e1a6-6e11-4b75-a9d7-ba2f24d535d8",
+        "name": null,
+        "nickname": "\u0421\u0442\u0430\u0440\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "2dd0018a-c52b-4d73-9ad2-27d9cec16ff2",
+        "name": null,
+        "nickname": "\u0421\u0443\u043c\u0456",
+        "club": null
+    },
+    {
+        "player_id": "0041de5e-427f-4c9c-9c70-d2b63fe40849",
+        "name": null,
+        "nickname": "\u0422\u0430\u043b\u0456\u0441\u043c\u0430\u043d",
+        "club": null
+    },
+    {
+        "player_id": "71093476-bbaf-4d1a-8126-6745270e469f",
+        "name": null,
+        "nickname": "\u0422\u0430\u043b\u0456\u0448\u0430",
+        "club": null
+    },
+    {
+        "player_id": "e95c83d1-22c2-4666-8ad0-1c3db0367987",
+        "name": null,
+        "nickname": "\u0422\u0430\u043d\u043a",
+        "club": null
+    },
+    {
+        "player_id": "e8af5bb2-3439-44e6-bacf-92bb274c9685",
+        "name": null,
+        "nickname": "\u0422\u0430\u0440\u0441\u0456\u0442",
+        "club": null
+    },
+    {
+        "player_id": "0451f997-905d-4826-858d-99208e5b7a63",
+        "name": null,
+        "nickname": "\u0422\u0432\u0430\u0440\u0438\u043d\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "36f467a1-126b-4274-a9c5-5e471c928c30",
+        "name": null,
+        "nickname": "\u0422\u0438\u0445\u0438\u0439\u0414\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "05ec5224-6afa-45eb-b540-1806aa62b189",
+        "name": null,
+        "nickname": "\u0422\u0456\u0433\u0440\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "2a989412-803e-4e63-b147-51d6ddc350de",
+        "name": null,
+        "nickname": "\u0422\u043e\u0442\u043e\u0440\u043e",
+        "club": null
+    },
+    {
+        "player_id": "52e3df7e-5d7c-4f22-a0a6-a9a2c2ad069f",
+        "name": null,
+        "nickname": "\u0422\u0443\u0437",
+        "club": null
+    },
+    {
+        "player_id": "f7ba311f-bf3f-499e-9c72-aeea68a3b0a7",
+        "name": null,
+        "nickname": "\u0423\u043c\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "bc862aef-6b23-47e7-8b8d-707a7243dc5c",
+        "name": null,
+        "nickname": "\u0423\u0445\u0422\u0438",
+        "club": null
+    },
+    {
+        "player_id": "eee930e5-d0e9-44fe-9f57-99891c3e385a",
+        "name": null,
+        "nickname": "\u0424\u0430\u0454\u0440",
+        "club": null
+    },
+    {
+        "player_id": "75f20026-2946-4264-8a04-0706cf9ff6f7",
+        "name": null,
+        "nickname": "\u0424\u0435\u044f",
+        "club": null
+    },
+    {
+        "player_id": "c2de9b6e-2662-4c0c-98fb-cdf67458b66a",
+        "name": null,
+        "nickname": "\u0424\u043e\u043a\u0441",
+        "club": null
+    },
+    {
+        "player_id": "135ef9d5-c0b0-44bc-ba2c-79d871118706",
+        "name": null,
+        "nickname": "\u0424\u043e\u0440\u0442\u0443\u043d\u0430\u0423\u0441\u043c\u0456\u0448\u043a\u0430\u042e\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "6a6ca2d8-cc3e-4571-8a80-d5ce639978b6",
+        "name": null,
+        "nickname": "\u0424\u0440\u0435\u0439\u0434",
+        "club": null
+    },
+    {
+        "player_id": "65ae5dda-e2e7-4a7f-b2ac-a5847a59e9f3",
+        "name": null,
+        "nickname": "\u0425\u0430\u0434\u0436\u0456",
+        "club": null
+    },
+    {
+        "player_id": "158c2c90-1a58-4d0d-84d1-c1e399083a4a",
+        "name": null,
+        "nickname": "\u0425\u0440\u0438\u0441\u0442\u043e\u0441",
+        "club": null
+    },
+    {
+        "player_id": "f7a67806-fb4c-4a2e-b393-f2590664f86f",
+        "name": null,
+        "nickname": "\u0427\u0435\u0440\u0432\u043e\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "12f8a28c-54c1-46e6-8890-4b28209c6fe0",
+        "name": null,
+        "nickname": "\u0427\u043e\u0440\u043d\u0430\u0414\u0456\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "1361a43b-2cb8-49b4-96e3-d56e20c95c21",
+        "name": null,
+        "nickname": "\u0428\u0443\u043c\u0441\u044c\u043a\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "11fee5e8-7408-442d-93ec-b24c4363fbbf",
+        "name": null,
+        "nickname": "\u042e\u043d\u0438\u0439\u041e\u0440\u0435\u043b",
+        "club": null
+    },
+    {
+        "player_id": "2a6e0754-9068-4d8c-b931-999b87352922",
+        "name": null,
+        "nickname": "\u042e\u0442\u0430",
+        "club": null
+    },
+    {
+        "player_id": "3e1b7ad8-041f-479f-8c6f-592f328a7694",
+        "name": null,
+        "nickname": "\u042f\u043c\u0430\u0442\u043e",
+        "club": null
+    },
+    {
+        "player_id": "226cc092-479d-444f-9367-a0b751a2fec4",
+        "name": null,
+        "nickname": "\u041a\u0441\u0435\u043d\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "4975d783-aa56-44a9-8481-39d10382d51f",
+        "name": null,
+        "nickname": "\u042e\u0440\u0438\u0441\u0442",
+        "club": null
+    },
+    {
+        "player_id": "c8fe5187-c2be-4fd9-8d96-92fad4286aef",
+        "name": null,
+        "nickname": "\u0420\u0456\u0434\u0436\u0438\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "9b7d18fc-f7e0-49eb-8292-fdd162c5fefd",
+        "name": null,
+        "nickname": "\u0414\u0432\u0456\u0439\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "3eccb6c3-6dfb-42f7-bb71-66b5a12cd0ec",
+        "name": null,
+        "nickname": "\u041d\u043e\u043c\u0435\u04409",
+        "club": null
+    },
+    {
+        "player_id": "09a79c16-9cfb-47b7-a8c4-d6fda9d91e2d",
+        "name": null,
+        "nickname": "\u0421\u0443\u043f\u0435\u0440\u0411\u043b\u043e\u043d\u0434\u0438\u043d\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "1499c840-e3e4-4a1f-8c7c-72fa0d4438ae",
+        "name": null,
+        "nickname": "\u0421\u043c\u043e\u0440\u043a",
+        "club": null
+    },
+    {
+        "player_id": "9835d1ba-bc54-4c30-aaa0-b6276d09cb16",
+        "name": null,
+        "nickname": "\u0421\u0442\u043e\u0443\u043d",
+        "club": null
+    },
+    {
+        "player_id": "f8ae2653-588e-4602-8a3c-f10f679b9587",
+        "name": null,
+        "nickname": "\u0421\u043e\u0439\u0444\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "3e29abd1-bead-4697-850c-31462ceba40c",
+        "name": null,
+        "nickname": "\u0410\u043b\u0456\u0441\u0430",
+        "club": null
+    },
+    {
+        "player_id": "ca7b0769-5aa1-4cc9-8b01-10eb35f2eca2",
+        "name": null,
+        "nickname": "\u0424\u0440\u0435\u0434\u0456",
+        "club": null
+    },
+    {
+        "player_id": "7e339807-4bf3-4754-9fd1-0a520614d148",
+        "name": null,
+        "nickname": "\u041c\u043e\u043b\u044c\u0444\u0430\u0440",
+        "club": null
+    },
+    {
+        "player_id": "bf29f67f-c700-4c64-9cd1-e92360394520",
+        "name": null,
+        "nickname": "\u0420\u0438\u0436\u0430\u0411\u043e\u0440\u043e\u0434\u0430",
+        "club": null
+    },
+    {
+        "player_id": "b902aaac-b405-4ed6-9cae-bdf7255b561f",
+        "name": null,
+        "nickname": "\u0404\u0433\u0435\u0440\u043c\u0435\u0439\u0441\u0442\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "8d6bfba1-cdc8-42a1-bfc4-2ea02fb0b8cd",
+        "name": null,
+        "nickname": "\u0427\u0435\u0440\u0432\u043e\u043d\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "7d86eabb-3486-466f-afdf-ed359fc41d27",
+        "name": null,
+        "nickname": "\u0428\u0435\u0432\u0447\u0435\u043d\u043a\u043e",
+        "club": null
+    },
+    {
+        "player_id": "4ecf52f5-f839-4912-b28c-1c340ba46ad6",
+        "name": null,
+        "nickname": "\u0411\u0430\u0440\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "7fa06263-e2b0-400b-aee7-31906b72e5bc",
+        "name": null,
+        "nickname": "\u041a\u0430\u0432\u0443\u043d",
+        "club": null
+    },
+    {
+        "player_id": "c5b44e09-2856-4fe4-ad3a-ba9cbeeb4485",
+        "name": null,
+        "nickname": "\u041b\u0456\u0432\u0430\u0440\u0440\u043e",
+        "club": null
+    },
+    {
+        "player_id": "3cc67354-c015-44b7-b61e-f8e11759cd6e",
+        "name": null,
+        "nickname": "\u0411\u0456\u043b\u043a\u0430",
+        "club": null
+    },
+    {
+        "player_id": "7036111a-e21d-410f-be58-dde644fa9e08",
+        "name": null,
+        "nickname": "\u0410\u0440\u0442\u0443\u0440",
+        "club": null
+    },
+    {
+        "player_id": "4ba604db-62f8-46a5-b749-c62928775d35",
+        "name": null,
+        "nickname": "\u0413\u043e\u043b\u0443\u0431\u0454\u0446",
+        "club": null
+    },
+    {
+        "player_id": "aecb60df-ec9f-48be-a471-40e3c77e6eb9",
+        "name": null,
+        "nickname": "\u0410\u043d\u0430\u0441\u0442\u0430\u0441\u0456\u044f",
+        "club": null
+    },
+    {
+        "player_id": "65045479-f28a-48b6-82eb-5bccff5ebcc2",
+        "name": null,
+        "nickname": "\u0420\u043e\u0431\u043e\u0442\u044f\u0433\u0430",
+        "club": null
+    },
+    {
+        "player_id": "639943f0-b201-4de9-830c-34818c972b3a",
+        "name": null,
+        "nickname": "\u041b\u0438\u0441\u0430",
+        "club": null
+    },
+    {
+        "player_id": "f79f8c29-c34c-4764-9236-c0db0181dfbb",
+        "name": null,
+        "nickname": "\u041c\u0443\u0442",
+        "club": null
+    },
+    {
+        "player_id": "4c5f8eb4-635a-4905-a80a-1c1381d64f6f",
+        "name": null,
+        "nickname": "8",
+        "club": null
+    },
+    {
+        "player_id": "be899dce-ef9f-4721-8186-a903d344d091",
+        "name": null,
+        "nickname": "\u0422\u0456\u0433\u0435\u0440\u043e\u043d",
+        "club": null
+    },
+    {
+        "player_id": "35fb7a8b-40af-4c7b-8e9c-bcc1ea80ac23",
+        "name": null,
+        "nickname": "\u041e\u0441\u0442\u0440\u0456\u0432",
+        "club": null
+    },
+    {
+        "player_id": "d93e0a6e-4764-4712-a5d2-1ae886ea8017",
+        "name": null,
+        "nickname": "\u041c\u0435\u0440\u0456",
+        "club": null
+    },
+    {
+        "player_id": "506564c6-4bf3-4dbe-88f0-cf61e6a17dc0",
+        "name": null,
+        "nickname": "\u041c\u0430\u043a\u0441",
+        "club": null
+    },
+    {
+        "player_id": "683e8174-c20b-441b-81f9-7da9917604bc",
+        "name": null,
+        "nickname": "\u0411\u0442\u0430",
+        "club": null
+    },
+    {
+        "player_id": "c8f1c363-e51c-40e4-8334-de1c6b78ea70",
+        "name": null,
+        "nickname": "\u0411\u0430\u043d\u0435\u043a\u043e",
+        "club": null
+    },
+    {
+        "player_id": "b730fada-028e-4cd0-bb31-b123e8ee7c2a",
+        "name": null,
+        "nickname": "\u0414\u0435\u0441",
+        "club": null
+    },
+    {
+        "player_id": "d2ac5b0b-a8d2-4c34-8f3a-02efeced9d8d",
+        "name": null,
+        "nickname": "\u041c\u0430\u0440\u0456\u043d\u0430",
+        "club": null
+    },
+    {
+        "player_id": "86840136-7767-4a38-af4c-5d2754d3715d",
+        "name": null,
+        "nickname": "\u0410\u0431\u0440\u0438\u043a\u043e\u0441",
+        "club": null
+    },
+    {
+        "player_id": "dbfe1f75-04c4-4078-b562-81f5071ec1b8",
+        "name": null,
+        "nickname": "\u0414\u0436\u0456\u043a\u0441\u0442\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "0437cbdc-ceed-4538-9476-68d3cfaf0de7",
+        "name": null,
+        "nickname": "\u0420\u0430\u0434\u0430",
+        "club": null
+    },
+    {
+        "player_id": "e63673d6-cb74-4c8e-a9be-25b60d155003",
+        "name": null,
+        "nickname": "\u042e\u0442\u043e",
+        "club": null
+    },
+    {
+        "player_id": "f87176bb-0fbb-4c9d-a34b-955876e62ef1",
+        "name": null,
+        "nickname": "\u0410\u0440\u0442\u0430\u0441",
+        "club": null
+    },
+    {
+        "player_id": "2a470c1a-99d4-4615-9601-ccf90c527b31",
+        "name": null,
+        "nickname": "\u041c\u0430\u0435\u0441\u0442\u0440\u043e",
+        "club": null
+    },
+    {
+        "player_id": "a4077fe1-1227-48ac-a6a2-45b16330b12b",
+        "name": null,
+        "nickname": "\u041a\u0430\u043b\u0430\u043d",
+        "club": null
+    },
+    {
+        "player_id": "ad7cdb9f-e769-437a-ae41-4f4d47ca2196",
+        "name": null,
+        "nickname": "\u041c\u0430\u0441\u0442\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "4d3ce840-595f-484b-925b-afaf538187ce",
+        "name": null,
+        "nickname": "\u042f\u043c\u0430\u0445\u0430",
+        "club": null
+    },
+    {
+        "player_id": "226cc67f-0da9-4551-83cc-29fb03914583",
+        "name": null,
+        "nickname": "\u041f\u0430\u0442\u043b\u0430\u0442\u0438\u0439",
+        "club": null
+    },
+    {
+        "player_id": "196ee01d-55f3-4a98-b7f9-56035cdccd54",
+        "name": null,
+        "nickname": "\u041a\u043b\u0430\u0439\u0434",
+        "club": null
+    },
+    {
+        "player_id": "0b580b73-7687-441c-befd-affde12915de",
+        "name": null,
+        "nickname": "\u0411\u043e\u043d\u043d\u0456",
+        "club": null
+    },
+    {
+        "player_id": "89f04d12-fbbf-4c88-bee4-e23c01598ab6",
+        "name": null,
+        "nickname": "\u0421\u043c\u0430\u0440\u043a",
+        "club": null
+    },
+    {
+        "player_id": "46d09881-f8a3-4396-8f0a-cdb17edd8189",
+        "name": null,
+        "nickname": "\u0414\u0436\u0430\u0441\u0442\u041a\u0435\u0440",
+        "club": null
+    },
+    {
+        "player_id": "e46c7450-99d0-4eed-9100-dd587a7fb34e",
+        "name": null,
+        "nickname": "\u0421\u0442\u043e\u043c\u0430\u0442\u043e\u043b\u043e\u0433",
+        "club": null
+    },
+    {
+        "player_id": "3fac991c-a0d6-411d-b7fa-d9b978e28a58",
+        "name": null,
+        "nickname": "\u0422\u0438\u0430\u043c\u0430\u0442",
+        "club": null
+    },
+    {
+        "player_id": "ed86ae39-ad90-48fe-a395-aa9594640839",
+        "name": null,
+        "nickname": "\u0414\u0430\u0442\u0443\u0440\u0430",
+        "club": null
+    },
+    {
+        "player_id": "7440ab57-3c98-439a-9e08-4ca16dce93b8",
+        "name": null,
+        "nickname": "\u0412\u043e\u0442\u0435\u0440\u0444\u043e\u043b",
+        "club": null
+    },
+    {
+        "player_id": "483d10ba-46d9-4c3b-82c0-60f7b1b18ee2",
+        "name": null,
+        "nickname": "\u0420\u0443\u043c\u0430\u0442\u0430",
+        "club": null
+    }
+]

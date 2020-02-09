@@ -5,7 +5,7 @@ import uuid
 import inject
 from zlo.adapters.bootstrap import bootstrap
 from zlo.cli.auth import auth
-from zlo.cli.zlo_logger import get_logger
+from zlo.cli.setup_env_for_test import setup_env_with_test_database
 from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.model import Player
 
@@ -39,14 +39,15 @@ def create_or_update_player(uowm: UnitOfWorkManager, player_data: dict):
 if __name__ == "__main__":
 
     cfg = os.environ.copy()
+    setup_env_with_test_database(cfg)
     bootstrap(cfg)
 
     client = auth()
     sheet = client.open('СписокГравців').sheet1
 
-    start_index = 220
+    start_index = 226
     step = 0
-    while step <= 205:
+    while step <= 300:
         player_row = sheet.row_values(start_index + step)
         player_nickname = player_row[1]
         player_uuid = player_row[0]
@@ -65,4 +66,3 @@ if __name__ == "__main__":
         })
         step += 1
         time.sleep(2)
-

@@ -14,3 +14,13 @@ def get_postgres_config(env):
         'password': env.get('SECRET_DB_PASSWORD', 'zlo'),
         'db_name': env.get('DB_NAME', 'zlo'),
     }
+
+
+def get_postgres_config_test(env):
+    return {
+        'host': env.get('DB_HOST', 'localhost'),
+        'port': env.get('DB_PORT', 5432),
+        'user': env.get('SECRET_DB_USER', 'test_zlo'),
+        'password': env.get('SECRET_DB_PASSWORD', 'test_zlo'),
+        'db_name': env.get('DB_NAME', 'test_zlo'),
+    }

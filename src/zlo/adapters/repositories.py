@@ -15,6 +15,9 @@ class PlayerRepository:
     def add(self, player: Player):
         self._session.add(player)
 
+    def all(self):
+        return self._session.query(Player).all()
+
 
 class GameRepository:
 

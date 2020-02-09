@@ -8,12 +8,22 @@ stop:
 build:
 	docker-compose build
 
-up:
+up-test:
 	docker-compose up -d test_zlo_db
+
+up-prod:
+	docker-compose up -d zlodb
 
 run-migrations:
 	docker-compose up -d test_zlo_db
-	sh migrations/run.sh
+	sh src/zlo/migrations/run.sh
 
 unit-tests:
 	run-contexts src/zlo/tests/unittests/
+
+integretional-tests:
+	run-contexts src/zlo/tests/integretional/
+
+run-all-tests:
+	run-contexts src/zlo/tests/unittests/
+	run-contexts src/zlo/tests/integretional/

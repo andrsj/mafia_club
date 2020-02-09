@@ -16,7 +16,7 @@ from zlo.tests.fixture import DEFAULT_PLAYERS as players, generate_ten_slots_for
 #
 #         for player in players:
 #             self.uowm.sess.players.add(player)
-# 
+#
 #         self.game = prepare_game(self.uowm.sess, result=GameResult.mafia)
 #
 #         self.houses = generate_ten_slots_for_game(self.game.game_id)

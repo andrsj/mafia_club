@@ -27,3 +27,6 @@ integretional-tests:
 run-all-tests:
 	run-contexts src/zlo/tests/unittests/
 	run-contexts src/zlo/tests/integretional/
+
+update-fixtures:
+	python src/zlo/cli/create_fixtures_from_sheet.py --sheet ТестовийБланкНеДляПротоколуІРейтингу

@@ -73,7 +73,3 @@ class WhenGameDataParsedAndMafia1x1Win(BlankParserMixin):
     def it_should_get_proper_values(self):
         expect(self.game_result).to(equal(GameResult.mafia))
         expect(self.advanced_game_result).to(equal(AdvancedGameResult.one_on_one))
-
-
-if __name__ == "__main__":
-    contexts.main()

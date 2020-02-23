@@ -47,3 +47,9 @@ class CreateOrUpdateBestMove:
 class CreateOrUpdateDisqualified:
     game_id: str
     disqualified_slots: List[int]
+
+
+@dataclass
+class CreateOrUpdateSheriffVersion:
+    game_id: str
+    sheriff_version_slots: List[int]

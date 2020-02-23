@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 
 from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove, \
-    CreateOrUpdateDisqualified
+    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -107,15 +107,25 @@ class BlankParser:
         return houses_events
 
     def parse_best_move(self) -> Optional[CreateOrUpdateBestMove]:
+        killed_player_slot = self.get_slot_number_from_string(self._matrix[22][1])
+        if not killed_player_slot:
+            return None
+
+        best_1_slot = self.get_slot_number_from_string(self._matrix[22][2])
+        best_2_slot = self.get_slot_number_from_string(self._matrix[22][3])
+        best_3_slot = self.get_slot_number_from_string(self._matrix[22][4])
+        if not best_1_slot + best_2_slot + best_3_slot > 1:
+            return None
+
         return CreateOrUpdateBestMove(
             game_id=self._game_id,
-            killed_player_slot=self._matrix[22][1],
-            best_1_slot=self._matrix[22][2],
-            best_2_slot=self._matrix[22][3],
-            best_3_slot=self._matrix[22][4],
+            killed_player_slot=killed_player_slot,
+            best_1_slot=self.get_slot_number_from_string(self._matrix[22][2]),
+            best_2_slot=self.get_slot_number_from_string(self._matrix[22][3]),
+            best_3_slot=self.get_slot_number_from_string(self._matrix[22][4]),
         )
 
-    def get_disqualified_slot(self, value):
+    def get_slot_number_from_string(self, value):
         value = value.strip()
         if value in [str(i) for i in range(1, 11)]:
             return int(value)
@@ -123,11 +133,19 @@ class BlankParser:
             return 0
 
     def parse_disqualified(self) -> CreateOrUpdateDisqualified:
-        slots = [self.get_disqualified_slot(value) for value in self._matrix[21][7:]]
+        slots = [self.get_slot_number_from_string(value) for value in self._matrix[21][7:]]
         slots = [slot for slot in slots if bool(slot)]
         return CreateOrUpdateDisqualified(
             game_id=self._game_id,
             disqualified_slots=slots
+        )
+
+    def parse_sheriff_versions(self) -> CreateOrUpdateSheriffVersion:
+        slots = [self.get_slot_number_from_string(value) for value in self._matrix[22][7:]]
+        slots = [slot for slot in slots if bool(slot)]
+        return CreateOrUpdateSheriffVersion(
+            game_id=self._game_id,
+            sheriff_version_slots=slots
         )
 
     def parse_kills(self):

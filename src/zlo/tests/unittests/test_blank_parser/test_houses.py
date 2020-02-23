@@ -7,7 +7,7 @@ from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.tests.unittests.test_blank_parser.common import BlankParserMixin
 
 
-class When_houses_are_parsed(BlankParserMixin):
+class WhenHousesAreParsed(BlankParserMixin):
 
     def given_blank_parser(self):
         matrix = self.get_matrix_data('ПеремогаМирних')

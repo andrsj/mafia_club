@@ -18,7 +18,7 @@ class WhenDisqualifiedParsed(BlankParserMixin):
         expect(self.disqualified_events.disqualified_slots[1]).to(equal(2))
 
 
-class Where_there_were_disqualified_players(BlankParserMixin):
+class WhenDisqualifiedParsedAndNoData(BlankParserMixin):
 
     def given_blank_parser(self):
         matrix = self.get_matrix_data('ПеремогаМирних')

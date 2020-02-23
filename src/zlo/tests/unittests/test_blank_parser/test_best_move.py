@@ -22,5 +22,27 @@ class WhenBestMoveParsed(BlankParserMixin):
         expect(self.best_move_event.best_3_slot).to(equal(10))
 
 
-if __name__ == "__main__":
-    contexts.main()
+class WhenBestMoveParsedAndNoData(BlankParserMixin):
+
+    def given_blank_parser(self):
+        matrix = self.get_matrix_data('ПеремогаМафії1в1')
+        self.blank_parser = BlankParser(matrix)
+
+    def because_we_parse_game_info(self):
+        self.best_move_event = self.blank_parser.parse_best_move()
+
+    def it_should_get_proper_values(self):
+        expect(self.best_move_event).to(be_none)
+
+
+class WhenBestMoveParsedAndDataIsNotValid(BlankParserMixin):
+
+    def given_blank_parser(self):
+        matrix = self.get_matrix_data('ПеремогаМафії2в2')
+        self.blank_parser = BlankParser(matrix)
+
+    def because_we_parse_game_info(self):
+        self.best_move_event = self.blank_parser.parse_best_move()
+
+    def it_should_get_proper_values(self):
+        expect(self.best_move_event).to(be_none)

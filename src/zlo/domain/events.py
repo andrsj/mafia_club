@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
+from typing import List, Dict, Optional
 
 from zlo.domain.types import ClassicRole
 
@@ -59,3 +59,9 @@ class CreateOrUpdateSheriffVersion:
 class CreateOrUpdateNominatedForBest:
     game_id: str
     nominated_slots: List[int]
+
+
+@dataclass
+class CreateOrUpdateVoted:
+    game_id: str
+    voted_slots: Dict[int, Optional[List[int]]]

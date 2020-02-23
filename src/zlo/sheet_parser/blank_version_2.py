@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 
 from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove, \
-    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion, CreateOrUpdateNominatedForBest
+    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion, CreateOrUpdateNominatedForBest, CreateOrUpdateVoted
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -132,6 +132,13 @@ class BlankParser:
         else:
             return 0
 
+    def get_voted_from_string(self, value: str):
+        value = value.strip()
+        value.replace(',', ' ').replace('.', ' ')
+        if value:
+            return [self.get_slot_number_from_string(v) for v in value.split(' ')]
+        return None
+
     def parse_disqualified(self) -> CreateOrUpdateDisqualified:
         slots = [self.get_slot_number_from_string(value) for value in self._matrix[21][7:]]
         slots = [slot for slot in slots if bool(slot)]
@@ -159,8 +166,16 @@ class BlankParser:
     def parse_kills(self):
         pass
 
-    def parse_voted_list(self):
-        pass
+    def parse_voted_list(self) -> Optional[CreateOrUpdateVoted]:
+        result = {}
+        for i, voted in enumerate(self._matrix[44][2:]):
+            result[i] = self.get_voted_from_string(voted)
+        if all([value is None for value in result.values()]):
+            return None
+        return CreateOrUpdateVoted(
+            game_id=self._game_id,
+            voted_slots=result
+        )
 
     def parse_sheriff_checks(self):
         pass

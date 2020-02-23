@@ -60,6 +60,12 @@ class BestMove:
 
 
 @dataclass
+class Disqualified:
+    game_id: GameID
+    house: HouseID
+
+
+@dataclass
 class Devise:
     devise_id: DeviseID
     game_id: GameID

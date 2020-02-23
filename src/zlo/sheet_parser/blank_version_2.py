@@ -1,7 +1,8 @@
 import uuid
 from typing import List, Optional
 
-from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove
+from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove, \
+    CreateOrUpdateDisqualified
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -112,6 +113,21 @@ class BlankParser:
             best_1_slot=self._matrix[22][2],
             best_2_slot=self._matrix[22][3],
             best_3_slot=self._matrix[22][4],
+        )
+
+    def get_disqualified_slot(self, value):
+        value = value.strip()
+        if value in [str(i) for i in range(1, 11)]:
+            return int(value)
+        else:
+            return 0
+
+    def parse_disqualified(self) -> CreateOrUpdateDisqualified:
+        slots = [self.get_disqualified_slot(value) for value in self._matrix[21][7:]]
+        slots = [slot for slot in slots if bool(slot)]
+        return CreateOrUpdateDisqualified(
+            game_id=self._game_id,
+            disqualified_slots=slots
         )
 
     def parse_kills(self):

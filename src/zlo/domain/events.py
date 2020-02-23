@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import List
 
 from zlo.domain.types import ClassicRole
 
@@ -40,3 +41,9 @@ class CreateOrUpdateBestMove:
         self.best_1_slot = int(best_1_slot) if best_1_slot else 0
         self.best_2_slot = int(best_2_slot) if best_2_slot else 0
         self.best_3_slot = int(best_3_slot) if best_3_slot else 0
+
+
+@dataclass
+class CreateOrUpdateDisqualified:
+    game_id: str
+    disqualified_slots: List[int]

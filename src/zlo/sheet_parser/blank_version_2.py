@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 
 from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove, \
-    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion
+    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion, CreateOrUpdateNominatedForBest
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -114,7 +114,7 @@ class BlankParser:
         best_1_slot = self.get_slot_number_from_string(self._matrix[22][2])
         best_2_slot = self.get_slot_number_from_string(self._matrix[22][3])
         best_3_slot = self.get_slot_number_from_string(self._matrix[22][4])
-        if not best_1_slot + best_2_slot + best_3_slot > 1:
+        if not bool(best_1_slot) + bool(best_2_slot) + bool(best_3_slot) > 1:
             return None
 
         return CreateOrUpdateBestMove(
@@ -146,6 +146,14 @@ class BlankParser:
         return CreateOrUpdateSheriffVersion(
             game_id=self._game_id,
             sheriff_version_slots=slots
+        )
+
+    def parse_nominated_for_best(self) -> CreateOrUpdateNominatedForBest:
+        slots = [self.get_slot_number_from_string(value) for value in self._matrix[24][2:]]
+        slots = [slot for slot in slots if bool(slot)]
+        return CreateOrUpdateNominatedForBest(
+            game_id=self._game_id,
+            nominated_slots=slots
         )
 
     def parse_kills(self):

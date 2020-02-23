@@ -53,3 +53,9 @@ class CreateOrUpdateDisqualified:
 class CreateOrUpdateSheriffVersion:
     game_id: str
     sheriff_version_slots: List[int]
+
+
+@dataclass
+class CreateOrUpdateNominatedForBest:
+    game_id: str
+    nominated_slots: List[int]

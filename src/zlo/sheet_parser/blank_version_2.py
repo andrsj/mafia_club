@@ -1,7 +1,7 @@
 import uuid
-from typing import List
+from typing import List, Optional
 
-from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse
+from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -67,10 +67,12 @@ class BlankParser:
             advance_result=advanced_game_result.value
         )
 
-    def get_bonus_mark(self, value):
+    @staticmethod
+    def get_bonus_mark(value):
         return float(value.strip().replace(',', '.')) if value else 0
 
-    def get_role_from_string(self, value):
+    @staticmethod
+    def get_role_from_string(value):
         if value == "":
             return ClassicRole.citizen
         elif value == "М":
@@ -102,6 +104,15 @@ class BlankParser:
             )
 
         return houses_events
+
+    def parse_best_move(self) -> Optional[CreateOrUpdateBestMove]:
+        return CreateOrUpdateBestMove(
+            game_id=self._game_id,
+            killed_player_slot=self._matrix[22][1],
+            best_1_slot=self._matrix[22][2],
+            best_2_slot=self._matrix[22][3],
+            best_3_slot=self._matrix[22][4],
+        )
 
     def parse_kills(self):
         pass

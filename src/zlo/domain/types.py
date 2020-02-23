@@ -19,7 +19,6 @@ class ClassicRole(enum.Enum):
     sheriff = 2
     don = 3
 
-
 class GameResult(enum.Enum):
     unfinished = 0
     citizen = 1

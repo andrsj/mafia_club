@@ -69,14 +69,9 @@ if __name__ == "__main__":
         matrix = client.parse_worksheet(work_sheet)
         blank_parser = BlankParser(matrix)
         game_info = blank_parser.parse_game_info()
-        if not game_info.game_id:
+        if not blank_parser.if_game_is_new():
             game_info.game_id = str(uuid.uuid4())
             update_game_id(work_sheet, game_info.game_id)
         if args.games:
             bus.publish(game_info)
-        # game_data = blank_parser.parse_game_info()
         break
-    # game_data = blank_parser
-
-
-

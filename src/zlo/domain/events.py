@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from zlo.domain.types import ClassicRole
+
 
 @dataclass
 class CreateOrUpdateGame:
@@ -12,3 +14,13 @@ class CreateOrUpdateGame:
     tournament: str
     heading: str
     advance_result: int
+
+
+@dataclass
+class CreateOrUpdateHouse:
+    game_id: str
+    player_nickname: str
+    role: ClassicRole
+    slot: int
+    bonus_mark: float
+    fouls: int

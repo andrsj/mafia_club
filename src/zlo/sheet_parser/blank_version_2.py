@@ -1,8 +1,8 @@
 import uuid
+from typing import List
 
-from zlo.domain.events import CreateOrUpdateGame
-from zlo.domain.types import AdvancedGameResult
-
+from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse
+from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
 
@@ -13,6 +13,13 @@ class NotFinishedBlank(Exception):
 class BlankParser:
     def __init__(self, matrix):
         self._matrix = matrix
+        self._game_id = self._matrix[6][2]
+        if not self._game_id:
+            self._game_id = str(uuid.uuid4())
+            self._new_game = True
+
+    def if_game_is_new(self):
+        return self._new_game
 
     def parse_game_result(self):
         """
@@ -49,9 +56,8 @@ class BlankParser:
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
-        game_id = self._matrix[6][2]
         return CreateOrUpdateGame(
-            game_id=game_id,
+            game_id=self._game_id,
             heading=self._matrix[1][2],
             date=self._matrix[0][2],
             club=self._matrix[3][2],
@@ -61,8 +67,41 @@ class BlankParser:
             advance_result=advanced_game_result.value
         )
 
-    def parse_houses(self):
-        pass
+    def get_bonus_mark(self, value):
+        return float(value.strip().replace(',', '.')) if value else 0
+
+    def get_role_from_string(self, value):
+        if value == "":
+            return ClassicRole.citizen
+        elif value == "М":
+            return ClassicRole.mafia
+        elif value == "Ш":
+            return ClassicRole.sheriff
+        elif value == "Д":
+            return ClassicRole.don
+        else:
+            raise ValueError()
+
+    def parse_houses(self) -> List[CreateOrUpdateHouse]:
+        houses_events = []
+        for i in range(1, 11):
+            row_number = i + 9
+            houses_events.append(
+                CreateOrUpdateHouse(
+                    game_id=self._game_id,
+                    player_nickname=self._matrix[row_number][2],
+                    role=self.get_role_from_string(self._matrix[row_number][0].strip()),
+                    slot=int(self._matrix[row_number][1]),
+                    bonus_mark=self.get_bonus_mark(self._matrix[row_number][7]),
+                    fouls=len(
+                        self._matrix[row_number][3]
+                        + self._matrix[row_number][4]
+                        + self._matrix[row_number][5]
+                        + self._matrix[row_number][6]),
+                )
+            )
+
+        return houses_events
 
     def parse_kills(self):
         pass

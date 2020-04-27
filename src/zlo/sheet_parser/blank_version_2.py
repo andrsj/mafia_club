@@ -2,7 +2,8 @@ import uuid
 from typing import List, Optional
 
 from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove, \
-    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion, CreateOrUpdateNominatedForBest, CreateOrUpdateVoted
+    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion, CreateOrUpdateNominatedForBest, CreateOrUpdateVoted, \
+    CreateOrUpdateSheriffChecks
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -177,7 +178,7 @@ class BlankParser:
             voted_slots=result
         )
 
-    def parse_sheriff_checks(self):
+    def parse_sheriff_checks(self) -> Optional[CreateOrUpdateSheriffChecks]:
         pass
 
     def get_bonus_points_from_houses_data(self, houses_data=None):

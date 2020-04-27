@@ -65,3 +65,9 @@ class CreateOrUpdateNominatedForBest:
 class CreateOrUpdateVoted:
     game_id: str
     voted_slots: Dict[int, Optional[List[int]]]
+
+
+@dataclass
+class CreateOrUpdateSheriffChecks:
+    game_id: str
+    sheriff_checks: Dict[int, int]

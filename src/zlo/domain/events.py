@@ -70,4 +70,67 @@ class CreateOrUpdateVoted:
 @dataclass
 class CreateOrUpdateSheriffChecks:
     game_id: str
-    sheriff_checks: Dict[int, int]
+    sheriff_checks: List[int]
+
+
+@dataclass
+class CreateOrUpdateKills:
+    game_id: str
+    kills_slots: List[int]
+
+
+@dataclass
+class CreateOrUpdateDonChecks:
+    game_id: str
+    don_checks: List[int]
+
+
+@dataclass
+class CreateOrUpdateBonusFromHeading:
+    game_id: str
+    house_slot: int
+    value: float
+
+
+@dataclass
+class CreateOrUpdateBonusFromPlayers:
+    game_id: str
+    slot_from: int
+    slot_to: int
+
+
+@dataclass
+class CreateOrUpdateBonusTolerant:
+    game_id: str
+    slot_from: int
+    slot_to: int
+
+
+@dataclass
+class CreateOrUpdateMisses:
+    game_id: str
+    misses_slots: List[int]
+
+
+@dataclass
+class CreateOrUpdateHandOfMafia:
+    game_id: str
+    slot_from: int
+    slot_to: int
+
+
+@dataclass
+class CreateOrUpdateBreaks:
+    game_id: str
+    count: int
+    slot_from: int
+    slot_to: int
+
+
+@dataclass
+class CreateOrUpdateDevises:
+    game_id: str
+    killed_slot: int
+    first_slot: int
+    second_slot: int
+    third_slot: int

@@ -3,8 +3,20 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from zlo.domain.types import GameID, HouseID, PlayerID, ClassicRole, ClubID, TournamentID, BestMoveID, \
-    DeviseID, HandOfMafiaID
+from zlo.domain.types import (
+    GameID,
+    HouseID,
+    PlayerID,
+    ClassicRole,
+    ClubID,
+    TournamentID,
+    BestMoveID,
+    DeviseID,
+    HandOfMafiaID,
+    SheriffVersionID,
+    DisqualifiedID,
+    NominatedForBestID
+)
 
 
 @dataclass
@@ -18,6 +30,14 @@ class Player:
 
     def __repr__(self):
         return f"Player({self.nickname})"
+
+    def as_dict(self):
+        return {
+            "player_id": str(self.player_id),
+            "name": self.name,
+            "nickname": self.nickname,
+            "club": self.club
+        }
 
 
 @dataclass
@@ -61,18 +81,21 @@ class BestMove:
 
 @dataclass
 class Disqualified:
+    disqualified_id: DisqualifiedID
     game_id: GameID
     house: HouseID
 
 
 @dataclass
 class SheriffVersion:
+    sheriff_version_id: SheriffVersionID
     game_id: GameID
     house: HouseID
 
 
 @dataclass
 class NominatedForBest:
+    nominated_for_best_id: NominatedForBestID
     game_id: GameID
     house: HouseID
 
@@ -124,10 +147,12 @@ class Voted:
     voted_id: str
     game_id: GameID
     voted_house_id: HouseID
+    voted_day: int
 
 
 @dataclass
 class SheriffChecks:
+    sheriff_checks_id: str
     game_id: GameID
     checked_house_id: Optional[HouseID]
     circle_number: int
@@ -135,6 +160,7 @@ class SheriffChecks:
 
 @dataclass
 class DonChecks:
+    don_checks_id: str
     game_id: GameID
     checked_house_id: Optional[HouseID]
     circle_number: int

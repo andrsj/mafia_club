@@ -6,8 +6,34 @@ from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData, 
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
-from zlo.domain.model import Player, Game, House
-from zlo.adapters.repositories import PlayerRepository, HouseRepository, GameRepository, BestMove, BestMoveRepository
+from zlo.domain.model import (
+    Game,
+    House,
+    Kills,
+    Voted,
+    Devise,
+    Player,
+    BestMove,
+    DonChecks,
+    HandOfMafia,
+    Disqualified,
+    SheriffChecks,
+    SheriffVersion,
+    NominatedForBest,
+    BonusPointsFromPlayers,
+    BonusTolerantPointFromPlayers
+)
+from zlo.adapters.repositories import (
+    NominatedForBestRepository,
+    SheriffVersionRepository,
+    DisqualifiedRepository,
+    BestMoveRepository,
+    PlayerRepository,
+    VotedRepository,
+    HouseRepository,
+    GameRepository,
+    BestMove
+)
 
 
 def isretryable(exn):
@@ -67,6 +93,22 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
     @property
     def best_moves(self):
         return BestMoveRepository(self.session)
+
+    @property
+    def sheriff_versions(self):
+        return SheriffVersionRepository(self.session)
+
+    @property
+    def disqualifieds(self):
+        return DisqualifiedRepository(self.session)
+
+    @property
+    def nominated_for_best(self):
+        return NominatedForBestRepository(self.session)
+
+    @property
+    def voted(self):
+        return VotedRepository(self.session)
 
 
 class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
@@ -150,6 +192,55 @@ class DatabaseSchema:
             Column("best_2", ForeignKey("houses.house_id")),
             Column("best_3", ForeignKey("houses.house_id")),
         )
+        self.disqualifieds = Table(
+            "disqualifieds",
+            self._metadata,
+            Column(
+                "disqualified_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("house", ForeignKey("houses.house_id")),
+        )
+        self.sheriffversions = Table(
+            "sheriffversions",
+            self._metadata,
+            Column(
+                "sheriff_version_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("house", ForeignKey("houses.house_id")),
+        )
+        self.nominated_for_best = Table(
+            "nominated_for_best",
+            self._metadata,
+            Column(
+                "nominated_for_best_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("house", ForeignKey("houses.house_id")),
+        )
+        self.voted = Table(
+            "voted",
+            self._metadata,
+            Column(
+                "voted_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("voted_house_id", ForeignKey("houses.house_id")),
+            Column("voted_day", Integer)
+        )
 
 
 def _configure_mappings(metadata):
@@ -161,6 +252,10 @@ def _configure_mappings(metadata):
     mapper(Game, meta.games)
     mapper(House, meta.houses)
     mapper(BestMove, meta.best_moves)
+    mapper(SheriffVersion, meta.sheriffversions)
+    mapper(Disqualified, meta.disqualifieds)
+    mapper(Voted, meta.voted)
+    mapper(NominatedForBest, meta.nominated_for_best)
 
     return metadata
 

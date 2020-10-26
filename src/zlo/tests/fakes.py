@@ -1,6 +1,5 @@
 import datetime
 from typing import List
-from dateutil import parser
 
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
 from zlo.domain.model import Player, Game, House
@@ -21,7 +20,7 @@ class FakePlayerRepo:
 
     def get_by_id(self, player_id):
         for player in self.players:
-            if player.id == player_id:
+            if player.player_id == player_id:
                 return player
         return None
 

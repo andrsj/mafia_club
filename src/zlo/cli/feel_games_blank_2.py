@@ -52,6 +52,34 @@ if __name__ == "__main__":
         required=False,
         help="Parse and update best moves"
     )
+    my_parser.add_argument(
+        '--sheriff_versions',
+        dest='sheriff_versions',
+        action='store_true',
+        required=False,
+        help="Parse and update sheriff versions"
+    )
+    my_parser.add_argument(
+        '--disqualifieds',
+        dest='disqualifieds',
+        action='store_true',
+        required=False,
+        help="Pase and update disqualifieds"
+    )
+    my_parser.add_argument(
+        '--nominated_for_best',
+        dest='nominated_for_best',
+        action='store_true',
+        required=False,
+        help="Parse and update nominated for best"
+    )
+    my_parser.add_argument(
+        '--voted',
+        dest='voted',
+        action='store_true',
+        required=False,
+        help="Pase and update voted"
+    )
 
     my_parser.add_argument(
         "--sheet",
@@ -60,18 +88,59 @@ if __name__ == "__main__":
         required=True
     )
 
+    my_parser.add_argument(
+        "--blank",
+        dest='blank_title',
+        type=str,
+        required=True
+    )
+
     args = my_parser.parse_args()
+
+    handlers = [
+        (args.houses, "parse_houses"),
+        (args.best_moves, "parse_best_move"),
+        (args.sheriff_versions, "parse_sheriff_versions"),
+        (args.disqualifieds, "parse_disqualified"),
+        (args.nominated_for_best, "parse_nominated_for_best"),
+        (args.voted, "parse_voted_list"),
+        # ("parse_sheriff_checks")
+        # ("parse_kills")
+        # ("parse_devise")
+        # ("parse_hand_of_mafia")
+        # ("get_bonus_points_from_houses_data")
+        # ("get_bonus_tolerant_points_from_houses_data")
+        # ("get_bonus_points_from_heading")
+        # ("parse_don_checks")
+        # ("parse_breaks")
+        # ("parse_misses")
+    ]
 
     client = inject.instance(SpreadSheetClient)
     bus = inject.instance(MessageBus)
     sheet = client.client.open(args.sheet_title)
     for work_sheet in sheet.worksheets():
+
+        if work_sheet.title != args.blank_title:
+            continue
+
         matrix = client.parse_worksheet(work_sheet)
         blank_parser = BlankParser(matrix)
+
         game_info = blank_parser.parse_game_info()
-        if not blank_parser.if_game_is_new():
+        if blank_parser.if_game_is_new():
             game_info.game_id = str(uuid.uuid4())
             update_game_id(work_sheet, game_info.game_id)
         if args.games:
             bus.publish(game_info)
+
+        for arg, method_name in handlers:
+            if arg:
+                method = getattr(blank_parser, method_name)
+                event = method()
+                if not isinstance(event, list) and event is not None:
+                    bus.publish(event)
+                elif isinstance(event, list):
+                    for event_ in event:
+                        bus.publish(event_)
         break

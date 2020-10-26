@@ -1,8 +1,11 @@
 import json
+from os.path import dirname
 
 import gspread
 import numpy
 from oauth2client.service_account import ServiceAccountCredentials
+
+from zlo import credentials
 
 
 class SpreadSheetClient:
@@ -10,7 +13,7 @@ class SpreadSheetClient:
     def __init__(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
         creds = ServiceAccountCredentials.from_json_keyfile_name(
-            '/home/dvasilov/Projects/zlo/guiding/credentials/ZloMafiaClub-655c0c73f071.json', scope)
+            dirname(credentials.__file__) + "/zlomafiaclub-bf747a844d45.json", scope)
         self.client = gspread.authorize(creds)
 
     def parse_worksheet(self, worksheet):

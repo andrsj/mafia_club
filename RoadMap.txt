@@ -1,0 +1,96 @@
++ Створення гравців скрипт обновити (загрузити всю таблицю і парсити її)
++ Перевірити дублікати нікнеймів
+
+- Обновити бібліотеку aouth
+
++ Перевірити та обновити req
+
+Вигрузка бланка
+Список що не вигружається з бланку
+
+	GAME (БД) + Handler
+        + Result
+        + Advanced result [3x3 2x2 1x1 Clean Guessing]
+        + Data
+        + Club
+        + Tournament
+        + Table
+        + Heading (ведучий)
+
+    HOUSES
+        + Game ID
+        + Nickname
+        + Role
+        + Slot
+        + Bonus mark
+        + Fouls
+
+    BEST MOVE
+        + Game ID
+        + Killed player SLOT
+        + Slot 1-2-3
+
+    SheriffVersion -> Вскрився
+        + Game ID
+        + House
+
+    Disqualified -> Дискфаліфіковані
+        + Game ID
+        + House
+
+    NominatedForBest -> Номіновані на кращих
+        + Game ID
+        + House
+
+    Voted -> Заголосовані
+        + Game ID
+        + House
+        + Day
+
+
+	+ Model (dataclass)
+		[-] Перевірки шерифа
+        [-] Вбивства
+        [-] Бонус за толерантність
+        [-] Заповіт
+        [-] Перевірки Дона
+        [-] Додаткові бали від гравців
+        [-] Рука Мафії
+
+    - Model
+        [-] Додаткові бали від ведучого
+        [-] Промахи
+        [-] Зломи
+
+
+Для кожного не вигруженого
+	Тест
+	Івент, який летить в меседж бас
+	Хендлер, який читає івент
+	В ОРМ добавлена таблиця
+	Для таблиці - репозиторій
+	Міграції для таблиць
+	В бланк парсер - метод для парсингу даних
+
+Потенційне покращення (перевірка наявності гравців, перед збереженням даних)
+Чи є гравець в базі (Якщо гравця немає - то скіпнути гру)
+
+Статус бланка прямо в доках + дата (окреме поле)
+
+Автоматичне створення бланку (скрипт)
+На місяць (10 вкладок на вечір) по конкретних днях + заповнення дати
+
+
+
+
+
+EVENT - structure of event
+Handler - class for work in DB with event
+MessageBus - connect events and handlers
+	register -> connect
+	publish -> call handler (write in DB)
+
+
+Model (object) -> ModelRepository (session) /
+	-> SqlAlchemyUnitOfWork (property) -> SqlAlchemyUnitOfWorkManager /
+		-> SqlAlchemy -> configuration

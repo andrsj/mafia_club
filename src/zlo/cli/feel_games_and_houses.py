@@ -7,7 +7,7 @@ from typing import List
 
 import inject
 from zlo.adapters.bootstrap import bootstrap
-from zlo.cli.auth import auth
+from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.cli.exceptions import UnknownPlayer
 from zlo.cli.zlo_logger import get_logger
 from zlo.domain.infrastructure import UnitOfWorkManager
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     cfg = os.environ.copy()
     bootstrap(cfg)
 
-    client = auth()
+    client = SpreadSheetClient().client
     # time.sleep(40)
     sheets = [
         # '13/12/2019',

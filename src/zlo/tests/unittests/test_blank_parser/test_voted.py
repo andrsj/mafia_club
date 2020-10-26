@@ -1,5 +1,4 @@
-import contexts
-from expects import expect, equal, have_len, be_empty, be_none
+from expects import expect, equal, have_len, be_none
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.tests.unittests.test_blank_parser.common import BlankParserMixin
 
@@ -81,7 +80,3 @@ class WhenVotedHaveEmptyValuesWithSuccessfulVotes(BlankParserMixin):
     def it_should_correct_parse_5_round_votes(self):
         expect(self.voted_event.voted_slots[5]).to(have_len(1))
         expect(self.voted_event.voted_slots[5][0]).to(equal(10))
-
-
-if __name__ == "__main__":
-    contexts.main()

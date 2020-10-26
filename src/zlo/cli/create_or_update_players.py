@@ -1,13 +1,16 @@
 import os
-import time
 import uuid
+
 
 import inject
 from zlo.adapters.bootstrap import bootstrap
-from zlo.cli.auth import auth
+from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.model import Player
+
+
+KEY_DUBLICAT_WORD = '--Dublicat--'
 
 
 @inject.params(
@@ -42,27 +45,41 @@ if __name__ == "__main__":
     setup_env_with_test_database(cfg)
     bootstrap(cfg)
 
-    client = auth()
-    sheet = client.open('СписокГравців').sheet1
+    client = inject.instance(SpreadSheetClient)
+    sheet = client.client.open('СписокГравців1').sheet1
 
-    start_index = 226
-    step = 0
-    while step <= 300:
-        player_row = sheet.row_values(start_index + step)
-        player_nickname = player_row[1]
-        player_uuid = player_row[0]
-        if not player_nickname:
-            break
+    players = sheet.get_all_records()
+
+    list_nicknames = []
+    uuid_players_list = []
+
+    for index, player_ in enumerate(players, start=2):
+
+        if player_['Nickname'] in list_nicknames:
+            sheet.update(f'B{index}', KEY_DUBLICAT_WORD + player_['Nickname'])
+            print(f"Oppa, dublicat: {player_['Nickname']} : {index}")
+            uuid_players_list.append(KEY_DUBLICAT_WORD)
+            continue
+
+        if str(player_['Nickname']).startswith(KEY_DUBLICAT_WORD):
+            print(f"Oppa, dublicat: {player_['Nickname']} : {index}")
+            uuid_players_list.append(KEY_DUBLICAT_WORD)
+            continue
+
+        player_uuid = player_['UUID']
+        list_nicknames.append(player_['Nickname'])
+
         if not player_uuid:
-            print(f"New player nickname {player_nickname}")
+            print(f"New player nickname {player_['Nickname']}, index: {index}")
             player_uuid = str(uuid.uuid4())
-            sheet.update_cell(start_index + step, 1, player_uuid)
-        time.sleep(1)
+
+        uuid_players_list.append(player_uuid)
+
         create_or_update_player(player_data={
             "player_id": player_uuid,
             "name": None,
             "club": None,
-            "nickname": player_nickname
+            "nickname": player_['Nickname']
         })
-        step += 1
-        time.sleep(2)
+
+    sheet.update(f"A2:A{index}", [[i] for i in uuid_players_list])

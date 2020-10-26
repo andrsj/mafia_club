@@ -1,9 +1,25 @@
 import uuid
 from typing import List, Optional
 
-from zlo.domain.events import CreateOrUpdateGame, CreateOrUpdateHouse, CreateOrUpdateBestMove, \
-    CreateOrUpdateDisqualified, CreateOrUpdateSheriffVersion, CreateOrUpdateNominatedForBest, CreateOrUpdateVoted, \
-    CreateOrUpdateSheriffChecks
+from zlo.domain.events import (
+    CreateOrUpdateGame,
+    CreateOrUpdateHouse,
+    CreateOrUpdateBestMove,
+    CreateOrUpdateDisqualified,
+    CreateOrUpdateSheriffVersion,
+    CreateOrUpdateNominatedForBest,
+    CreateOrUpdateVoted,
+    CreateOrUpdateSheriffChecks,
+    CreateOrUpdateKills,
+    CreateOrUpdateDonChecks,
+    CreateOrUpdateMisses,
+    CreateOrUpdateBonusFromHeading,
+    CreateOrUpdateBonusFromPlayers,
+    CreateOrUpdateBonusTolerant,
+    CreateOrUpdateHandOfMafia,
+    CreateOrUpdateBreaks,
+    CreateOrUpdateDevises
+)
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
 
@@ -16,6 +32,7 @@ class BlankParser:
     def __init__(self, matrix):
         self._matrix = matrix
         self._game_id = self._matrix[6][2]
+        self._new_game = False
         if not self._game_id:
             self._game_id = str(uuid.uuid4())
             self._new_game = True
@@ -108,25 +125,26 @@ class BlankParser:
         return houses_events
 
     def parse_best_move(self) -> Optional[CreateOrUpdateBestMove]:
-        killed_player_slot = self.get_slot_number_from_string(self._matrix[22][1])
+        killed_player_slot = self.get_slot_or_count_number_from_string(self._matrix[22][1])
         if not killed_player_slot:
             return None
 
-        best_1_slot = self.get_slot_number_from_string(self._matrix[22][2])
-        best_2_slot = self.get_slot_number_from_string(self._matrix[22][3])
-        best_3_slot = self.get_slot_number_from_string(self._matrix[22][4])
+        best_1_slot = self.get_slot_or_count_number_from_string(self._matrix[22][2])
+        best_2_slot = self.get_slot_or_count_number_from_string(self._matrix[22][3])
+        best_3_slot = self.get_slot_or_count_number_from_string(self._matrix[22][4])
         if not bool(best_1_slot) + bool(best_2_slot) + bool(best_3_slot) > 1:
             return None
 
         return CreateOrUpdateBestMove(
             game_id=self._game_id,
             killed_player_slot=killed_player_slot,
-            best_1_slot=self.get_slot_number_from_string(self._matrix[22][2]),
-            best_2_slot=self.get_slot_number_from_string(self._matrix[22][3]),
-            best_3_slot=self.get_slot_number_from_string(self._matrix[22][4]),
+            best_1_slot=self.get_slot_or_count_number_from_string(self._matrix[22][2]),
+            best_2_slot=self.get_slot_or_count_number_from_string(self._matrix[22][3]),
+            best_3_slot=self.get_slot_or_count_number_from_string(self._matrix[22][4]),
         )
 
-    def get_slot_number_from_string(self, value):
+    @staticmethod
+    def get_slot_or_count_number_from_string(value) -> int:
         value = value.strip()
         if value in [str(i) for i in range(1, 11)]:
             return int(value)
@@ -137,11 +155,11 @@ class BlankParser:
         value = value.strip()
         value.replace(',', ' ').replace('.', ' ')
         if value:
-            return [self.get_slot_number_from_string(v) for v in value.split(' ')]
+            return [self.get_slot_or_count_number_from_string(v) for v in value.split(' ')]
         return None
 
     def parse_disqualified(self) -> CreateOrUpdateDisqualified:
-        slots = [self.get_slot_number_from_string(value) for value in self._matrix[21][7:]]
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[21][7:]]
         slots = [slot for slot in slots if bool(slot)]
         return CreateOrUpdateDisqualified(
             game_id=self._game_id,
@@ -149,7 +167,7 @@ class BlankParser:
         )
 
     def parse_sheriff_versions(self) -> CreateOrUpdateSheriffVersion:
-        slots = [self.get_slot_number_from_string(value) for value in self._matrix[22][7:]]
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[22][7:]]
         slots = [slot for slot in slots if bool(slot)]
         return CreateOrUpdateSheriffVersion(
             game_id=self._game_id,
@@ -157,15 +175,21 @@ class BlankParser:
         )
 
     def parse_nominated_for_best(self) -> CreateOrUpdateNominatedForBest:
-        slots = [self.get_slot_number_from_string(value) for value in self._matrix[24][2:]]
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[24][2:]]
         slots = [slot for slot in slots if bool(slot)]
         return CreateOrUpdateNominatedForBest(
             game_id=self._game_id,
             nominated_slots=slots
         )
 
-    def parse_kills(self):
-        pass
+    def parse_kills(self) -> CreateOrUpdateKills:
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[33][2:]]
+        while slots and slots[-1] == 0:
+            slots.pop()
+        return CreateOrUpdateKills(
+            game_id=self._game_id,
+            kills_slots=slots
+        )
 
     def parse_voted_list(self) -> Optional[CreateOrUpdateVoted]:
         result = {}
@@ -179,16 +203,117 @@ class BlankParser:
         )
 
     def parse_sheriff_checks(self) -> Optional[CreateOrUpdateSheriffChecks]:
-        pass
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[37][2:]]
+        while slots and slots[-1] == 0:
+            slots.pop()
+        return CreateOrUpdateSheriffChecks(
+            game_id=self._game_id,
+            sheriff_checks=slots
+        )
 
-    def get_bonus_points_from_houses_data(self, houses_data=None):
-        pass
+    def parse_don_checks(self) -> CreateOrUpdateDonChecks:
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[40][2:]]
+        while slots and slots[-1] == 0:
+            slots.pop()
+        return CreateOrUpdateDonChecks(
+            game_id=self._game_id,
+            don_checks=slots
+        )
 
-    def get_bonus_tolerant_points_from_houses_data(self, houses_data=None):
-        pass
+    def get_bonus_points_from_houses_data(self) -> List[CreateOrUpdateBonusFromPlayers]:
+        slots = {}
+        for i in range(1, 11):
+            row_number = i + 9
+            slot = self.get_slot_or_count_number_from_string(self._matrix[row_number][8])
+            if slot != 0:
+                slots[i] = slot
 
-    def parse_hand_of_mafia(self):
-        pass
+        return [
+            CreateOrUpdateBonusFromPlayers(
+                game_id=self._game_id,
+                slot_to=slot_to,
+                slot_from=slot_from
+            ) for slot_from, slot_to in slots.items()
+        ]
+
+    def get_bonus_tolerant_points_from_houses_data(self) -> List[CreateOrUpdateBonusTolerant]:
+        slots = {}
+        for i in range(1, 11):
+            row_number = i + 9
+            slot = self.get_slot_or_count_number_from_string(self._matrix[row_number][9])
+            if slot != 0:
+                slots[i] = slot
+
+        return [
+            CreateOrUpdateBonusTolerant(
+                game_id=self._game_id,
+                slot_to=slot_to,
+                slot_from=slot_from
+            ) for slot_from, slot_to in slots.items()
+        ]
+
+    def get_bonus_points_from_heading(self) -> List[CreateOrUpdateBonusFromHeading]:
+        bonus_points = {}
+        for i in range(1, 11):
+            row_number = i + 9
+            point = self.get_bonus_mark(self._matrix[row_number][7])
+            if point != 0:
+                bonus_points[i] = point
+
+        events = [
+            CreateOrUpdateBonusFromHeading(
+                game_id=self._game_id,
+                house_slot=slot,
+                value=point
+            ) for slot, point in bonus_points.items()
+        ]
+        return events
+
+    def parse_hand_of_mafia(self) -> CreateOrUpdateHandOfMafia:
+        voted_from = self.get_slot_or_count_number_from_string(self._matrix[6][8])
+        voted_to = self.get_slot_or_count_number_from_string(self._matrix[6][9])
+        return CreateOrUpdateHandOfMafia(
+            game_id=self._game_id,
+            slot_from=voted_from,
+            slot_to=voted_to
+        )
 
     def parse_devise(self):
-        pass
+        devises = []
+        for row in range(27, 31):
+            if self.get_slot_or_count_number_from_string(self._matrix[row][7]):
+                devises.append(
+                    CreateOrUpdateDevises(
+                        game_id=self._game_id,
+                        killed_slot=self.get_slot_or_count_number_from_string(self._matrix[row][7]),
+                        first_slot=self.get_slot_or_count_number_from_string(self._matrix[row][8]),
+                        second_slot=self.get_slot_or_count_number_from_string(self._matrix[row][9]),
+                        third_slot=self.get_slot_or_count_number_from_string(self._matrix[row][10]),
+                    )
+                )
+
+        return devises
+
+    def parse_misses(self) -> CreateOrUpdateMisses:
+        slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[34][2:]]
+        while slots and slots[-1] == 0:
+            slots.pop()
+        return CreateOrUpdateMisses(
+            game_id=self._game_id,
+            misses_slots=slots
+        )
+
+    def parse_breaks(self):
+        breaks = []
+        for row in range(27, 31):
+            if self.get_slot_or_count_number_from_string(self._matrix[row][2]):
+                breaks.append(
+                    CreateOrUpdateBreaks(
+                        game_id=self._game_id,
+                        count=self.get_slot_or_count_number_from_string(self._matrix[row][2]),
+                        slot_from=self.get_slot_or_count_number_from_string(self._matrix[row][3]),
+                        slot_to=self.get_slot_or_count_number_from_string(self._matrix[row][4])
+                    )
+                )
+
+        return breaks

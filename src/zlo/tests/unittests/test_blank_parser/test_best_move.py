@@ -46,6 +46,3 @@ class WhenBestMoveParsedAndDataIsNotValid(BlankParserMixin):
 
     def it_should_get_proper_values(self):
         expect(self.best_move_event).to(be_none)
-
-if __name__ == "__main__":
-    contexts.main()

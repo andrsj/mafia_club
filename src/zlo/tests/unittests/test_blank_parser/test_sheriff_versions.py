@@ -1,4 +1,3 @@
-import contexts
 from expects import expect, equal, have_len, be_empty
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.tests.unittests.test_blank_parser.common import BlankParserMixin
@@ -30,7 +29,3 @@ class WhenSheriffVersionParsedAndNoVersions(BlankParserMixin):
 
     def it_should_get_proper_values(self):
         expect(self.sheriff_version_event.sheriff_version_slots).to(be_empty)
-
-
-if __name__ == "__main__":
-    contexts.main()

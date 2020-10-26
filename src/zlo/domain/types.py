@@ -11,6 +11,9 @@ TournamentID = str
 BestMoveID = str
 DeviseID = str
 HandOfMafiaID = str
+DisqualifiedID = str
+SheriffVersionID = str
+NominatedForBestID = str
 
 
 class ClassicRole(enum.Enum):

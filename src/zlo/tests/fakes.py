@@ -2,7 +2,7 @@ import datetime
 from typing import List
 
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
-from zlo.domain.model import Player, Game, House
+from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
 
 
@@ -57,12 +57,28 @@ class FakeHouseRepo:
         return [house for house in self.houses if house.game_id == game_id]
 
 
+class FakeVotedRepo:
+    voted: List[Voted] = []
+
+    def add(self, voted: Voted):
+        self.voted.append(voted)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [voted for voted in self.voted if voted.game_id == game_id]
+
+    def get_by_game_id_and_days(self, game_id: GameID, day: int):
+        return [
+            voted for voted in self.voted
+            if voted.game_id == game_id and voted.voted_day == day
+        ]
+
 class FakeUnitOfWork(UnitOfWork):
 
     def __init__(self):
         self.games = FakeGameRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
+        self.voted = FakeVotedRepo()
         self.committed = False
         self.rolled_back = False
         self.flushed = False

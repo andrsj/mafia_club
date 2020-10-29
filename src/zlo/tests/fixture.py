@@ -4,7 +4,9 @@ import uuid
 from typing import List
 
 from zlo.domain.model import Player, House, Game
-from zlo.domain.types import ClassicRole, HouseID, GameResult
+from zlo.domain.types import ClassicRole, HouseID, GameResult, AdvancedGameResult
+from zlo.tests.fakes import FakeUnitOfWorkManager
+
 
 # This is default players to test some basic logic
 DEFAULT_PLAYERS = [
@@ -61,21 +63,22 @@ DEFAULT_PLAYERS = [
 ]
 
 
-def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
+def generate_ten_slots_for_game_in_repo(game_id, uowm: FakeUnitOfWorkManager, randomize_roles=False) -> List[House]:
     """
     Use default players to generate slots for game
     """
     houses: List[House] = []
     for i, player in enumerate(DEFAULT_PLAYERS, start=1):
-        houses.append(
-            House(
-                player_id=player.id,
-                role=ClassicRole.citizen,
-                game_id=game_id,
-                slot=i,
-                id=HouseID(str(uuid.uuid4()))  # what to do with this stuff
-            )
+        house = House(
+            player_id=player.player_id,
+            role=ClassicRole.citizen,
+            game_id=game_id,
+            slot=i,
+            house_id=HouseID(str(uuid.uuid4()))  # what to do with this stuff
         )
+        houses.append(house)
+        uowm.sess.houses.add(house)
+
     # first number will be sheriff
     # second -> don
     # third and fourth will be mafia
@@ -86,27 +89,34 @@ def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
         houses[roles[1]].role = ClassicRole.don
         houses[roles[2]].role = ClassicRole.mafia
         houses[roles[3]].role = ClassicRole.mafia
+
     return houses
 
 
-def prepare_game(uow,
-                 date=None,
-                 heading_player=None,
-                 game_id=None,
-                 table=0, club="ZloMafiaClub",
-                 result=GameResult.unfinished) -> Game:
-    print(id(uow))
+def prepare_game(
+    uow: FakeUnitOfWorkManager,
+    date=None,
+    heading_player=None,
+    game_id=None,
+    table=0,
+    club="ZloMafiaClub",
+    result=GameResult.unfinished
+) -> Game:
+
     if heading_player is None:
         heading_player = Player(nickname="Nata", name="Katya", club="ZloMafiaClub")
-        uow.players.add(heading_player)
+        uow.sess.players.add(heading_player)
+
     game = Game(
         date=date if date else datetime.datetime.utcnow(),
-        id=game_id if game_id is not None else str(uuid.uuid4()),
-        heading=heading_player.id,
+        game_id=game_id if game_id is not None else str(uuid.uuid4()),
+        heading=heading_player.player_id,
         club=club,
-        result=result,
-        table=table
+        result=result.value,
+        table=table,
+        tournament=None,
+        advance_result=AdvancedGameResult.guessing_game.value
     )
 
-    uow.games.add(game)
+    uow.sess.games.add(game)
     return game

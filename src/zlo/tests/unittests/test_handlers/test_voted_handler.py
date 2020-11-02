@@ -2,13 +2,14 @@ from random import sample
 from typing import List
 
 
+import contexts
 from zlo.domain.model import House
 from zlo.domain.handlers import CreateOrUpdateVotedHundler
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
 
 
-class WhenDisqualiefieldIsCreating(BaseTestHadnler):
+class WhenVotedIsCreating(BaseTestHadnler):
 
     def given_fake_uowm_handler_and_info(self):
         self.handler = CreateOrUpdateVotedHundler(uowm=self._uown)

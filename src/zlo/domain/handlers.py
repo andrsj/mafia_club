@@ -252,7 +252,7 @@ class CreateOrUpdateVotedHundler:
             for day, slots in evt.voted_slots.items():
                 if slots is not None:
                     for slot in slots:
-                        house = next((house_ for house_ in houses if lambda house_: house_.slot == slot), None)
+                        house = next(filter(lambda house_: house_.slot == slot, houses), None)
                         if house is not None:
                             voted_houses.append({'day': day, 'house': house.house_id})
             voted: List[Voted] = tx.voted.get_by_game_id(evt.game_id)

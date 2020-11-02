@@ -63,22 +63,21 @@ DEFAULT_PLAYERS = [
 ]
 
 
-def generate_ten_slots_for_game_in_repo(game_id, uowm: FakeUnitOfWorkManager, randomize_roles=False) -> List[House]:
+def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
     """
     Use default players to generate slots for game
     """
     houses: List[House] = []
     for i, player in enumerate(DEFAULT_PLAYERS, start=1):
-        house = House(
-            player_id=player.player_id,
-            role=ClassicRole.citizen,
-            game_id=game_id,
-            slot=i,
-            house_id=HouseID(str(uuid.uuid4()))  # what to do with this stuff
+        houses.append(
+            House(
+                player_id=player.player_id,
+                role=ClassicRole.citizen,
+                game_id=game_id,
+                slot=i,
+                house_id=HouseID(str(uuid.uuid4()))  # what to do with this stuff
+            )
         )
-        houses.append(house)
-        uowm.sess.houses.add(house)
-
     # first number will be sheriff
     # second -> don
     # third and fourth will be mafia
@@ -89,17 +88,20 @@ def generate_ten_slots_for_game_in_repo(game_id, uowm: FakeUnitOfWorkManager, ra
         houses[roles[1]].role = ClassicRole.don
         houses[roles[2]].role = ClassicRole.mafia
         houses[roles[3]].role = ClassicRole.mafia
+    else:
+        houses[0].role = ClassicRole.sheriff
+        houses[1].role = ClassicRole.don
+        houses[2].role = ClassicRole.mafia
+        houses[3].role = ClassicRole.mafia
 
     return houses
-
 
 def prepare_game(
     uow: FakeUnitOfWorkManager,
     date=None,
     heading_player=None,
     game_id=None,
-    table=0,
-    club="ZloMafiaClub",
+    table=0, club="ZloMafiaClub",
     result=GameResult.unfinished
 ) -> Game:
 

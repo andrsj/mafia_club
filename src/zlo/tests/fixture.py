@@ -112,7 +112,7 @@ def prepare_game(
     game = Game(
         date=date if date else datetime.datetime.utcnow(),
         game_id=game_id if game_id is not None else str(uuid.uuid4()),
-        heading=heading_player.id,
+        heading=heading_player.player_id,
         club=club,
         result=result.value,
         table=table,

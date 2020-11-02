@@ -3,24 +3,16 @@ from typing import List
 
 
 from zlo.domain.model import House
-from zlo.tests.fakes import FakeUnitOfWorkManager
 from zlo.domain.handlers import CreateOrUpdateVotedHundler
 from zlo.domain.events import CreateOrUpdateVoted
-from zlo.tests.fixture import prepare_game, generate_ten_slots_for_game_in_repo
+from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
 
 
-class WhenDisqualiefieldIsCreating:
+class WhenDisqualiefieldIsCreating(BaseTestHadnler):
 
     def given_fake_uowm_handler_and_info(self):
-        self._uown = FakeUnitOfWorkManager()
         self.handler = CreateOrUpdateVotedHundler(uowm=self._uown)
 
-        self.game = prepare_game(uow=self._uown)
-
-        self.houses: List[House] = generate_ten_slots_for_game_in_repo(
-            game_id=self.game.game_id,
-            uowm=self._uown
-        )
         # Choise houses for event
         self.choises_houses: List[House] = sample(self.houses, k=3)
         self.days = {

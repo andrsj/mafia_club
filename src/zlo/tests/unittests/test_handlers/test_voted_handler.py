@@ -1,9 +1,3 @@
-from random import sample
-from typing import List
-
-
-import contexts
-from zlo.domain.model import House
 from zlo.domain.handlers import CreateOrUpdateVotedHundler
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
@@ -11,15 +5,18 @@ from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
 
 class WhenVotedIsCreating(BaseTestHadnler):
 
-    def given_fake_uowm_handler_and_info(self):
+    @classmethod
+    def examples_of_days(cls):
+        yield {1: [1], 2: [2]}
+        yield {1: [1, 2], 2: [3, 4]}
+        yield {1: [1, 2, 3], 2: [4, 5, 6]}
+        yield {1: [1, 2, 3, 4]}
+        yield {1: [1, 2, 3, 4, 5]}
+
+    def given_fake_uowm_handler_and_info(self, example):
         self.handler = CreateOrUpdateVotedHundler(uowm=self._uown)
 
-        # Choise houses for event
-        self.choises_houses: List[House] = sample(self.houses, k=3)
-        self.days = {
-            1: [house.slot for house in self.choises_houses[:2]],
-            2: [self.choises_houses[2].slot]
-        }
+        self.days = example
 
         self.voted_event = CreateOrUpdateVoted(
             game_id=self.game.game_id,
@@ -33,4 +30,7 @@ class WhenVotedIsCreating(BaseTestHadnler):
         for day, slots in self.days.items():
             our_voted = self._uown.sess.voted.get_by_game_id_and_days(self.game.game_id, day)
             for voted in our_voted:
-                assert voted.voted_house_id in [house.house_id for house in self.choises_houses]
+                assert voted.voted_house_id in [
+                    house.house_id for house in self.houses
+                    if house.slot in self.days[day]
+                ]

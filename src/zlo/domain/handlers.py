@@ -284,17 +284,13 @@ class CreateOrUpdateKillsHandler:
     def __call__(self, evt: CreateOrUpdateKills):
         with self._uowm.start() as tx:
             houses: List[House] = tx.houses.get_by_game_id(evt.game_id)
-            killed_houses = []
 
+            killed_houses = []
             for slot in evt.kills_slots:
                 house = next(filter(lambda house_: house_.slot == slot, houses), None)
                 killed_houses.append(house)
 
-            kills_dict = {day: house for day, house in enumerate(
-                killed_houses, start=1
-            )}
-
-            kills_dict = {day: house for day, house in kills_dict.items() if house is not None}
+            kills_dict = {day: house for day, house in enumerate(killed_houses, start=1) if house is not None}
 
             kills: List[Kills] = tx.kills.get_by_game_id(evt.game_id)
             if not kills:

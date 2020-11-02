@@ -32,18 +32,15 @@ class WhenKillsIsCreating(BaseTestHadnler):
         our_kills = self._uown.sess.kills.get_by_game_id(game_id=self.game.game_id)
 
         # For save order of zero number houses (no house)
-        # For example [1, 0, 2, 3] => [House1, None, House2, House3]
-        killed_houses_expected = []
+        # For example List: slot [1, 0, 2, 3] => List: house_id = [House1, None, House2, House3]
+        killed_houses_id_expected = []
         for slot in choises_slots:
-            killed_houses_expected.append(
-                next(filter(lambda house_: house_.slot == slot, self.houses), None)
-            )
+            house = next(filter(lambda house_: house_.slot == slot, self.houses), None)
+            value = house.house_id if house is not None else None
+            killed_houses_id_expected.append(value)
 
         # Get dict like {day: house_id} for tests
-        circles = {day: house.house_id if house is not None else None for day, house in enumerate(
-            killed_houses_expected,
-            start=1
-        )}
+        circles = {day: house_id for day, house_id in enumerate(killed_houses_id_expected, start=1)}
 
         expect(our_kills).to(have_len(len([slot for slot in choises_slots if slot])))
         for our_kill in our_kills:

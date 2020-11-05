@@ -1,6 +1,7 @@
 import logging
 import uuid
 from typing import List
+from collections import namedtuple
 
 import inject
 from zlo.domain.events import (
@@ -248,25 +249,40 @@ class CreateOrUpdateVotedHundler:
         with self._uowm.start() as tx:
             # Create ot update voted
             houses: List[House] = tx.houses.get_by_game_id(evt.game_id)
-            voted_houses = []
+            voted_event_houses = []
+
+            event_house = namedtuple("EventHouse", ['day', 'house_id'])
+
             for day, slots in evt.voted_slots.items():
-                if slots is not None:
-                    for slot in slots:
-                        house = next(filter(lambda house_: house_.slot == slot, houses), None)
-                        if house is not None:
-                            voted_houses.append({'day': day, 'house': house.house_id})
-            voted: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
-            if not voted:
-                for voted_house in voted_houses:
-                    voted_ = Voted(
+                if slots is None:
+                    continue
+                for slot in slots:
+                    house = next(filter(lambda house_: house_.slot == slot, houses), None)
+                    if house is None:
+                        continue
+                    voted_event_houses.append(event_house(day=day, house_id=house.house_id))
+
+            votes: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
+            if not votes:
+                for voted_house in voted_event_houses:
+                    voted = Voted(
                         voted_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
-                        voted_house_id=voted_house['house'],
-                        voted_day=voted_house['day']
+                        voted_house_id=voted_house.house_id,
+                        voted_day=voted_house.day
                     )
-                    tx.voted.add(voted_)
+                    tx.voted.add(voted)
             else:
-                for voted_, voted_house in zip(voted, voted_houses):
-                    voted_.voted_house_id = voted_house['house']
-                    voted_.voted_day = voted_house['day']
+                for event_house in voted_event_houses:
+                    voted = next(filter(lambda _voted: _voted.voted_house_id == event_house.house_id, votes), None)
+                    if voted is None:
+                        voted = Voted(
+                            game_id=evt.game_id,
+                            voted_id=str(uuid.uuid4()),
+                            voted_house_id=event_house.house_id,
+                            voted_day=event_house.day
+                        )
+                        tx.voted.add(voted)
+                    else:
+                        voted.voted_day = event_house.day
             tx.commit()

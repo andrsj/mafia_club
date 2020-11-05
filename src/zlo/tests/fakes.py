@@ -63,6 +63,9 @@ class FakeVotedRepo:
     def add(self, voted: Voted):
         self.voted.append(voted)
 
+    def delete(self, voted: Voted):
+        self.voted.remove(voted)
+
     def get_by_game_id(self, game_id: GameID):
         return [voted for voted in self.voted if voted.game_id == game_id]
 

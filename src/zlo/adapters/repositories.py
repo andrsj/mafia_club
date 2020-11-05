@@ -135,3 +135,6 @@ class VotedRepository:
 
     def add(self, voted: Voted):
         self._session.add(voted)
+
+    def delete(self, voted: Voted):
+        self._session.query(Voted).filter_by(Voted.voted_id == voted.voted_id).delete()

@@ -276,16 +276,34 @@ class CreateOrUpdateVotedHundler:
                     )
                     tx.voted.add(voted)
             else:
-                for event_house in voted_event_houses:
-                    voted = next(filter(lambda _voted: _voted.voted_house_id == event_house.house_id, votes), None)
-                    if voted is None:
-                        voted = Voted(
-                            game_id=evt.game_id,
-                            voted_id=str(uuid.uuid4()),
-                            voted_house_id=event_house.house_id,
-                            voted_day=event_house.day
-                        )
-                        tx.voted.add(voted)
-                    else:
-                        voted.voted_day = event_house.day
+                # Check if no one will be deleted
+                if len(votes) == len(voted_event_houses):
+                    for event_house in voted_event_houses:
+                        # Get needed model
+                        voted = next(filter(lambda _voted: _voted.voted_house_id == event_house.house_id, votes), None)
+
+                        if voted is None:
+                            # Create new model
+                            voted = Voted(
+                                game_id=evt.game_id,
+                                voted_id=str(uuid.uuid4()),
+                                voted_house_id=event_house.house_id,
+                                voted_day=event_house.day
+                            )
+                            tx.voted.add(voted)
+                        else:
+                            # Update model
+                            voted.voted_day = event_house.day
+
+                else:
+                    # If one from models will be deleted
+                    for event_house in voted_event_houses:
+                        for vote in votes:
+                            # If model house_id not in event houses
+                            if vote.voted_house_id not in [event.house_id for event in voted_event_houses]:
+                                tx.voted.delete(vote)
+
+                            # Update model (find by house_id)
+                            if event_house.house_id == vote.voted_house_id:
+                                vote.voted_day = event_house.day
             tx.commit()

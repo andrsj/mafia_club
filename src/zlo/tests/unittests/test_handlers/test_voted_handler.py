@@ -44,16 +44,17 @@ class WhenVotedIsUpdated(BaseTestHadnler):
 
     @classmethod
     def examples_of_days(cls):
-        yield {1: [1], 4: [3]}
-        yield {1: [1, 2], 3: [3]}
-        yield {1: [1], 2: [3]}
+        yield {1: [1], 3: [3]}, {1: [1], 4: [3]}
+        yield {1: [1], 3: [3]}, {1: [1, 2], 3: [3]}
+        yield {1: [1], 3: [3]}, {1: [1, 2], 2: [3]}
+        yield {1: [1, 2]}, {1: [1]}
 
-    def given_fake_uowm_handler_and_info(self, example):
+    def given_fake_uowm_handler_and_info(self, old_days, new_days):
         self.cache = FakeHouseCacheMemory(uowm=self._uown)
         self.handler = CreateOrUpdateVotedHundler(uowm=self._uown, cache=self.cache)
 
         # Create data in repository
-        self.old_days = {1: [1], 3: [3]}
+        self.old_days = old_days
         self.voted_event = CreateOrUpdateVoted(
             game_id=self.game.game_id,
             voted_slots=self.old_days
@@ -61,7 +62,7 @@ class WhenVotedIsUpdated(BaseTestHadnler):
         self.handler(self.voted_event)
 
         # New updated data
-        self.update_days = example
+        self.update_days = new_days
         self.voted_event = CreateOrUpdateVoted(
             game_id=self.game.game_id,
             voted_slots=self.update_days

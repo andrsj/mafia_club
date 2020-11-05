@@ -1,6 +1,6 @@
 import logging
 import uuid
-from typing import List
+from typing import List, Dict
 from collections import namedtuple
 
 import inject
@@ -13,7 +13,7 @@ from zlo.domain.events import (
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest
 )
-from zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.infrastructure import UnitOfWorkManager, CacheMemory
 from zlo.domain.model import (
     Game,
     House,
@@ -241,16 +241,19 @@ class CreateOrUpdateVotedHundler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
-    def __init__(self, uowm):
+    def __init__(self, uowm, cache: CacheMemory):
         self._uowm = uowm
         self._log = logging.getLogger(__name__)
+        self.cache = cache
 
     def __call__(self, evt: CreateOrUpdateVoted):
         with self._uowm.start() as tx:
             # Create ot update voted
-            houses: List[House] = tx.houses.get_by_game_id(evt.game_id)
-            voted_event_houses = []
 
+            game_slot_houses_dict: Dict[int, House] = self.cache.get_by_game_id_from_cache(evt.game_id)
+            houses: List[House] = [house for _, house in game_slot_houses_dict.items()]
+
+            voted_event_houses = []
             event_house = namedtuple("EventHouse", ['day', 'house_id'])
 
             for day, slots in evt.voted_slots.items():

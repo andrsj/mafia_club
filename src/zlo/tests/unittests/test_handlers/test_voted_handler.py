@@ -1,6 +1,8 @@
+import contexts
 from zlo.domain.handlers import CreateOrUpdateVotedHundler
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
+from zlo.tests.fakes import FakeHouseCacheMemory
 
 
 class WhenVotedIsCreating(BaseTestHadnler):
@@ -14,7 +16,8 @@ class WhenVotedIsCreating(BaseTestHadnler):
         yield {1: [1, 2, 3, 4, 5]}
 
     def given_fake_uowm_handler_and_info(self, example):
-        self.handler = CreateOrUpdateVotedHundler(uowm=self._uown)
+        self.cache = FakeHouseCacheMemory(uowm=self._uown)
+        self.handler = CreateOrUpdateVotedHundler(uowm=self._uown, cache=self.cache)
 
         self.days = example
 
@@ -46,7 +49,8 @@ class WhenVotedIsUpdated(BaseTestHadnler):
         yield {1: [1], 2: [3]}
 
     def given_fake_uowm_handler_and_info(self, example):
-        self.handler = CreateOrUpdateVotedHundler(uowm=self._uown)
+        self.cache = FakeHouseCacheMemory(uowm=self._uown)
+        self.handler = CreateOrUpdateVotedHundler(uowm=self._uown, cache=self.cache)
 
         # Create data in repository
         self.old_days = {1: [1], 3: [3]}
@@ -75,3 +79,6 @@ class WhenVotedIsUpdated(BaseTestHadnler):
                     house.house_id for house in self.houses
                     if house.slot in self.update_days[day]
                 ]
+
+if __name__ == '__main__':
+    contexts.main()

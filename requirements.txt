@@ -8,5 +8,4 @@ Contexts==0.12
 oauth2client==4.1.3
 gspread==3.6.0
 alembic==1.2.1
-dataclasses==0.7
 python_dateutil==2.8.1

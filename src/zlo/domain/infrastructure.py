@@ -1,16 +1,16 @@
 class UnitOfWork:
 
     def __enter__(self):
-        raise NotImplementedError("enter")
+        raise NotImplementedError
 
     def __exit__(self, type, value, traceback):
-        raise NotImplementedError("exit")
+        raise NotImplementedError
 
     def commit(self):
-        raise NotImplementedError("commit")
+        raise NotImplementedError
 
     def rollback(self):
-        raise NotImplementedError("rollback")
+        raise NotImplementedError
 
 
 class UnitOfWorkManager:
@@ -21,11 +21,8 @@ class UnitOfWorkManager:
 
 class CacheMemory:
 
-    def get_by_game_id_from_cache(self, game_id):
-        raise NotImplementedError("get by game id from cache")
-
-    def __get_by_game_id_from_db(self, game_id):
-        raise NotImplementedError("get by game id from db")
+    def get_houses_by_game_id(self, game_id):
+        raise NotImplementedError
 
     def __check_data_by_game_id_in_cache(self, game_id):
-        raise NotImplementedError("check data by game id in cache")
+        raise NotImplementedError

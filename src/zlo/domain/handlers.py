@@ -1,5 +1,6 @@
 import logging
 import uuid
+from copy import copy
 from typing import List, Dict
 from collections import namedtuple
 
@@ -31,6 +32,7 @@ from zlo.domain.model import (
     BonusPointsFromPlayers,
     BonusTolerantPointFromPlayers
 )
+from zlo.tests.fakes import FakeHouseCacheMemory
 
 
 class CreateOrUpdateGameHandler:
@@ -237,73 +239,67 @@ class CreateOrUpdateNominatedForBestHundler:
             tx.commit()
 
 
-class CreateOrUpdateVotedHundler:
+class CreateOrUpdateVotedHandler:
     @inject.params(
-        uowm=UnitOfWorkManager
+        uowm=UnitOfWorkManager,
+        cache=CacheMemory
     )
-    def __init__(self, uowm, cache: CacheMemory):
+    def __init__(self, uowm, cache):
         self._uowm = uowm
         self._log = logging.getLogger(__name__)
-        self.cache = cache
+        self.cache: FakeHouseCacheMemory = cache
 
     def __call__(self, evt: CreateOrUpdateVoted):
         with self._uowm.start() as tx:
             # Create ot update voted
 
-            game_slot_houses_dict: Dict[int, House] = self.cache.get_by_game_id_from_cache(evt.game_id)
-            houses: List[House] = [house for _, house in game_slot_houses_dict.items()]
+            # Get slots from cache if they exist
+            houses: Dict[int, House] = self.cache.get_houses_by_game_id(evt.game_id)
+
+            if houses is None:
+                houses_from_db: List[House] = tx.houses.get_by_game_id(evt.game_id)
+                self.cache.add_houses_by_game(game_id=evt.game_id, houses=houses_from_db)
+                houses = {house.slot: house for house in houses_from_db}
 
             voted_event_houses = []
+            # This object if to replace list of dict with list of namedtuple.
+            # Just to make code more readable and comfortable to write
             event_house = namedtuple("EventHouse", ['day', 'house_id'])
 
+            # Parse voted slots from event
             for day, slots in evt.voted_slots.items():
                 if slots is None:
                     continue
                 for slot in slots:
-                    house = next(filter(lambda house_: house_.slot == slot, houses), None)
-                    if house is None:
+                    try:
+                        house = houses[slot]
+                    except KeyError:
+                        # todo exception should be raised about missing house
                         continue
+
                     voted_event_houses.append(event_house(day=day, house_id=house.house_id))
 
+            # Get slots which are already saved in db. And check if they are up-to-date
+
             votes: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
-            if not votes:
-                for voted_house in voted_event_houses:
+            all_votes_tuples = [event_house(voted.day, voted.house_id) for voted in votes]
+            valid_votes = copy(all_votes_tuples)
+
+            # Remove redundant
+            for voted, voted_t in zip(votes, all_votes_tuples):
+                if voted_t not in voted_event_houses:
+                    tx.voted.delete(voted)
+                    valid_votes.remove(voted_t)
+
+            # Add which is missed
+            for voted_event in voted_event_houses:
+                if voted_event not in valid_votes:
                     voted = Voted(
-                        voted_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
-                        voted_house_id=voted_house.house_id,
-                        voted_day=voted_house.day
+                        voted_id=str(uuid.uuid4()),
+                        house_id=voted_event.house_id,
+                        day=voted_event.day
                     )
                     tx.voted.add(voted)
-            else:
-                # Check if no one will be deleted
-                if len(votes) == len(voted_event_houses):
-                    for event_house in voted_event_houses:
-                        # Get needed model
-                        voted = next(filter(lambda _voted: _voted.voted_house_id == event_house.house_id, votes), None)
 
-                        if voted is None:
-                            # Create new model
-                            voted = Voted(
-                                game_id=evt.game_id,
-                                voted_id=str(uuid.uuid4()),
-                                voted_house_id=event_house.house_id,
-                                voted_day=event_house.day
-                            )
-                            tx.voted.add(voted)
-                        else:
-                            # Update model
-                            voted.voted_day = event_house.day
-
-                else:
-                    # If one from models will be deleted
-                    for event_house in voted_event_houses:
-                        for vote in votes:
-                            # If model house_id not in event houses
-                            if vote.voted_house_id not in [event.house_id for event in voted_event_houses]:
-                                tx.voted.delete(vote)
-
-                            # Update model (find by house_id)
-                            if event_house.house_id == vote.voted_house_id:
-                                vote.voted_day = event_house.day
             tx.commit()

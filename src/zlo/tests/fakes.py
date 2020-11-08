@@ -72,8 +72,9 @@ class FakeVotedRepo:
     def get_by_game_id_and_days(self, game_id: GameID, day: int):
         return [
             voted for voted in self.voted
-            if voted.game_id == game_id and voted.voted_day == day
+            if voted.game_id == game_id and voted.day == day
         ]
+
 
 class FakeUnitOfWork(UnitOfWork):
 
@@ -117,17 +118,8 @@ class FakeUnitOfWorkManager(UnitOfWorkManager):
 class FakeHouseCacheMemory(CacheMemory):
     cache: Dict[GameID, Dict[int, House]] = {}
 
-    def __init__(self, uowm: FakeUnitOfWorkManager):
-        self._uowm = uowm
+    def get_houses_by_game_id(self, game_id: GameID) -> Dict[int, House]:
+        return self.cache.get(game_id)
 
-    def get_by_game_id_from_cache(self, game_id: GameID) -> Dict[int, House]:
-        if not self.__check_data_by_game_id_in_cache(game_id):
-            self.__get_by_game_id_from_db(game_id)
-        return self.cache[game_id]
-
-    def __get_by_game_id_from_db(self, game_id: GameID):
-        houses = self._uowm.sess.houses.get_by_game_id(game_id)
+    def add_houses_by_game(self, game_id: GameID, houses: List[House]):
         self.cache[game_id] = {house.slot: house for house in houses}
-
-    def __check_data_by_game_id_in_cache(self, game_id: GameID):
-        return game_id in self.cache

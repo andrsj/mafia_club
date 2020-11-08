@@ -7,6 +7,7 @@ from zlo.adapters import orm
 from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.config import map_handlers
+from zlo.tests.fakes import FakeHouseCacheMemory
 
 
 def bootstrap(env):
@@ -21,6 +22,7 @@ def configure_binder(env, binder):
 
     dal.configure_mappings()
     binder.bind(ports.UnitOfWorkManager, dal.unit_of_work_manager())
+    binder.bind(ports.CacheMemory, FakeHouseCacheMemory())
     binder.bind("orm", dal)
 
     client = SpreadSheetClient()

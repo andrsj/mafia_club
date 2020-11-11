@@ -112,7 +112,7 @@ class CreateOrUpdateHouseHandler:
             tx.commit()
 
 
-class CreateOrUpdateBestMoveHundler:
+class CreateOrUpdateBestMoveHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -149,7 +149,7 @@ class CreateOrUpdateBestMoveHundler:
             tx.commit()
 
 
-class CreateOrUpdateSheriffVersionHundler:
+class CreateOrUpdateSheriffVersionHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -179,7 +179,7 @@ class CreateOrUpdateSheriffVersionHundler:
             tx.commit()
 
 
-class CreateOrUpdateDisqualifiedHundler:
+class CreateOrUpdateDisqualifiedHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -209,7 +209,7 @@ class CreateOrUpdateDisqualifiedHundler:
             tx.commit()
 
 
-class CreateOrUpdateNominatedForBestHundler:
+class CreateOrUpdateNominatedForBestHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )

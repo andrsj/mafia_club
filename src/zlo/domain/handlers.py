@@ -14,7 +14,7 @@ from zlo.domain.events import (
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest
 )
-from zlo.domain.infrastructure import UnitOfWorkManager, CacheMemory
+from zlo.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import (
     Game,
     House,
@@ -242,7 +242,7 @@ class CreateOrUpdateNominatedForBestHundler:
 class CreateOrUpdateVotedHandler:
     @inject.params(
         uowm=UnitOfWorkManager,
-        cache=CacheMemory
+        cache=HouseCacheMemory
     )
     def __init__(self, uowm, cache):
         self._uowm = uowm

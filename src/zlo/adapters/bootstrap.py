@@ -22,7 +22,7 @@ def configure_binder(env, binder):
 
     dal.configure_mappings()
     binder.bind(ports.UnitOfWorkManager, dal.unit_of_work_manager())
-    binder.bind(ports.CacheMemory, FakeHouseCacheMemory())
+    binder.bind(ports.HouseCacheMemory, FakeHouseCacheMemory())
     binder.bind("orm", dal)
 
     client = SpreadSheetClient()

@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Dict
 
-from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, CacheMemory
+from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
 
@@ -133,7 +133,7 @@ class FakeUnitOfWorkManager(UnitOfWorkManager):
         return self.sess
 
 
-class FakeHouseCacheMemory(CacheMemory):
+class FakeHouseCacheMemory(HouseCacheMemory):
     cache: Dict[GameID, Dict[int, House]] = {}
 
     def get_houses_by_game_id(self, game_id: GameID) -> Dict[int, House]:

@@ -2,11 +2,10 @@ from collections import defaultdict
 from typing import Dict
 
 import contexts
-from nose.tools import assert_dict_equal
+from nose.tools import assert_dict_equal, assert_list_equal
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.domain.handlers import CreateOrUpdateVotedHandler
 from zlo.domain.model import House
-from zlo.tests.fakes import FakeHouseCacheMemory
 from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
 
 
@@ -21,9 +20,10 @@ class WhenVotedIsCreating(BaseTestHadnler):
         yield {1: [1, 2, 3, 4, 5]}
 
     def given_fake_uowm_handler_and_info(self, example):
+
         self.handler = CreateOrUpdateVotedHandler(
             uowm=self._uown,
-            cache=FakeHouseCacheMemory()
+            cache=self.cache
         )
         self.days = example
 
@@ -37,16 +37,23 @@ class WhenVotedIsCreating(BaseTestHadnler):
 
     def it_should_save_voted(self):
         our_votes = self._uown.sess.voted.get_by_game_id(self.game.game_id)
+        our_votes_tuples = [(voted.day, voted.house_id) for voted in our_votes]
+
+        houses = self.cache.get_houses_by_game_id(self.game.game_id)
+        expected_votes_tuples = []
         for day, slots in self.days.items():
-            our_voted = [voted for voted in our_votes if voted.day == day]
-            for voted in our_voted:
-                assert voted.house_id in [
-                    house.house_id for house in self.houses
-                    if house.slot in self.days[day]
-                ]
+            for slot in slots:
+                house = houses[slot]
+                expected_votes_tuples.append((day, house.house_id))
+
+        assert_list_equal(
+            sorted(our_votes_tuples, key=lambda v: v[0]),
+            sorted(expected_votes_tuples, key=lambda v: v[0])
+        )
 
     def cleanup(self):
         self._uown.sess.clean_all()
+        self.cache.clean()
 
 
 class WhenVotedIsUpdated(BaseTestHadnler):
@@ -65,10 +72,8 @@ class WhenVotedIsUpdated(BaseTestHadnler):
         yield {1: [1, 2]}, {1: [1, 3]}
 
     def given_fake_uowm_handler_and_info(self, old_days, new_days):
-        self.cache = FakeHouseCacheMemory()
         self.handler = CreateOrUpdateVotedHandler(uowm=self._uown, cache=self.cache)
 
-        self.cache.add_houses_by_game(game_id=self.game.game_id, houses=self.houses)
         # Create data in repository
         self.handler(CreateOrUpdateVoted(
             game_id=self.game.game_id,
@@ -99,6 +104,7 @@ class WhenVotedIsUpdated(BaseTestHadnler):
 
     def cleanup(self):
         self._uown.sess.clean_all()
+        self.cache.clean()
 
 
 if __name__ == '__main__':

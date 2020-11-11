@@ -2,8 +2,7 @@ from collections import defaultdict
 from typing import Dict
 
 import contexts
-import expects
-from nose.tools import assert_list_equal, assert_dict_equal
+from nose.tools import assert_dict_equal
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.domain.handlers import CreateOrUpdateVotedHandler
 from zlo.domain.model import House
@@ -45,6 +44,9 @@ class WhenVotedIsCreating(BaseTestHadnler):
                     house.house_id for house in self.houses
                     if house.slot in self.days[day]
                 ]
+
+    def cleanup(self):
+        self._uown.sess.clean_all()
 
 
 class WhenVotedIsUpdated(BaseTestHadnler):
@@ -94,6 +96,9 @@ class WhenVotedIsUpdated(BaseTestHadnler):
             saved_days[voted.day].append(houses_by_id[voted.house_id].slot)
 
         assert_dict_equal(dict(saved_days), self.update_days)
+
+    def cleanup(self):
+        self._uown.sess.clean_all()
 
 
 if __name__ == '__main__':

@@ -23,6 +23,3 @@ class CacheMemory:
 
     def get_houses_by_game_id(self, game_id):
         raise NotImplementedError
-
-    def __check_data_by_game_id_in_cache(self, game_id):
-        raise NotImplementedError

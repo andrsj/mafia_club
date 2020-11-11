@@ -10,6 +10,7 @@ class BaseTestHadnler:
 
     def given_prepare_game_and_houses(self):
         self._uown = FakeUnitOfWorkManager()
+        self._uown.sess.clean_all()
         self.game = prepare_game(uow=self._uown)
         self.houses: List[House] = generate_ten_slots_for_game(self.game.game_id)
 

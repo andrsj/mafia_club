@@ -24,6 +24,9 @@ class FakePlayerRepo:
                 return player
         return None
 
+    def clean(self):
+        self.players = []
+
 
 class FakeGameRepo:
     games: List[Game] = []
@@ -40,6 +43,9 @@ class FakeGameRepo:
     def get_by_datetime_range(self, start_date: datetime.datetime, end_date: datetime.datetime):
         return [game for game in self.games if start_date < game.date < end_date]
 
+    def clean(self):
+        self.games = []
+
 
 class FakeHouseRepo:
     houses: List[House] = []
@@ -55,6 +61,9 @@ class FakeHouseRepo:
 
     def get_by_game_id(self, game_id: GameID):
         return [house for house in self.houses if house.game_id == game_id]
+
+    def clean(self):
+        self.houses = []
 
 
 class FakeVotedRepo:
@@ -74,6 +83,9 @@ class FakeVotedRepo:
             voted for voted in self.voted
             if voted.game_id == game_id and voted.day == day
         ]
+
+    def clean(self):
+        self.voted = []
 
 
 class FakeUnitOfWork(UnitOfWork):
@@ -102,6 +114,12 @@ class FakeUnitOfWork(UnitOfWork):
     def flush(self):
         self.flushed = True
 
+    def clean_all(self):
+        self.games.clean()
+        self.houses.clean()
+        self.players.clean()
+        self.voted.clean()
+
 
 class FakeUnitOfWorkManager(UnitOfWorkManager):
 
@@ -123,3 +141,6 @@ class FakeHouseCacheMemory(CacheMemory):
 
     def add_houses_by_game(self, game_id: GameID, houses: List[House]):
         self.cache[game_id] = {house.slot: house for house in houses}
+
+    def clean(self):
+        self.cache = {}

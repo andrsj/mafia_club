@@ -146,8 +146,8 @@ class Kills:
 class Voted:
     voted_id: str
     game_id: GameID
-    voted_house_id: HouseID
-    voted_day: int
+    house_id: HouseID
+    day: int
 
 
 @dataclass

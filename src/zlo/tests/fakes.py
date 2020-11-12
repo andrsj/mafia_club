@@ -1,8 +1,8 @@
 import datetime
-from typing import List
+from typing import List, Dict
 
-from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
-from zlo.domain.model import Player, Game, House
+from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
+from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
 
 
@@ -24,6 +24,9 @@ class FakePlayerRepo:
                 return player
         return None
 
+    def clean(self):
+        self.players = []
+
 
 class FakeGameRepo:
     games: List[Game] = []
@@ -39,6 +42,9 @@ class FakeGameRepo:
 
     def get_by_datetime_range(self, start_date: datetime.datetime, end_date: datetime.datetime):
         return [game for game in self.games if start_date < game.date < end_date]
+
+    def clean(self):
+        self.games = []
 
 
 class FakeHouseRepo:
@@ -56,6 +62,31 @@ class FakeHouseRepo:
     def get_by_game_id(self, game_id: GameID):
         return [house for house in self.houses if house.game_id == game_id]
 
+    def clean(self):
+        self.houses = []
+
+
+class FakeVotedRepo:
+    voted: List[Voted] = []
+
+    def add(self, voted: Voted):
+        self.voted.append(voted)
+
+    def delete(self, voted: Voted):
+        self.voted.remove(voted)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [voted for voted in self.voted if voted.game_id == game_id]
+
+    def get_by_game_id_and_days(self, game_id: GameID, day: int):
+        return [
+            voted for voted in self.voted
+            if voted.game_id == game_id and voted.day == day
+        ]
+
+    def clean(self):
+        self.voted = []
+
 
 class FakeUnitOfWork(UnitOfWork):
 
@@ -63,6 +94,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.games = FakeGameRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
+        self.voted = FakeVotedRepo()
         self.committed = False
         self.rolled_back = False
         self.flushed = False
@@ -82,6 +114,12 @@ class FakeUnitOfWork(UnitOfWork):
     def flush(self):
         self.flushed = True
 
+    def clean_all(self):
+        self.games.clean()
+        self.houses.clean()
+        self.players.clean()
+        self.voted.clean()
+
 
 class FakeUnitOfWorkManager(UnitOfWorkManager):
 
@@ -93,3 +131,16 @@ class FakeUnitOfWorkManager(UnitOfWorkManager):
 
     def start(self):
         return self.sess
+
+
+class FakeHouseCacheMemory(HouseCacheMemory):
+    cache: Dict[GameID, Dict[int, House]] = {}
+
+    def get_houses_by_game_id(self, game_id: GameID) -> Dict[int, House]:
+        return self.cache.get(game_id)
+
+    def add_houses_by_game(self, game_id: GameID, houses: List[House]):
+        self.cache[game_id] = {house.slot: house for house in houses}
+
+    def clean(self):
+        self.cache = {}

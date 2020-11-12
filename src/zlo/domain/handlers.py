@@ -1,6 +1,8 @@
 import logging
 import uuid
-from typing import List
+from copy import copy
+from typing import List, Dict
+from collections import namedtuple
 
 import inject
 from zlo.domain.events import (
@@ -12,7 +14,7 @@ from zlo.domain.events import (
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest
 )
-from zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import (
     Game,
     House,
@@ -30,6 +32,7 @@ from zlo.domain.model import (
     BonusPointsFromPlayers,
     BonusTolerantPointFromPlayers
 )
+from zlo.tests.fakes import FakeHouseCacheMemory
 
 
 class CreateOrUpdateGameHandler:
@@ -109,7 +112,7 @@ class CreateOrUpdateHouseHandler:
             tx.commit()
 
 
-class CreateOrUpdateBestMoveHundler:
+class CreateOrUpdateBestMoveHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -146,7 +149,7 @@ class CreateOrUpdateBestMoveHundler:
             tx.commit()
 
 
-class CreateOrUpdateSheriffVersionHundler:
+class CreateOrUpdateSheriffVersionHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -176,7 +179,7 @@ class CreateOrUpdateSheriffVersionHundler:
             tx.commit()
 
 
-class CreateOrUpdateDisqualifiedHundler:
+class CreateOrUpdateDisqualifiedHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -206,7 +209,7 @@ class CreateOrUpdateDisqualifiedHundler:
             tx.commit()
 
 
-class CreateOrUpdateNominatedForBestHundler:
+class CreateOrUpdateNominatedForBestHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -236,37 +239,67 @@ class CreateOrUpdateNominatedForBestHundler:
             tx.commit()
 
 
-class CreateOrUpdateVotedHundler:
+class CreateOrUpdateVotedHandler:
     @inject.params(
-        uowm=UnitOfWorkManager
+        uowm=UnitOfWorkManager,
+        cache=HouseCacheMemory
     )
-    def __init__(self, uowm):
+    def __init__(self, uowm, cache):
         self._uowm = uowm
         self._log = logging.getLogger(__name__)
+        self.cache: FakeHouseCacheMemory = cache
 
     def __call__(self, evt: CreateOrUpdateVoted):
         with self._uowm.start() as tx:
             # Create ot update voted
-            houses: List[House] = tx.houses.get_by_game_id(evt.game_id)
-            voted_houses = []
+
+            # Get slots from cache if they exist
+            houses: Dict[int, House] = self.cache.get_houses_by_game_id(evt.game_id)
+
+            if houses is None:
+                houses_from_db: List[House] = tx.houses.get_by_game_id(evt.game_id)
+                self.cache.add_houses_by_game(game_id=evt.game_id, houses=houses_from_db)
+                houses = {house.slot: house for house in houses_from_db}
+
+            voted_event_houses = []
+            # This object if to replace list of dict with list of namedtuple.
+            # Just to make code more readable and comfortable to write
+            event_house = namedtuple("EventHouse", ['day', 'house_id'])
+
+            # Parse voted slots from event
             for day, slots in evt.voted_slots.items():
-                if slots is not None:
-                    for slot in slots:
-                        house = next((house_ for house_ in houses if lambda house_: house_.slot == slot), None)
-                        if house is not None:
-                            voted_houses.append({'day': day, 'house': house.house_id})
-            voted: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
-            if not voted:
-                for voted_house in voted_houses:
-                    voted_ = Voted(
-                        voted_id=str(uuid.uuid4()),
+                if slots is None:
+                    continue
+                for slot in slots:
+                    try:
+                        house = houses[slot]
+                    except KeyError:
+                        # todo exception should be raised about missing house
+                        continue
+
+                    voted_event_houses.append(event_house(day=day, house_id=house.house_id))
+
+            # Get slots which are already saved in db. And check if they are up-to-date
+
+            votes: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
+            all_votes_tuples = [event_house(voted.day, voted.house_id) for voted in votes]
+            valid_votes = copy(all_votes_tuples)
+
+            # Remove redundant
+            for voted, voted_t in zip(votes, all_votes_tuples):
+                if voted_t not in voted_event_houses:
+                    tx.voted.delete(voted)
+                    valid_votes.remove(voted_t)
+
+            # Add which is missed
+            for voted_event in voted_event_houses:
+                if voted_event not in valid_votes:
+                    voted = Voted(
                         game_id=evt.game_id,
-                        voted_house_id=voted_house['house'],
-                        voted_day=voted_house['day']
+                        voted_id=str(uuid.uuid4()),
+                        house_id=voted_event.house_id,
+                        day=voted_event.day
                     )
-                    tx.voted.add(voted_)
-            else:
-                for voted_, voted_house in zip(voted, voted_houses):
-                    voted_.voted_house_id = voted_house['house']
-                    voted_.voted_day = voted_house['day']
+                    tx.voted.add(voted)
+
             tx.commit()

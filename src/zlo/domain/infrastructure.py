@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class UnitOfWork(metaclass=ABCMeta):
+class UnitOfWork(ABC):
 
     @abstractmethod
     def __enter__(self):
@@ -20,14 +20,14 @@ class UnitOfWork(metaclass=ABCMeta):
         pass
 
 
-class UnitOfWorkManager(metaclass=ABCMeta):
+class UnitOfWorkManager(ABC):
 
     @abstractmethod
     def start(self):
         pass
 
 
-class HouseCacheMemory(metaclass=ABCMeta):
+class HouseCacheMemory(ABC):
 
     @abstractmethod
     def get_houses_by_game_id(self, game_id):

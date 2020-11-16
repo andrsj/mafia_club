@@ -1,6 +1,8 @@
 import datetime
 from typing import List, Dict
 
+
+from zlo.domain.model import Player, Game, House, HandOfMafia
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
@@ -9,7 +11,7 @@ from zlo.domain.types import HouseID, GameID
 class FakePlayerRepo:
     players: List[Player] = []
 
-    def add(self, player):
+    def add(self, player: Player):
         self.players.append(player)
 
     def get_by_player_nickname(self, nick):
@@ -31,7 +33,7 @@ class FakePlayerRepo:
 class FakeGameRepo:
     games: List[Game] = []
 
-    def add(self, game):
+    def add(self, game: Game):
         self.games.append(game)
 
     def get_by_game_id(self, game_id):
@@ -88,13 +90,28 @@ class FakeVotedRepo:
         self.voted = []
 
 
+class FakeHandOfMafiaRepo:
+    hands_of_mafia: List[HandOfMafia] = []
+
+    def add(self, hand_of_mafia: HandOfMafia):
+        self.hands_of_mafia.append(hand_of_mafia)
+
+    def get_by_game_id(self, game_id: GameID):
+        return next(filter(lambda hand: hand.game_id == game_id, self.hands_of_mafia), None)
+
+    def clean(self):
+        self.hands_of_mafia = []
+
+
 class FakeUnitOfWork(UnitOfWork):
 
     def __init__(self):
         self.games = FakeGameRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
+        self.hand_of_mafia = FakeHandOfMafiaRepo()
         self.voted = FakeVotedRepo()
+
         self.committed = False
         self.rolled_back = False
         self.flushed = False
@@ -119,6 +136,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.houses.clean()
         self.players.clean()
         self.voted.clean()
+        self.hand_of_mafia.clean()
 
 
 class FakeUnitOfWorkManager(UnitOfWorkManager):

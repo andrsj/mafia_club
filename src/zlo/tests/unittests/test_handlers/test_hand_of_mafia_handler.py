@@ -10,7 +10,7 @@ class WhenHandOfMafiaIsCreating(BaseTestHadnler):
 
     def given_event(self):
 
-        self.handler = CreateOrUpdateHandOfMafiaHandler(uowm=self._uown, cache=self.cache)
+        self.handler = CreateOrUpdateHandOfMafiaHandler(uowm=self._uowm, cache=self.cache)
 
         self.choises_houses = [self.houses[0], self.houses[1]]
 
@@ -24,7 +24,7 @@ class WhenHandOfMafiaIsCreating(BaseTestHadnler):
         self.handler(self.hand_of_mafia_event)
 
     def it_should_save_hand_of_mafia(self):
-        our_hand_of_mafia: HandOfMafia = self._uown.sess.hand_of_mafia.get_by_game_id(self.game.game_id)
+        our_hand_of_mafia: HandOfMafia = self._uowm.sess.hand_of_mafia.get_by_game_id(self.game.game_id)
         expect(our_hand_of_mafia.house_hand_id).to(equal(self.choises_houses[0].house_id))
         expect(our_hand_of_mafia.victim_id).to(equal(self.choises_houses[1].house_id))
 
@@ -32,9 +32,9 @@ class WhenHandOfMafiaIsCreating(BaseTestHadnler):
 class WhenHandOfMafiaIsUpdated(BaseTestHadnler):
     def given_event(self):
 
-        self.handler = CreateOrUpdateHandOfMafiaHandler(uowm=self._uown, cache=self.cache)
+        self.handler = CreateOrUpdateHandOfMafiaHandler(uowm=self._uowm, cache=self.cache)
 
-        self._uown.sess.hand_of_mafia.add(
+        self._uowm.sess.hand_of_mafia.add(
             HandOfMafia(
                 hand_of_mafia_id='hand_of_maifa_id_1',
                 game_id=self.game.game_id,
@@ -55,6 +55,6 @@ class WhenHandOfMafiaIsUpdated(BaseTestHadnler):
         self.handler(self.new_hand_of_mafia_event)
 
     def it_should_update_hand_of_mafia(self):
-        our_hand_of_mafia: HandOfMafia = self._uown.sess.hand_of_mafia.get_by_game_id(self.game.game_id)
+        our_hand_of_mafia: HandOfMafia = self._uowm.sess.hand_of_mafia.get_by_game_id(self.game.game_id)
         expect(our_hand_of_mafia.house_hand_id).to(equal(self.choises_houses[0].house_id))
         expect(our_hand_of_mafia.victim_id).to(equal(self.choises_houses[1].house_id))

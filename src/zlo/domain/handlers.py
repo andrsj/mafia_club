@@ -77,7 +77,7 @@ class CreateOrUpdateGameHandler:
 
         with self._uowm.start() as tx:
             player: Player = tx.players.get_by_nickname(evt.heading)
-            game: Game = tx.games.get_by_id(evt.game_id)
+            game: Game = tx.games.get_by_game_id(evt.game_id)
             if game is None:
                 self._log.info(f"Create new game {evt}")
                 game = Game(
@@ -143,6 +143,7 @@ class CreateOrUpdateBestMoveHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateBestMove):
         with self._uowm.start() as tx:
+
             houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
 
             killed_house: House = houses[evt.killed_player_slot]

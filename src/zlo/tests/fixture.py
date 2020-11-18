@@ -101,7 +101,8 @@ def prepare_game(
     date=None,
     heading_player=None,
     game_id=None,
-    table=0, club="ZloMafiaClub",
+    table=0,
+    club="ZloMafiaClub",
     result=GameResult.unfinished
 ) -> Game:
 
@@ -111,7 +112,7 @@ def prepare_game(
 
     game = Game(
         date=date if date else datetime.datetime.utcnow(),
-        game_id=game_id if game_id is not None else str(uuid.uuid4()),
+        game_id=game_id if game_id is not None else 'test_game_id_0',
         heading=heading_player.player_id,
         club=club,
         result=result.value,

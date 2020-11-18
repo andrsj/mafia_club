@@ -7,10 +7,10 @@ from expects import expect, equal
 from zlo.domain.model import House, BestMove
 from zlo.domain.handlers import CreateOrUpdateBestMoveHandler
 from zlo.domain.events import CreateOrUpdateBestMove
-from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
+from zlo.tests.unittests.test_handlers.common import BaseTestHandler
 
 
-class WhenBestMoveIsCreating(BaseTestHadnler):
+class WhenBestMoveIsCreating(BaseTestHandler):
 
     def given_fake_uowm_handler_and_info(self):
 
@@ -42,7 +42,7 @@ class WhenBestMoveIsCreating(BaseTestHadnler):
         self.cache.clean()
 
 
-class WhenBestMoveIsUpdated(BaseTestHadnler):
+class WhenBestMoveIsUpdated(BaseTestHandler):
 
     def given_updated_event(self):
         self.choises_houses: List[House] = sample(self.houses, k=4)

@@ -101,7 +101,8 @@ def prepare_game(
     date=None,
     heading_player=None,
     game_id=None,
-    table=0, club="ZloMafiaClub",
+    table=0,
+    club="ZloMafiaClub",
     result=GameResult.unfinished
 ) -> Game:
 

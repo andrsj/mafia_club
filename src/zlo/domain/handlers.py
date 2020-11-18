@@ -113,7 +113,7 @@ class CreateOrUpdateHouseHandler:
 
     def __call__(self, evt: CreateOrUpdateHouse):
         with self._uowm.start() as tx:
-            player: Player = tx.players.get_by_player_nickname(evt.player_nickname)
+            player: Player = tx.players.get_by_nickname(evt.player_nickname)
             house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.slot)
 
             if house is None:

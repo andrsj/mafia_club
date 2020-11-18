@@ -5,11 +5,11 @@ import contexts
 from nose.tools import assert_dict_equal, assert_list_equal
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.domain.handlers import CreateOrUpdateVotedHandler
-from zlo.domain.model import House
+from zlo.domain.model import House, Voted
 from zlo.tests.unittests.test_handlers.common import BaseTestHandler
 
 
-class WhenVotedIsCreating(BaseTestHandler):
+class WhenVotedIsCreated(BaseTestHandler):
 
     @classmethod
     def examples_of_days(cls):
@@ -74,11 +74,16 @@ class WhenVotedIsUpdated(BaseTestHandler):
     def given_fake_uowm_handler_and_info(self, old_days, new_days):
         self.handler = CreateOrUpdateVotedHandler(uowm=self._uowm, cache=self.cache)
 
-        # Create data in repository
-        self.handler(CreateOrUpdateVoted(
-            game_id=self.game.game_id,
-            voted_slots=old_days
-        ))
+        for day, slots in old_days.items():
+            for slot in slots:
+                self._uowm.sess.voted.add(
+                    Voted(
+                        voted_id='voted_id_1',
+                        game_id=self.game.game_id,
+                        house_id=self.cache.get_houses_by_game_id(self.game.game_id)[slot],
+                        day=day
+                    )
+                )
 
         # Setup new event
         self.update_days = new_days

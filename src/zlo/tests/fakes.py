@@ -81,7 +81,7 @@ class FakeBestMoveRepo:
         self.best_moves[best_move.game_id] = best_move
 
     def get_by_game_id(self, game_id: GameID):
-        return self.best_moves.get(game_id, None)
+        return self.best_moves.get(game_id)
 
     def clean(self):
         self.best_moves = {}
@@ -110,16 +110,16 @@ class FakeVotedRepo:
 
 
 class FakeHandOfMafiaRepo:
-    hands_of_mafia: List[HandOfMafia] = []
+    hands_of_mafia: Dict[GameID, HandOfMafia] = {}
 
     def add(self, hand_of_mafia: HandOfMafia):
-        self.hands_of_mafia.append(hand_of_mafia)
+        self.hands_of_mafia[hand_of_mafia.game_id] = hand_of_mafia
 
     def get_by_game_id(self, game_id: GameID):
-        return next(filter(lambda hand: hand.game_id == game_id, self.hands_of_mafia), None)
+        return self.hands_of_mafia.get(game_id)
 
     def clean(self):
-        self.hands_of_mafia = []
+        self.hands_of_mafia = {}
 
 
 class FakeUnitOfWork(UnitOfWork):
@@ -156,6 +156,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.houses.clean()
         self.players.clean()
         self.voted.clean()
+        self.best_moves.clean()
         self.hand_of_mafia.clean()
 
 

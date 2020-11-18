@@ -25,7 +25,7 @@ class PlayerRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_nickname(self, nick: str):
+    def get_by_player_nickname(self, nick: str):
         return self._session.query(Player).filter_by(nickname=nick).first()
 
     def get_by_id(self, player_id):

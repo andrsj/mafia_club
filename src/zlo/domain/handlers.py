@@ -139,20 +139,17 @@ class CreateOrUpdateHouseHandler:
             tx.commit()
 
 
-class CreateOrUpdateBestMoveHandler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateBestMoveHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateBestMove):
         with self._uowm.start() as tx:
-            killed_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.killed_player_slot)
-            best_1_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.best_1_slot)
-            best_2_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.best_2_slot)
-            best_3_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.best_3_slot)
+            houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            killed_house: House = houses[evt.killed_player_slot]
+            best_1_house: House = houses[evt.best_1_slot]
+            best_2_house: House = houses[evt.best_2_slot]
+            best_3_house: House = houses[evt.best_3_slot]
+
             best_move: BestMove = tx.best_moves.get_by_game_id(evt.game_id)
 
             if best_move is None:
@@ -167,6 +164,7 @@ class CreateOrUpdateBestMoveHandler:
                 )
                 tx.best_moves.add(best_move)
             else:
+                self._log.info(f"Update best move {evt}")
                 best_move.game_id = evt.game_id
                 best_move.killed_house = killed_house.house_id
                 best_move.best_1 = best_1_house.house_id

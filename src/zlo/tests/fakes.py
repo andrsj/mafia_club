@@ -2,7 +2,7 @@ import datetime
 from typing import List, Dict
 
 
-from zlo.domain.model import Player, Game, House, HandOfMafia
+from zlo.domain.model import Player, Game, House, BestMove, HandOfMafia
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
@@ -64,8 +64,27 @@ class FakeHouseRepo:
     def get_by_game_id(self, game_id: GameID):
         return [house for house in self.houses if house.game_id == game_id]
 
+    def get_by_game_id_and_slot(self, game_id: GameID, slot: int):
+        for house in self.houses:
+            if house.game_id == game_id and house.slot == slot:
+                return house
+        return None
+
     def clean(self):
         self.houses = []
+
+
+class FakeBestMoveRepo:
+    best_moves: Dict[GameID, BestMove] = {}
+
+    def add(self, best_move: BestMove):
+        self.best_moves[best_move.game_id] = best_move
+
+    def get_by_game_id(self, game_id: GameID):
+        return self.best_moves.get(game_id, None)
+
+    def clean(self):
+        self.best_moves = {}
 
 
 class FakeVotedRepo:
@@ -109,6 +128,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.games = FakeGameRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
+        self.best_moves = FakeBestMoveRepo()
         self.hand_of_mafia = FakeHandOfMafiaRepo()
         self.voted = FakeVotedRepo()
 

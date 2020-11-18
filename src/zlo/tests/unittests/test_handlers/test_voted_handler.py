@@ -22,7 +22,7 @@ class WhenVotedIsCreating(BaseTestHadnler):
     def given_fake_uowm_handler_and_info(self, example):
 
         self.handler = CreateOrUpdateVotedHandler(
-            uowm=self._uown,
+            uowm=self._uowm,
             cache=self.cache
         )
         self.days = example
@@ -36,7 +36,7 @@ class WhenVotedIsCreating(BaseTestHadnler):
         self.handler(self.voted_event)
 
     def it_should_save_voted(self):
-        our_votes = self._uown.sess.voted.get_by_game_id(self.game.game_id)
+        our_votes = self._uowm.sess.voted.get_by_game_id(self.game.game_id)
         our_votes_tuples = [(voted.day, voted.house_id) for voted in our_votes]
 
         houses = self.cache.get_houses_by_game_id(self.game.game_id)
@@ -52,7 +52,7 @@ class WhenVotedIsCreating(BaseTestHadnler):
         )
 
     def cleanup(self):
-        self._uown.sess.clean_all()
+        self._uowm.sess.clean_all()
         self.cache.clean()
 
 
@@ -72,7 +72,7 @@ class WhenVotedIsUpdated(BaseTestHadnler):
         yield {1: [1, 2]}, {1: [1, 3]}
 
     def given_fake_uowm_handler_and_info(self, old_days, new_days):
-        self.handler = CreateOrUpdateVotedHandler(uowm=self._uown, cache=self.cache)
+        self.handler = CreateOrUpdateVotedHandler(uowm=self._uowm, cache=self.cache)
 
         # Create data in repository
         self.handler(CreateOrUpdateVoted(
@@ -91,7 +91,7 @@ class WhenVotedIsUpdated(BaseTestHadnler):
         self.handler(self.voted_event)
 
     def it_should_remove_redundant_days_from_repo(self):
-        voted_from_db = self._uown.sess.voted.get_by_game_id(self.game.game_id)
+        voted_from_db = self._uowm.sess.voted.get_by_game_id(self.game.game_id)
 
         houses_by_slot: Dict[int, House] = self.cache.get_houses_by_game_id(self.game.game_id)
         houses_by_id: Dict[str, House] = {house.house_id: house for house in list(houses_by_slot.values())}
@@ -103,7 +103,7 @@ class WhenVotedIsUpdated(BaseTestHadnler):
         assert_dict_equal(dict(saved_days), self.update_days)
 
     def cleanup(self):
-        self._uown.sess.clean_all()
+        self._uowm.sess.clean_all()
         self.cache.clean()
 
 

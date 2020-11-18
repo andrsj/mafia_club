@@ -3,10 +3,10 @@ from expects import expect, equal
 from zlo.domain.handlers import CreateOrUpdateHandOfMafiaHandler
 from zlo.domain.events import CreateOrUpdateHandOfMafia
 from zlo.domain.model import HandOfMafia
-from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
+from zlo.tests.unittests.test_handlers.common import BaseTestHandler
 
 
-class WhenHandOfMafiaIsCreating(BaseTestHadnler):
+class WhenHandOfMafiaIsCreating(BaseTestHandler):
 
     def given_event(self):
 
@@ -29,7 +29,7 @@ class WhenHandOfMafiaIsCreating(BaseTestHadnler):
         expect(our_hand_of_mafia.victim_id).to(equal(self.choises_houses[1].house_id))
 
 
-class WhenHandOfMafiaIsUpdated(BaseTestHadnler):
+class WhenHandOfMafiaIsUpdated(BaseTestHandler):
     def given_event(self):
 
         self.handler = CreateOrUpdateHandOfMafiaHandler(uowm=self._uowm, cache=self.cache)

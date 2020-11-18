@@ -14,7 +14,7 @@ class FakePlayerRepo:
     def add(self, player: Player):
         self.players.append(player)
 
-    def get_by_player_nickname(self, nick):
+    def get_by_nickname(self, nick):
         for player in self.players:
             if player.nickname == nick:
                 return player

@@ -6,10 +6,10 @@ from nose.tools import assert_dict_equal, assert_list_equal
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.domain.handlers import CreateOrUpdateVotedHandler
 from zlo.domain.model import House
-from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
+from zlo.tests.unittests.test_handlers.common import BaseTestHandler
 
 
-class WhenVotedIsCreating(BaseTestHadnler):
+class WhenVotedIsCreating(BaseTestHandler):
 
     @classmethod
     def examples_of_days(cls):
@@ -56,7 +56,7 @@ class WhenVotedIsCreating(BaseTestHadnler):
         self.cache.clean()
 
 
-class WhenVotedIsUpdated(BaseTestHadnler):
+class WhenVotedIsUpdated(BaseTestHandler):
 
     @classmethod
     def examples_of_days(cls):

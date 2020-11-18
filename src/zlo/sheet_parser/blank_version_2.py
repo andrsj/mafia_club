@@ -1,5 +1,6 @@
 import uuid
 from typing import List, Optional
+from datetime import datetime
 
 from zlo.domain.events import (
     CreateOrUpdateGame,
@@ -78,10 +79,13 @@ class BlankParser:
         return CreateOrUpdateGame(
             game_id=self._game_id,
             heading=self._matrix[1][2],
-            date=self._matrix[0][2],
+
+            # strptime(m[0][2], '%Y-%m-%d') or datetime.fromisoformat(m[0][2])
+            date=datetime.strptime(self._matrix[0][2], '%Y-%m-%d'),
+
             club=self._matrix[3][2],
             tournament=self._matrix[4][2] or None,
-            table=self._matrix[4][5],
+            table=self.get_number_of_table(self._matrix[4][5]),
             result=game_result.value,
             advance_result=advanced_game_result.value
         )
@@ -142,6 +146,12 @@ class BlankParser:
             best_2_slot=self.get_slot_or_count_number_from_string(self._matrix[22][3]),
             best_3_slot=self.get_slot_or_count_number_from_string(self._matrix[22][4]),
         )
+
+    @staticmethod
+    def get_number_of_table(value: str) -> int:
+        if value.isdigit():
+            return int(value)
+        return None
 
     @staticmethod
     def get_slot_or_count_number_from_string(value) -> int:

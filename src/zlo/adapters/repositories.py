@@ -43,7 +43,7 @@ class GameRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_id(self, game_id):
+    def get_by_game_id(self, game_id):
         return self._session.query(Game).filter_by(game_id=game_id).first()
 
     def get_by_datetime_range(self, start_date, end_date):

@@ -6,7 +6,7 @@ from zlo.tests.fakes import FakeUnitOfWorkManager, FakeHouseCacheMemory
 from zlo.tests.fixture import prepare_game, generate_ten_slots_for_game
 
 
-class BaseTestHadnler:
+class BaseTestHandler:
 
     def given_prepare_game_and_houses(self):
 

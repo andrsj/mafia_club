@@ -75,7 +75,7 @@ def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
                 role=ClassicRole.citizen,
                 game_id=game_id,
                 slot=i,
-                house_id=HouseID(str(uuid.uuid4()))  # what to do with this stuff
+                house_id=f'{i}_house_id_test'
             )
         )
     # first number will be sheriff

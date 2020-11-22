@@ -348,16 +348,17 @@ class CreateOrUpdateKillsHandler(BaseHandler):
             # Just to make code more readable and comfortable to write
             event_house = namedtuple("EventHouse", ['day', 'house_id'])
 
-            for day, slot in enumerate(evt.kills_slots):
+            for day, slot in enumerate(evt.kills_slots, start=1):
                 house = houses.get(slot)
                 if house is None:
-                    continue
-                killed_event_houses.append(
-                    event_house(
-                        day=day,
-                        house_id=house.house_id
+                    killed_event_houses.append(None)
+                else:
+                    killed_event_houses.append(
+                        event_house(
+                            day=day,
+                            house_id=house.house_id
+                        )
                     )
-                )
 
             # Get slots which are already saved in db. And check if they are up-to-date
 
@@ -373,7 +374,7 @@ class CreateOrUpdateKillsHandler(BaseHandler):
 
             # Add which is missed
             for kill_event in killed_event_houses:
-                if kill_event not in valid_kills:
+                if kill_event not in valid_kills and kill_event is not None:
                     kill = Kills(
                         kill_id=str(uuid.uuid4()),
                         game_id=evt.game_id,

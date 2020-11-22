@@ -337,37 +337,49 @@ class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
             tx.commit()
 
 
-class CreateOrUpdateKillsHandler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateKillsHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateKills):
         with self._uowm.start() as tx:
-            houses: List[House] = tx.houses.get_by_game_id(evt.game_id)
+            houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
 
-            killed_houses = []
-            for slot in evt.kills_slots:
-                house = next(filter(lambda house_: house_.slot == slot, houses), None)
-                killed_houses.append(house)
+            killed_event_houses = []
+            # This object if to replace list of dict with list of namedtuple.
+            # Just to make code more readable and comfortable to write
+            event_house = namedtuple("EventHouse", ['day', 'house_id'])
 
-            kills_dict = {day: house for day, house in enumerate(killed_houses, start=1) if house is not None}
+            for day, slot in enumerate(evt.kills_slots):
+                house = houses.get(slot)
+                if house is None:
+                    continue
+                killed_event_houses.append(
+                    event_house(
+                        day=day,
+                        house_id=house.house_id
+                    )
+                )
+
+            # Get slots which are already saved in db. And check if they are up-to-date
 
             kills: List[Kills] = tx.kills.get_by_game_id(evt.game_id)
-            if not kills:
-                for day, house in kills_dict.items():
-                    if house is None:
-                        continue
+            all_kills_tuples = [event_house(kill.circle_number, kill.killed_house_id) for kill in kills]
+            valid_kills = copy(all_kills_tuples)
+
+            # Remove redundant
+            for kill, kill_t in zip(kills, all_kills_tuples):
+                if kill_t not in killed_event_houses:
+                    tx.kills.delete(kill)
+                    valid_kills.remove(kill_t)
+
+            # Add which is missed
+            for kill_event in killed_event_houses:
+                if kill_event not in valid_kills:
                     kill = Kills(
                         kill_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
-                        circle_number=day,
-                        killed_house_id=house.house_id,
+                        killed_house_id=kill_event.house_id,
+                        circle_number=kill_event.day
                     )
                     tx.kills.add(kill)
-            else:
-                for kill, kill_dict in zip(kills, kills_dict):
-                    kill.killed_house_id = kill_dict[kill.circle_number]
+
+            tx.commit()

@@ -128,8 +128,14 @@ class FakeKillRepo:
     def add(self, kill: Kills):
         self.kills.append(kill)
 
+    def delete(self, kill: Kills):
+        self.kills.remove(kill)
+
     def get_by_game_id(self, game_id: GameID) -> List[Kills]:
         return [kill for kill in self.kills if kill.game_id == game_id]
+
+    def clean(self):
+        self.kills = []
 
 
 class FakeUnitOfWork(UnitOfWork):
@@ -169,6 +175,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.voted.clean()
         self.best_moves.clean()
         self.hand_of_mafia.clean()
+        self.kills.clean()
 
 
 class FakeUnitOfWorkManager(UnitOfWorkManager):

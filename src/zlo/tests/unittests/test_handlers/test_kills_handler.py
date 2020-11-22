@@ -1,10 +1,10 @@
-from expects import expect, equal, have_len
+from nose.tools import assert_list_equal
 from zlo.domain.handlers import CreateOrUpdateKillsHandler
 from zlo.domain.events import CreateOrUpdateKills
 from zlo.tests.unittests.test_handlers.common import BaseTestHandler
 
 
-class WhenKillsIsCreating(BaseTestHandler):
+class WhenKillsIsCreated(BaseTestHandler):
 
     @classmethod
     def examples_slots(cls):
@@ -15,9 +15,7 @@ class WhenKillsIsCreating(BaseTestHandler):
 
     def given_event(self, choises_slots):
 
-        self.handler = CreateOrUpdateKillsHandler(self._uowm)
-
-        self.choises_houses = [house for house in self.houses if house.slot in choises_slots]
+        self.handler = CreateOrUpdateKillsHandler(self._uowm, self.cache)
 
         self.kills_event = CreateOrUpdateKills(
             game_id=self.game.game_id,
@@ -29,18 +27,20 @@ class WhenKillsIsCreating(BaseTestHandler):
 
     def it_should_save_kills(self, choises_slots):
         our_kills = self._uowm.sess.kills.get_by_game_id(game_id=self.game.game_id)
+        our_kills_tuples = [(kill.circle_number, kill.killed_house_id) for kill in our_kills]
 
-        # For save order of zero number houses (no house)
-        # For example List: slot [1, 0, 2, 3] => List: house_id = [House1, None, House2, House3]
-        killed_houses_id_expected = []
-        for slot in choises_slots:
-            house = next(filter(lambda house_: house_.slot == slot, self.houses), None)
-            value = house.house_id if house is not None else None
-            killed_houses_id_expected.append(value)
+        houses = self.cache.get_houses_by_game_id(self.game.game_id)
+        expected_kills_tuples = []
+        for day, slot in enumerate(choises_slots):
+            house = houses.get(slot)
+            if house is not None:
+                expected_kills_tuples.append((day, house.house_id))
 
-        # Get dict like {day: house_id} for tests
-        circles = {day: house_id for day, house_id in enumerate(killed_houses_id_expected, start=1)}
+        assert_list_equal(
+            sorted(our_kills_tuples, key=lambda k: k[0]),
+            sorted(expected_kills_tuples, key=lambda k: k[0])
+        )
 
-        expect(our_kills).to(have_len(len([slot for slot in choises_slots if slot])))
-        for our_kill in our_kills:
-            expect(our_kill.killed_house_id).to(equal(circles[our_kill.circle_number]))
+    def cleanup(self):
+        self._uowm.sess.clean_all()
+        self.cache.clean()

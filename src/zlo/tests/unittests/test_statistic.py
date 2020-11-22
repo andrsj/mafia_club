@@ -4,7 +4,7 @@ from expects import expect, have_len, be_above_or_equal, be_below
 from zlo.domain.statistic import generate_statistic_by_date
 from zlo.domain.types import GameResult, ClassicRole
 from zlo.tests.fakes import FakeUnitOfWorkManager
-from zlo.tests.fixture import DEFAULT_PLAYERS as players, generate_ten_slots_for_game, prepare_game
+# from zlo.tests.fixture import DEFAULT_PLAYERS as players, generate_ten_slots_for_game, prepare_game
 
 
 # class When_statistic_calculated_for_one_game:

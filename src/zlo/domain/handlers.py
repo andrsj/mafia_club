@@ -1,19 +1,23 @@
 import logging
 import uuid
-from typing import List
+from copy import copy
+from typing import List, Dict
+from collections import namedtuple
 
 import inject
+from zlo.domain.types import GameID
 from zlo.domain.events import (
     CreateOrUpdateGame,
     CreateOrUpdateHouse,
     CreateOrUpdateVoted,
     CreateOrUpdateKills,
     CreateOrUpdateBestMove,
+    CreateOrUpdateHandOfMafia,
     CreateOrUpdateDisqualified,
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest
 )
-from zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import (
     Game,
     House,
@@ -31,10 +35,38 @@ from zlo.domain.model import (
     BonusPointsFromPlayers,
     BonusTolerantPointFromPlayers
 )
+from zlo.tests.fakes import FakeHouseCacheMemory
+
+
+class BaseHandler:
+    @inject.params(
+        uowm=UnitOfWorkManager,
+        cache=HouseCacheMemory
+    )
+    def __init__(self, uowm, cache):
+        self._uowm = uowm
+        self._log = logging.getLogger(__name__)
+        self.cache: FakeHouseCacheMemory = cache
+
+    def get_houses(self, tx, game_id: GameID):
+        """
+        Get houses from cache.
+        If no houses in cache than houses get from db
+        and save in cache
+        Transform house to dict
+        Example: {slot: House, ...}
+        """
+        houses: Dict[int, House] = self.cache.get_houses_by_game_id(game_id)
+
+        if houses is None:
+            houses_from_db: List[House] = tx.houses.get_by_game_id(game_id)
+            self.cache.add_houses_by_game(game_id=game_id, houses=houses_from_db)
+            houses = {house.slot: house for house in houses_from_db}
+
+        return houses
 
 
 class CreateOrUpdateGameHandler:
-
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -45,9 +77,8 @@ class CreateOrUpdateGameHandler:
     def __call__(self, evt: CreateOrUpdateGame):
 
         with self._uowm.start() as tx:
-            # Create ot update game
             player: Player = tx.players.get_by_nickname(evt.heading)
-            game: Game = tx.games.get_by_id(evt.game_id)
+            game: Game = tx.games.get_by_game_id(evt.game_id)
             if game is None:
                 self._log.info(f"Create new game {evt}")
                 game = Game(
@@ -83,7 +114,6 @@ class CreateOrUpdateHouseHandler:
 
     def __call__(self, evt: CreateOrUpdateHouse):
         with self._uowm.start() as tx:
-            # Create ot update houses
             player: Player = tx.players.get_by_nickname(evt.player_nickname)
             house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.slot)
 
@@ -101,30 +131,27 @@ class CreateOrUpdateHouseHandler:
                 tx.houses.add(house)
             else:
                 self._log.info(f"Update existing house {evt}")
-                house.game_id = evt.game_id,
-                house.player_id = player.player_id,
-                house.role = evt.role.value,
-                house.slot = evt.slot,
-                house.bonus_mark = evt.bonus_mark,
+                house.game_id = evt.game_id
+                house.player_id = player.player_id
+                house.role = evt.role.value
+                house.slot = evt.slot
+                house.bonus_mark = evt.bonus_mark
                 house.fouls = evt.fouls
             tx.commit()
 
 
-class CreateOrUpdateBestMoveHundler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateBestMoveHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateBestMove):
         with self._uowm.start() as tx:
-            # Create ot update best move
-            killed_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.killed_player_slot)
-            best_1_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.best_1_slot)
-            best_2_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.best_2_slot)
-            best_3_house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.best_3_slot)
+
+            houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            killed_house: House = houses[evt.killed_player_slot]
+            best_1_house: House = houses[evt.best_1_slot]
+            best_2_house: House = houses[evt.best_2_slot]
+            best_3_house: House = houses[evt.best_3_slot]
+
             best_move: BestMove = tx.best_moves.get_by_game_id(evt.game_id)
 
             if best_move is None:
@@ -139,6 +166,7 @@ class CreateOrUpdateBestMoveHundler:
                 )
                 tx.best_moves.add(best_move)
             else:
+                self._log.info(f"Update best move {evt}")
                 best_move.game_id = evt.game_id
                 best_move.killed_house = killed_house.house_id
                 best_move.best_1 = best_1_house.house_id
@@ -147,7 +175,7 @@ class CreateOrUpdateBestMoveHundler:
             tx.commit()
 
 
-class CreateOrUpdateSheriffVersionHundler:
+class CreateOrUpdateSheriffVersionHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -157,7 +185,6 @@ class CreateOrUpdateSheriffVersionHundler:
 
     def __call__(self, evt: CreateOrUpdateSheriffVersion):
         with self._uowm.start() as tx:
-            # Create ot update sheriff version
             houses: List[House] = [
                 house for house in tx.houses.get_by_game_id(evt.game_id)
                 if house.slot in evt.sheriff_version_slots
@@ -177,7 +204,7 @@ class CreateOrUpdateSheriffVersionHundler:
             tx.commit()
 
 
-class CreateOrUpdateDisqualifiedHundler:
+class CreateOrUpdateDisqualifiedHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -187,7 +214,6 @@ class CreateOrUpdateDisqualifiedHundler:
 
     def __call__(self, evt: CreateOrUpdateDisqualified):
         with self._uowm.start() as tx:
-            # Create ot update disqualified
             houses: List[House] = [
                 house for house in tx.houses.get_by_game_id(evt.game_id)
                 if house.slot in evt.disqualified_slots
@@ -207,7 +233,7 @@ class CreateOrUpdateDisqualifiedHundler:
             tx.commit()
 
 
-class CreateOrUpdateNominatedForBestHundler:
+class CreateOrUpdateNominatedForBestHandler:
     @inject.params(
         uowm=UnitOfWorkManager
     )
@@ -217,7 +243,6 @@ class CreateOrUpdateNominatedForBestHundler:
 
     def __call__(self, evt: CreateOrUpdateNominatedForBest):
         with self._uowm.start() as tx:
-            # Create ot update nominated for best
             houses: List[House] = [
                 house for house in tx.houses.get_by_game_id(evt.game_id)
                 if house.slot in evt.nominated_slots
@@ -237,39 +262,78 @@ class CreateOrUpdateNominatedForBestHundler:
             tx.commit()
 
 
-class CreateOrUpdateVotedHundler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateVotedHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateVoted):
         with self._uowm.start() as tx:
-            # Create ot update voted
-            houses: List[House] = tx.houses.get_by_game_id(evt.game_id)
-            voted_houses = []
+
+            houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            voted_event_houses = []
+            # This object if to replace list of dict with list of namedtuple.
+            # Just to make code more readable and comfortable to write
+            event_house = namedtuple("EventHouse", ['day', 'house_id'])
+
+            # Parse voted slots from event
             for day, slots in evt.voted_slots.items():
-                if slots is not None:
-                    for slot in slots:
-                        house = next((house_ for house_ in houses if lambda house_: house_.slot == slot), None)
-                        if house is not None:
-                            voted_houses.append({'day': day, 'house': house.house_id})
-            voted: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
-            if not voted:
-                for voted_house in voted_houses:
-                    voted_ = Voted(
-                        voted_id=str(uuid.uuid4()),
+                if slots is None:
+                    continue
+                for slot in slots:
+                    try:
+                        house = houses[slot]
+                    except KeyError:
+                        # todo exception should be raised about missing house
+                        continue
+
+                    voted_event_houses.append(event_house(day=day, house_id=house.house_id))
+
+            # Get slots which are already saved in db. And check if they are up-to-date
+
+            votes: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
+            all_votes_tuples = [event_house(voted.day, voted.house_id) for voted in votes]
+            valid_votes = copy(all_votes_tuples)
+
+            # Remove redundant
+            for voted, voted_t in zip(votes, all_votes_tuples):
+                if voted_t not in voted_event_houses:
+                    tx.voted.delete(voted)
+                    valid_votes.remove(voted_t)
+
+            # Add which is missed
+            for voted_event in voted_event_houses:
+                if voted_event not in valid_votes:
+                    voted = Voted(
                         game_id=evt.game_id,
-                        voted_house_id=voted_house['house'],
-                        voted_day=voted_house['day']
+                        voted_id=str(uuid.uuid4()),
+                        house_id=voted_event.house_id,
+                        day=voted_event.day
                     )
-                    tx.voted.add(voted_)
+                    tx.voted.add(voted)
+
+            tx.commit()
+
+
+class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateHandOfMafia):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            hand_house = houses[evt.slot_from]  # Who vote
+            victim_house = houses[evt.slot_to]  # Who voted
+
+            hand_of_mafia: HandOfMafia = tx.hand_of_mafia.get_by_game_id(evt.game_id)
+            if hand_of_mafia is None:
+                hand_of_mafia = HandOfMafia(
+                    hand_of_mafia_id=str(uuid.uuid4()),
+                    game_id=evt.game_id,
+                    house_hand_id=hand_house.house_id,
+                    victim_id=victim_house.house_id
+                )
+                tx.hand_of_mafia.add(hand_of_mafia)
             else:
-                for voted_, voted_house in zip(voted, voted_houses):
-                    voted_.voted_house_id = voted_house['house']
-                    voted_.voted_day = voted_house['day']
+                hand_of_mafia.house_hand_id = hand_house.house_id
+                hand_of_mafia.victim_id = victim_house.house_id
             tx.commit()
 
 

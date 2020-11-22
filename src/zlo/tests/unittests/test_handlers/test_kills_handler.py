@@ -1,22 +1,21 @@
 from expects import expect, equal, have_len
 from zlo.domain.handlers import CreateOrUpdateKillsHandler
 from zlo.domain.events import CreateOrUpdateKills
-from zlo.tests.unittests.test_handlers.common import BaseTestHadnler
+from zlo.tests.unittests.test_handlers.common import BaseTestHandler
 
 
-class WhenKillsIsCreating(BaseTestHadnler):
+class WhenKillsIsCreating(BaseTestHandler):
 
     @classmethod
     def examples_slots(cls):
         yield [1, 2]
-        yield [1, 2, 3]
         yield [1, 2, 3, 4]
         yield [1, 0, 2, 3]
         yield [1, 0, 0, 2, 3]
 
     def given_event(self, choises_slots):
 
-        self.handler = CreateOrUpdateKillsHandler(self._uown)
+        self.handler = CreateOrUpdateKillsHandler(self._uowm)
 
         self.choises_houses = [house for house in self.houses if house.slot in choises_slots]
 
@@ -29,7 +28,7 @@ class WhenKillsIsCreating(BaseTestHadnler):
         self.handler(self.kills_event)
 
     def it_should_save_kills(self, choises_slots):
-        our_kills = self._uown.sess.kills.get_by_game_id(game_id=self.game.game_id)
+        our_kills = self._uowm.sess.kills.get_by_game_id(game_id=self.game.game_id)
 
         # For save order of zero number houses (no house)
         # For example List: slot [1, 0, 2, 3] => List: house_id = [House1, None, House2, House3]

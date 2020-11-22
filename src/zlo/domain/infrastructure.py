@@ -1,19 +1,34 @@
-class UnitOfWork:
+from abc import ABC, abstractmethod
 
+
+class UnitOfWork(ABC):
+
+    @abstractmethod
     def __enter__(self):
-        raise NotImplementedError("enter")
+        pass
 
+    @abstractmethod
     def __exit__(self, type, value, traceback):
-        raise NotImplementedError("exit")
+        pass
 
+    @abstractmethod
     def commit(self):
-        raise NotImplementedError("commit")
+        pass
 
+    @abstractmethod
     def rollback(self):
-        raise NotImplementedError("rollback")
+        pass
 
 
-class UnitOfWorkManager:
+class UnitOfWorkManager(ABC):
 
+    @abstractmethod
     def start(self):
-        return UnitOfWork()
+        pass
+
+
+class HouseCacheMemory(ABC):
+
+    @abstractmethod
+    def get_houses_by_game_id(self, game_id):
+        pass

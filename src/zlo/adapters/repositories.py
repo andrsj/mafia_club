@@ -25,7 +25,7 @@ class PlayerRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_nickname(self, nick: str):
+    def get_by_player_nickname(self, nick: str):
         return self._session.query(Player).filter_by(nickname=nick).first()
 
     def get_by_id(self, player_id):
@@ -43,7 +43,7 @@ class GameRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_id(self, game_id):
+    def get_by_game_id(self, game_id):
         return self._session.query(Game).filter_by(game_id=game_id).first()
 
     def get_by_datetime_range(self, start_date, end_date):
@@ -135,3 +135,6 @@ class VotedRepository:
 
     def add(self, voted: Voted):
         self._session.add(voted)
+
+    def delete(self, voted: Voted):
+        self._session.query(Voted).filter_by(Voted.voted_id == voted.voted_id).delete()

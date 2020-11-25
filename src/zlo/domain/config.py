@@ -5,25 +5,28 @@ from zlo.domain.events import (
     CreateOrUpdateVoted,
     CreateOrUpdateBestMove,
     CreateOrUpdateDisqualified,
+    CreateOrUpdateSheriffChecks,
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest
 )
 from zlo.domain.handlers import (
     CreateOrUpdateGameHandler,
-    CreateOrUpdateVotedHundler,
+    CreateOrUpdateVotedHandler,
     CreateOrUpdateHouseHandler,
-    CreateOrUpdateBestMoveHundler,
-    CreateOrUpdateDisqualifiedHundler,
-    CreateOrUpdateSheriffVersionHundler,
-    CreateOrUpdateNominatedForBestHundler,
+    CreateOrUpdateBestMoveHandler,
+    CreateOrUpdateDisqualifiedHandler,
+    CreateOrUpdateSheriffChecksHandler,
+    CreateOrUpdateSheriffVersionHandler,
+    CreateOrUpdateNominatedForBestHandler,
 )
 
 
 def map_handlers(bus: MessageBus):
     bus.register(CreateOrUpdateGame, CreateOrUpdateGameHandler)
-    bus.register(CreateOrUpdateVoted, CreateOrUpdateVotedHundler)
+    bus.register(CreateOrUpdateVoted, CreateOrUpdateVotedHandler)
     bus.register(CreateOrUpdateHouse, CreateOrUpdateHouseHandler)
-    bus.register(CreateOrUpdateBestMove, CreateOrUpdateBestMoveHundler)
-    bus.register(CreateOrUpdateDisqualified, CreateOrUpdateDisqualifiedHundler)
-    bus.register(CreateOrUpdateSheriffVersion, CreateOrUpdateSheriffVersionHundler)
-    bus.register(CreateOrUpdateNominatedForBest, CreateOrUpdateNominatedForBestHundler)
+    bus.register(CreateOrUpdateBestMove, CreateOrUpdateBestMoveHandler)
+    bus.register(CreateOrUpdateDisqualified, CreateOrUpdateDisqualifiedHandler)
+    bus.register(CreateOrUpdateSheriffChecks, CreateOrUpdateSheriffChecksHandler)
+    bus.register(CreateOrUpdateSheriffVersion, CreateOrUpdateSheriffVersionHandler)
+    bus.register(CreateOrUpdateNominatedForBest, CreateOrUpdateNominatedForBestHandler)

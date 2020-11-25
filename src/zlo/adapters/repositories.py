@@ -15,8 +15,8 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
+    BonusTolerantFromPlayers,
     BonusFromPlayers,
-    BonusTolerantPointFromPlayers
 )
 
 

@@ -244,32 +244,31 @@ class CreateOrUpdateDisqualifiedHandler(BaseHandler):
             tx.commit()
 
 
-class CreateOrUpdateNominatedForBestHandler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateNominatedForBestHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateNominatedForBest):
         with self._uowm.start() as tx:
-            houses: List[House] = [
-                house for house in tx.houses.get_by_game_id(evt.game_id)
-                if house.slot in evt.nominated_slots
-            ]
+            houses = self.get_houses(tx=tx, game_id=evt.game_id)
+
+            event_nominated_for_best = [houses.get(slot).house_id for slot in evt.nominated_slots]
+
             nominated_for_bests: List[NominatedForBest] = tx.nominated_for_best.get_by_game_id(evt.game_id)
-            if not nominated_for_bests:
-                for house in houses:
+            nominated_for_bests.sort(key=lambda n: n.house)
+            all_nominated_for_bests = [nominated_for_best for nominated_for_best in nominated_for_bests]
+
+            for nominated_for_best in event_nominated_for_best:
+                if nominated_for_best not in all_nominated_for_bests:
                     nominated_for_best = NominatedForBest(
                         nominated_for_best_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
-                        house=house.house_id
+                        house=nominated_for_best
                     )
                     tx.nominated_for_best.add(nominated_for_best)
-            else:
-                for nominated_for_best, house in zip(nominated_for_bests, houses):
-                    nominated_for_best.house = house.house_id
+
+            for nominated_for_best, nominated_for_best_house in zip(nominated_for_bests, all_nominated_for_bests):
+                if nominated_for_best_house not in event_nominated_for_best:
+                    tx.nominated_for_best.delete(nominated_for_best)
+
             tx.commit()
 
 

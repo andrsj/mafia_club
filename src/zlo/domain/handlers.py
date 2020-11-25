@@ -10,6 +10,7 @@ from zlo.domain.events import (
     CreateOrUpdateGame,
     CreateOrUpdateHouse,
     CreateOrUpdateVoted,
+    CreateOrUpdateKills,
     CreateOrUpdateMisses,
     CreateOrUpdateBestMove,
     CreateOrUpdateDonChecks,
@@ -342,6 +343,51 @@ class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
             tx.commit()
 
 
+class CreateOrUpdateKillsHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateKills):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            killed_event_houses = []
+
+            for day, slot in enumerate(evt.kills_slots, start=1):
+                house = houses.get(slot)
+                if house is None:
+                    killed_event_houses.append(None)
+                else:
+                    killed_event_houses.append(EventHouseModel(
+                            day=day,
+                            house_id=house.house_id
+                        )
+                    )
+
+            # Get slots which are already saved in db. And check if they are up-to-date
+
+            kills: List[Kills] = tx.kills.get_by_game_id(evt.game_id)
+            all_kills_tuples = [EventHouseModel(kill.circle_number, kill.killed_house_id) for kill in kills]
+            valid_kills = copy(all_kills_tuples)
+
+            # Remove redundant
+            for kill, kill_t in zip(kills, all_kills_tuples):
+                if kill_t not in killed_event_houses:
+                    tx.kills.delete(kill)
+                    valid_kills.remove(kill_t)
+
+            # Add which is missed
+            for kill_event in killed_event_houses:
+                if kill_event not in valid_kills and kill_event is not None:
+                    kill = Kills(
+                        kill_id=str(uuid.uuid4()),
+                        game_id=evt.game_id,
+                        killed_house_id=kill_event.house_id,
+                        circle_number=kill_event.day
+                    )
+                    tx.kills.add(kill)
+
+            tx.commit()
+
+
 class CreateOrUpdateMissesHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateMisses):
@@ -447,8 +493,6 @@ class CreateOrUpdateDonChecksHandler(BaseHandler):
                             house_id=house.house_id
                         )
                     )
-
-            # Get slots which are already saved in db. And check if they are up-to-date
 
             don_checks: List[DonChecks] = tx.don_checks.get_by_game_id(evt.game_id)
             all_don_checks_tuples = [

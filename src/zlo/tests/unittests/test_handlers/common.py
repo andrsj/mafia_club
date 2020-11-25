@@ -25,3 +25,4 @@ class BaseTestHandler:
 
         for house in self.houses:
             self._uowm.sess.houses.add(house)
+

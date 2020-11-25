@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 
 class UnitOfWork(ABC):
@@ -33,4 +32,3 @@ class HouseCacheMemory(ABC):
     @abstractmethod
     def get_houses_by_game_id(self, game_id):
         pass
-

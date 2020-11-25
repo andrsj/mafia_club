@@ -38,7 +38,6 @@ class WhenVotedIsCreated(BaseTestHandler):
     def it_should_save_voted(self):
         our_votes = self._uowm.sess.voted.get_by_game_id(self.game.game_id)
         our_votes_tuples = [(voted.day, voted.house_id) for voted in our_votes]
-
         houses = self.cache.get_houses_by_game_id(self.game.game_id)
         expected_votes_tuples = []
         for day, slots in self.days.items():

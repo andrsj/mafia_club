@@ -13,6 +13,9 @@ from zlo.domain.events import (
     CreateOrUpdateBestMove,
     CreateOrUpdateHandOfMafia,
     CreateOrUpdateDisqualified,
+    CreateOrUpdateBonusTolerant,
+    CreateOrUpdateSheriffVersion,
+    CreateOrUpdateNominatedForBest,
     CreateOrUpdateSheriffChecks,
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest,
@@ -33,8 +36,8 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
-    BonusFromPlayers,
-    BonusTolerantPointFromPlayers
+    BonusTolerantFromPlayers,
+    BonusFromPlayers
 )
 from zlo.tests.fakes import FakeHouseCacheMemory
 
@@ -423,3 +426,42 @@ class CreateOrUpdateSheriffChecksHandler(BaseHandler):
                     tx.sheriff_checks.add(sheriff_check)
 
             tx.commit()
+
+class CreateOrUpdateBonusTolerantHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateBonusTolerant):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            bonuses_tolerant: List[BonusTolerantFromPlayers] = tx.bonuses_tolerant.get_by_game_id(evt.game_id)
+            bonuses_tolerant_tuples = [
+                (bonus.house_from_id, bonus.house_to_id)
+                for bonus in bonuses_tolerant
+            ]
+            valid_bonuses_tolerant_tuples = copy(bonuses_tolerant_tuples)
+
+            bonuses_tolerant_event_tuples = []
+            for slot_from, slot_to in evt.bonuses.items():
+                house_from = houses.get(slot_from).house_id
+                house_to = houses.get(slot_to).house_id
+                bonuses_tolerant_event_tuples.append((house_from, house_to))
+
+            # Remove redundant
+            for bonus, bonus_t in zip(bonuses_tolerant, bonuses_tolerant_tuples):
+                if bonus_t not in bonuses_tolerant_event_tuples:
+                    tx.bonuses_tolerant.delete(bonus)
+                    valid_bonuses_tolerant_tuples.remove(bonus_t)
+
+            # Add which is missed
+            for bonus_event in bonuses_tolerant_event_tuples:
+                if bonus_event not in valid_bonuses_tolerant_tuples:
+                    bonus = BonusTolerantFromPlayers(
+                        game_id=evt.game_id,
+                        bonus_id=str(uuid.uuid4()),
+                        house_from_id=bonus_event[0],
+                        house_to_id=bonus_event[1]
+                    )
+                    tx.bonuses_tolerant.add(bonus)
+
+            tx.commit()
+

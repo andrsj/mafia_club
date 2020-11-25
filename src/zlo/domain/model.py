@@ -119,8 +119,8 @@ class HandOfMafia:
 
 
 @dataclass
-class BonusTolerantPointFromPlayers:
-    bonus_tolerant_point_id: str
+class BonusTolerantFromPlayers:
+    bonus_id: str
     game_id: GameID
     house_from_id: HouseID
     house_to_id: HouseID

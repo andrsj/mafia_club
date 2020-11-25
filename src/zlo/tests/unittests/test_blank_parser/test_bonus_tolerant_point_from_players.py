@@ -1,5 +1,5 @@
 import contexts
-from expects import expect, equal, be_empty
+from expects import expect, equal, have_keys
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.tests.unittests.test_blank_parser.common import BlankParserMixin
 
@@ -14,14 +14,10 @@ class WhenBonusTolerantPointsFromPlayersParsed(BlankParserMixin):
         self.bonus_tolerant_point_from_players = self.blank_parser.get_bonus_tolerant_points_from_houses_data()
 
     def it_should_get_proper_values(self):
-        expect(self.bonus_tolerant_point_from_players[0].slot_to).to(equal(1))
-        expect(self.bonus_tolerant_point_from_players[0].slot_from).to(equal(4))
-
-        expect(self.bonus_tolerant_point_from_players[1].slot_to).to(equal(2))
-        expect(self.bonus_tolerant_point_from_players[1].slot_from).to(equal(5))
-
-        expect(self.bonus_tolerant_point_from_players[2].slot_to).to(equal(5))
-        expect(self.bonus_tolerant_point_from_players[2].slot_from).to(equal(8))
+        expect(self.bonus_tolerant_point_from_players.bonuses).to(have_keys(4, 5, 8))
+        expect(self.bonus_tolerant_point_from_players.bonuses[4]).to(equal(1))
+        expect(self.bonus_tolerant_point_from_players.bonuses[5]).to(equal(2))
+        expect(self.bonus_tolerant_point_from_players.bonuses[8]).to(equal(5))
 
 
 class WhenBonusTolerantPointsFromPlayersIsEmpty(BlankParserMixin):
@@ -34,4 +30,4 @@ class WhenBonusTolerantPointsFromPlayersIsEmpty(BlankParserMixin):
         self.bonus_tolerant_point_from_players = self.blank_parser.get_bonus_tolerant_points_from_houses_data()
 
     def it_should_get_proper_values(self):
-        expect(self.bonus_tolerant_point_from_players).to(be_empty)
+        expect(self.bonus_tolerant_point_from_players.bonuses).to(equal({}))

@@ -10,6 +10,7 @@ from zlo.domain.events import (
     CreateOrUpdateGame,
     CreateOrUpdateHouse,
     CreateOrUpdateVoted,
+    CreateOrUpdateMisses,
     CreateOrUpdateBestMove,
     CreateOrUpdateHandOfMafia,
     CreateOrUpdateDisqualified,
@@ -28,6 +29,7 @@ from zlo.domain.model import (
     Kills,
     Voted,
     Devise,
+    Misses,
     Player,
     BestMove,
     DonChecks,
@@ -339,6 +341,50 @@ class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
             tx.commit()
 
 
+class CreateOrUpdateMissesHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateMisses):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            misses_event_houses = []
+
+            for day, slot in enumerate(evt.misses_slots, start=1):
+                house = houses.get(slot)
+                if house is None:
+                    misses_event_houses.append(None)
+                else:
+                    misses_event_houses.append(
+                        EventHouseModel(
+                            day=day,
+                            house_id=house.house_id
+                        )
+                    )
+
+            misses: List[Misses] = tx.misses.get_by_game_id(evt.game_id)
+            all_misses_tuples = [EventHouseModel(miss.circle_number, miss.house_id) for miss in misses]
+            valid_misses = copy(all_misses_tuples)
+
+            # Remove redundant
+            for miss, miss_tuple in zip(misses, all_misses_tuples):
+                if miss_tuple not in misses_event_houses:
+                    tx.misses.delete(miss)
+                    valid_misses.remove(miss_tuple)
+
+            # Add which is missed
+            for miss_event in misses_event_houses:
+                if miss_event not in valid_misses and miss_event is not None:
+                    miss = Misses(
+                        misses_id=str(uuid.uuid4()),
+                        game_id=evt.game_id,
+                        house_id=miss_event.house_id,
+                        circle_number=miss_event.day
+                    )
+                    tx.misses.add(miss)
+
+            tx.commit()
+
+
 class CreateOrUpdateBonusFromPlayersHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateBonusFromPlayers):
@@ -397,8 +443,6 @@ class CreateOrUpdateSheriffChecksHandler(BaseHandler):
                             house_id=house.house_id
                         )
                     )
-
-            # Get slots which are already saved in db. And check if they are up-to-date
 
             sheriff_checks: List[SheriffChecks] = tx.sheriff_checks.get_by_game_id(evt.game_id)
             all_sheriff_checks_tuples = [

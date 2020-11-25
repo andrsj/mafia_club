@@ -183,32 +183,35 @@ class CreateOrUpdateBestMoveHandler(BaseHandler):
             tx.commit()
 
 
-class CreateOrUpdateSheriffVersionHandler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateSheriffVersionHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateSheriffVersion):
         with self._uowm.start() as tx:
-            houses: List[House] = [
-                house for house in tx.houses.get_by_game_id(evt.game_id)
-                if house.slot in evt.sheriff_version_slots
+            houses = self.get_houses(tx=tx, game_id=evt.game_id)
+
+            event_sheriff_versions = [
+                houses.get(slot).house_id for slot in evt.sheriff_version_slots
             ]
+
             sheriff_versions: List[SheriffVersion] = tx.sheriff_versions.get_by_game_id(evt.game_id)
-            if not sheriff_versions:
-                for house in houses:
+            sheriff_versions = sorted(sheriff_versions, key=lambda d: d.house)
+            all_sheriff_versions = [
+                sheriff_version.house for sheriff_version in sheriff_versions
+            ]
+
+            for sheriff_version in event_sheriff_versions:
+                if sheriff_version not in all_sheriff_versions:
                     sheriff_version = SheriffVersion(
                         sheriff_version_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
-                        house=house.house_id
+                        house=sheriff_version
                     )
                     tx.sheriff_versions.add(sheriff_version)
-            else:
-                for sheriff_version, house in zip(sheriff_versions, houses):
-                    sheriff_version.house = house.house_id
+
+            for sheriff_version, sheriff_version_house in zip(sheriff_versions, all_sheriff_versions):
+                if sheriff_version_house not in event_sheriff_versions:
+                    tx.sheriff_versions.delete(sheriff_version)
+
             tx.commit()
 
 

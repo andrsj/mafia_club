@@ -2,7 +2,7 @@ import datetime
 from typing import List, Dict
 
 
-from zlo.domain.model import Player, Game, House, BestMove, HandOfMafia, SheriffChecks
+from zlo.domain.model import Player, Game, House, BestMove, HandOfMafia, SheriffChecks, BonusFromPlayers
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
@@ -122,6 +122,22 @@ class FakeHandOfMafiaRepo:
         self.hands_of_mafia = {}
 
 
+class FakeBonusFromPlayersRepo:
+    bonus_from_players: List[BonusFromPlayers] = []
+
+    def add(self, bonus: BonusFromPlayers):
+        self.bonus_from_players.append(bonus)
+
+    def delete(self, bonus: BonusFromPlayers):
+        self.bonus_from_players.remove(bonus)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [bonus for bonus in self.bonus_from_players if bonus.game_id == game_id]
+
+    def clean(self):
+        self.bonus_from_players = []
+
+
 class FakeSheriffChecksRepo:
     sheriff_checks: List[SheriffChecks] = []
 
@@ -142,10 +158,12 @@ class FakeUnitOfWork(UnitOfWork):
 
     def __init__(self):
         self.games = FakeGameRepo()
+        self.voted = FakeVotedRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
         self.best_moves = FakeBestMoveRepo()
         self.hand_of_mafia = FakeHandOfMafiaRepo()
+        self.bonuses_from_players = FakeBonusFromPlayersRepo()
         self.sheriff_checks = FakeSheriffChecksRepo()
         self.voted = FakeVotedRepo()
 
@@ -175,6 +193,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.voted.clean()
         self.best_moves.clean()
         self.hand_of_mafia.clean()
+        self.bonuses_from_players.clean()
         self.sheriff_checks.clean()
 
 

@@ -121,7 +121,3 @@ class WhenKillsIsUpdated(BaseTestHandler):
 
         for kill_tuple in expected_deleted_kills_tuples:
             assert kill_tuple not in our_kills_tuples
-
-
-if __name__ == '__main__':
-    contexts.main()

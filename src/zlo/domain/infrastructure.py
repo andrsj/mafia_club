@@ -34,7 +34,3 @@ class HouseCacheMemory(ABC):
     def get_houses_by_game_id(self, game_id):
         pass
 
-@dataclass
-class EventHouseModel:
-    day: int
-    house_id: str

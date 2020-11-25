@@ -6,6 +6,7 @@ from collections import namedtuple
 
 import inject
 from zlo.domain.types import GameID
+from zlo.domain.utils import EventHouseModel
 from zlo.domain.events import (
     CreateOrUpdateGame,
     CreateOrUpdateHouse,
@@ -13,6 +14,7 @@ from zlo.domain.events import (
     CreateOrUpdateBestMove,
     CreateOrUpdateHandOfMafia,
     CreateOrUpdateDisqualified,
+    CreateOrUpdateSheriffChecks,
     CreateOrUpdateSheriffVersion,
     CreateOrUpdateNominatedForBest
 )
@@ -269,9 +271,6 @@ class CreateOrUpdateVotedHandler(BaseHandler):
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
 
             voted_event_houses = []
-            # This object if to replace list of dict with list of namedtuple.
-            # Just to make code more readable and comfortable to write
-            event_house = namedtuple("EventHouse", ['day', 'house_id'])
 
             # Parse voted slots from event
             for day, slots in evt.voted_slots.items():
@@ -284,12 +283,12 @@ class CreateOrUpdateVotedHandler(BaseHandler):
                         # todo exception should be raised about missing house
                         continue
 
-                    voted_event_houses.append(event_house(day=day, house_id=house.house_id))
+                    voted_event_houses.append(EventHouseModel(day=day, house_id=house.house_id))
 
             # Get slots which are already saved in db. And check if they are up-to-date
 
             votes: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
-            all_votes_tuples = [event_house(voted.day, voted.house_id) for voted in votes]
+            all_votes_tuples = [EventHouseModel(voted.day, voted.house_id) for voted in votes]
             valid_votes = copy(all_votes_tuples)
 
             # Remove redundant
@@ -333,4 +332,54 @@ class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
             else:
                 hand_of_mafia.house_hand_id = hand_house.house_id
                 hand_of_mafia.victim_id = victim_house.house_id
+            tx.commit()
+
+
+class CreateOrUpdateSheriffChecksHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateSheriffChecks):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            sheriff_checks_event_houses = []
+
+            for day, slot in enumerate(evt.sheriff_checks, start=1):
+                house = houses.get(slot)
+                if house is None:
+                    sheriff_checks_event_houses.append(None)
+                else:
+                    sheriff_checks_event_houses.append(
+                        EventHouseModel(
+                            day=day,
+                            house_id=house.house_id
+                        )
+                    )
+
+            # Get slots which are already saved in db. And check if they are up-to-date
+
+            sheriff_checks: List[SheriffChecks] = tx.sheriff_checks.get_by_game_id(evt.game_id)
+            all_sheriff_checks_tuples = [
+                # event_house(check.circle_number, check.checked_house_id)
+                EventHouseModel(check.circle_number, check.checked_house_id)
+                for check in sheriff_checks
+            ]
+            valid_sheriff_checks = copy(all_sheriff_checks_tuples)
+
+            # Remove redundant
+            for sheriff_check, sheriff_check_t in zip(sheriff_checks, all_sheriff_checks_tuples):
+                if sheriff_check_t not in sheriff_checks_event_houses:
+                    tx.sheriff_checks.delete(sheriff_check)
+                    valid_sheriff_checks.remove(sheriff_check_t)
+
+            # Add which is missed
+            for sheriff_check_event in sheriff_checks_event_houses:
+                if sheriff_check_event not in valid_sheriff_checks and sheriff_check_event is not None:
+                    sheriff_check = SheriffChecks(
+                        sheriff_checks_id=str(uuid.uuid4()),
+                        game_id=evt.game_id,
+                        checked_house_id=sheriff_check_event.house_id,
+                        circle_number=sheriff_check_event.day
+                    )
+                    tx.sheriff_checks.add(sheriff_check)
+
             tx.commit()

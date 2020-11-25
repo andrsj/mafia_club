@@ -4,10 +4,11 @@ from typing import List, Dict
 
 from zlo.domain.model import (Player, Game, House, BestMove, HandOfMafia, SheriffChecks,
                               BonusFromPlayers, BonusTolerantFromPlayers, Misses, DonChecks,
-                              Kills)
+                              Kills, Disqualified)
 
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
+
 from zlo.domain.types import HouseID, GameID
 
 
@@ -75,6 +76,22 @@ class FakeHouseRepo:
 
     def clean(self):
         self.houses = []
+
+
+class FakeDisqualifiedRepo:
+    disqualifieds: List[Disqualified] = []
+
+    def add(self, disqualified: Disqualified):
+        self.disqualifieds.append(disqualified)
+
+    def delete(self, disqualified: Disqualified):
+        self.disqualifieds.remove(disqualified)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [disqualified for disqualified in self.disqualifieds if disqualified.game_id == game_id]
+
+    def clean(self):
+        self.disqualifieds = []
 
 
 class FakeBestMoveRepo:
@@ -228,6 +245,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.voted = FakeVotedRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
+        self.disqualifieds = FakeDisqualifiedRepo()
         self.kills = FakeKillRepo()
         self.best_moves = FakeBestMoveRepo()
         self.hand_of_mafia = FakeHandOfMafiaRepo()
@@ -266,6 +284,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.misses.clean()
         self.best_moves.clean()
         self.hand_of_mafia.clean()
+        self.disqualifieds.clean()
         self.kills.clean()
         self.bonuses_tolerant.clean()
         self.bonuses_from_players.clean()

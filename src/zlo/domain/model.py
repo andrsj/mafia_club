@@ -159,8 +159,17 @@ class DonChecks:
 
 
 @dataclass
+class Misses:
+    misses_id: str
+    game_id: GameID
+    house_id: Optional[HouseID]
+    circle_number: int
+
+
+@dataclass
 class BonusFromPlayers:
     bonus_id: str
     game_id: GameID
     bonus_from: Optional[HouseID]
     bonus_to: Optional[HouseID]
+

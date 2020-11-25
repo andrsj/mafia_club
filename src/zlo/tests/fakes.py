@@ -4,7 +4,7 @@ from typing import List, Dict
 
 from zlo.domain.model import (Player, Game, House, BestMove, HandOfMafia, SheriffChecks,
                               BonusFromPlayers, BonusTolerantFromPlayers, Misses, DonChecks,
-                              Kills, Disqualified, NominatedForBest)
+                              Kills, Disqualified, NominatedForBest, SheriffVersion)
 
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
@@ -161,6 +161,25 @@ class FakeHandOfMafiaRepo:
         self.hands_of_mafia = {}
 
 
+class FakeSheriffVersionRepo:
+    sheriff_versions: List[SheriffVersion] = []
+
+    def add(self, sheriff_version: SheriffVersion):
+        self.sheriff_versions.append(sheriff_version)
+
+    def delete(self, sheriff_version: SheriffVersion):
+        self.sheriff_versions.remove(sheriff_version)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [
+            sheriff_version for sheriff_version in self.sheriff_versions
+            if sheriff_version.game_id == game_id
+        ]
+
+    def clean(self):
+        self.sheriff_versions = []
+
+
 class FakeKillRepo:
     kills: List[Kills] = []
 
@@ -264,6 +283,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.voted = FakeVotedRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
+        self.sheriff_versions = FakeSheriffVersionRepo()
         self.nominated_for_best = FakeNominatedForBest()
         self.disqualifieds = FakeDisqualifiedRepo()
         self.kills = FakeKillRepo()
@@ -304,6 +324,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.misses.clean()
         self.best_moves.clean()
         self.hand_of_mafia.clean()
+        self.sheriff_versions.clean()
         self.nominated_for_best.clean()
         self.disqualifieds.clean()
         self.kills.clean()

@@ -20,8 +20,8 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
-    BonusPointsFromPlayers,
-    BonusTolerantPointFromPlayers
+    BonusTolerantFromPlayers,
+    BonusFromPlayers,
 )
 from zlo.adapters.repositories import (
     NominatedForBestRepository,

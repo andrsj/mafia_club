@@ -230,7 +230,7 @@ class BlankParser:
             don_checks=slots
         )
 
-    def get_bonus_points_from_houses_data(self) -> List[CreateOrUpdateBonusFromPlayers]:
+    def get_bonus_points_from_houses_data(self) -> CreateOrUpdateBonusFromPlayers:
         slots = {}
         for i in range(1, 11):
             row_number = i + 9
@@ -238,15 +238,13 @@ class BlankParser:
             if slot != 0:
                 slots[i] = slot
 
-        return [
-            CreateOrUpdateBonusFromPlayers(
-                game_id=self._game_id,
-                slot_to=slot_to,
-                slot_from=slot_from
-            ) for slot_from, slot_to in slots.items()
-        ]
+        return CreateOrUpdateBonusFromPlayers(
+            game_id=self._game_id,
+            bonus=slots
+        )
 
-    def get_bonus_tolerant_points_from_houses_data(self) -> List[CreateOrUpdateBonusTolerant]:
+
+    def get_bonus_tolerant_points_from_houses_data(self) -> CreateOrUpdateBonusTolerant:
         slots = {}
         for i in range(1, 11):
             row_number = i + 9
@@ -254,13 +252,10 @@ class BlankParser:
             if slot != 0:
                 slots[i] = slot
 
-        return [
-            CreateOrUpdateBonusTolerant(
-                game_id=self._game_id,
-                slot_to=slot_to,
-                slot_from=slot_from
-            ) for slot_from, slot_to in slots.items()
-        ]
+        return CreateOrUpdateBonusTolerant(
+            game_id=self._game_id,
+            bonuses=slots
+        )
 
     def get_bonus_points_from_heading(self) -> List[CreateOrUpdateBonusFromHeading]:
         bonus_points = {}

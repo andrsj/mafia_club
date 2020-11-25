@@ -2,7 +2,10 @@ import datetime
 from typing import List, Dict
 
 
-from zlo.domain.model import Player, Game, House, BestMove, HandOfMafia, Kills
+from zlo.domain.model import (Player, Game, House, BestMove, HandOfMafia, SheriffChecks,
+                              BonusFromPlayers, BonusTolerantFromPlayers, Misses, DonChecks,
+                              Kills)
+
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
 from zlo.domain.types import HouseID, GameID
@@ -138,16 +141,102 @@ class FakeKillRepo:
         self.kills = []
 
 
+class FakeDonChecksRepo:
+    don_checks: List[DonChecks] = []
+
+    def add(self, kill: DonChecks):
+        self.don_checks.append(kill)
+
+    def delete(self, kill: DonChecks):
+        self.don_checks.remove(kill)
+
+    def get_by_game_id(self, game_id: GameID) -> List[DonChecks]:
+        return [don_check for don_check in self.don_checks if don_check.game_id == game_id]
+
+    def clean(self):
+        self.don_checks = []
+
+
+class FakeMissesRepo:
+    misses: List[Misses] = []
+
+    def add(self, miss: Misses):
+        self.misses.append(miss)
+
+    def delete(self, miss: Misses):
+        self.misses.remove(miss)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [miss for miss in self.misses if miss.game_id == game_id]
+
+    def clean(self):
+        self.misses = []
+
+
+class FakeBonusTolerantRepo:
+    bonuses_tolerant: List[BonusTolerantFromPlayers] = []
+
+    def add(self, bonus: BonusTolerantFromPlayers):
+        self.bonuses_tolerant.append(bonus)
+
+    def delete(self, bonus: BonusTolerantFromPlayers):
+        self.bonuses_tolerant.remove(bonus)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [bonus for bonus in self.bonuses_tolerant if bonus.game_id == game_id]
+
+    def clean(self):
+        self.bonuses_tolerant = []
+
+
+class FakeBonusFromPlayersRepo:
+    bonus_from_players: List[BonusFromPlayers] = []
+
+    def add(self, bonus: BonusFromPlayers):
+        self.bonus_from_players.append(bonus)
+
+    def delete(self, bonus: BonusFromPlayers):
+        self.bonus_from_players.remove(bonus)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [bonus for bonus in self.bonus_from_players if bonus.game_id == game_id]
+
+    def clean(self):
+        self.bonus_from_players = []
+
+
+class FakeSheriffChecksRepo:
+    sheriff_checks: List[SheriffChecks] = []
+
+    def add(self, sheriff_check: SheriffChecks):
+        self.sheriff_checks.append(sheriff_check)
+
+    def delete(self, sheriff_check: SheriffChecks):
+        self.sheriff_checks.remove(sheriff_check)
+
+    def get_by_game_id(self, game_id: GameID):
+        return [check for check in self.sheriff_checks if check.game_id == game_id]
+
+    def clean(self):
+        self.sheriff_checks = []
+
+
 class FakeUnitOfWork(UnitOfWork):
 
     def __init__(self):
         self.games = FakeGameRepo()
+        self.voted = FakeVotedRepo()
         self.houses = FakeHouseRepo()
         self.players = FakePlayerRepo()
         self.kills = FakeKillRepo()
         self.best_moves = FakeBestMoveRepo()
         self.hand_of_mafia = FakeHandOfMafiaRepo()
+        self.bonuses_from_players = FakeBonusFromPlayersRepo()
+        self.sheriff_checks = FakeSheriffChecksRepo()
         self.voted = FakeVotedRepo()
+        self.don_checks = FakeDonChecksRepo()
+        self.misses = FakeMissesRepo()
+        self.bonuses_tolerant = FakeBonusTolerantRepo()
 
         self.committed = False
         self.rolled_back = False
@@ -173,9 +262,14 @@ class FakeUnitOfWork(UnitOfWork):
         self.houses.clean()
         self.players.clean()
         self.voted.clean()
+        self.don_checks.clean()
+        self.misses.clean()
         self.best_moves.clean()
         self.hand_of_mafia.clean()
         self.kills.clean()
+        self.bonuses_tolerant.clean()
+        self.bonuses_from_players.clean()
+        self.sheriff_checks.clean()
 
 
 class FakeUnitOfWorkManager(UnitOfWorkManager):

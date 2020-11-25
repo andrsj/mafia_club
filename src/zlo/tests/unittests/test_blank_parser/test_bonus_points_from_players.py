@@ -1,5 +1,5 @@
 import contexts
-from expects import expect, equal, be_empty
+from expects import expect, equal, have_keys
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.tests.unittests.test_blank_parser.common import BlankParserMixin
 
@@ -14,11 +14,9 @@ class WhenBonusPointsFromPlayersParsed(BlankParserMixin):
         self.bonus_points_from_players_event = self.blank_parser.get_bonus_points_from_houses_data()
 
     def it_should_get_proper_values(self):
-        expect(self.bonus_points_from_players_event[0].slot_to).to(equal(4))
-        expect(self.bonus_points_from_players_event[0].slot_from).to(equal(2))
-
-        expect(self.bonus_points_from_players_event[1].slot_to).to(equal(5))
-        expect(self.bonus_points_from_players_event[1].slot_from).to(equal(4))
+        expect(self.bonus_points_from_players_event.bonus).to(have_keys(2, 4))
+        expect(self.bonus_points_from_players_event.bonus[2]).to(equal(4))
+        expect(self.bonus_points_from_players_event.bonus[4]).to(equal(5))
 
 
 class WhenBonusPointsFromPlayersIsEmpty(BlankParserMixin):
@@ -31,4 +29,4 @@ class WhenBonusPointsFromPlayersIsEmpty(BlankParserMixin):
         self.bonus_points_from_players_event = self.blank_parser.get_bonus_points_from_houses_data()
 
     def it_should_get_proper_values(self):
-        expect(self.bonus_points_from_players_event).to(be_empty)
+        expect(self.bonus_points_from_players_event.bonus).to(equal({}))

@@ -15,6 +15,10 @@ from zlo.domain.handlers import (
     CreateOrUpdateHouseHandler,
     CreateOrUpdateBestMoveHandler,
     CreateOrUpdateDisqualifiedHandler,
+    CreateOrUpdateSheriffVersionHandler,
+    CreateOrUpdateNominatedForBestHandler,
+    CreateOrUpdateBestMoveHandler,
+    CreateOrUpdateDisqualifiedHandler,
     CreateOrUpdateSheriffChecksHandler,
     CreateOrUpdateSheriffVersionHandler,
     CreateOrUpdateNominatedForBestHandler,
@@ -25,6 +29,10 @@ def map_handlers(bus: MessageBus):
     bus.register(CreateOrUpdateGame, CreateOrUpdateGameHandler)
     bus.register(CreateOrUpdateVoted, CreateOrUpdateVotedHandler)
     bus.register(CreateOrUpdateHouse, CreateOrUpdateHouseHandler)
+    bus.register(CreateOrUpdateBestMove, CreateOrUpdateBestMoveHundler)
+    bus.register(CreateOrUpdateDisqualified, CreateOrUpdateDisqualifiedHandler)
+    bus.register(CreateOrUpdateSheriffVersion, CreateOrUpdateSheriffVersionHundler)
+    bus.register(CreateOrUpdateNominatedForBest, CreateOrUpdateNominatedForBestHundler)
     bus.register(CreateOrUpdateBestMove, CreateOrUpdateBestMoveHandler)
     bus.register(CreateOrUpdateDisqualified, CreateOrUpdateDisqualifiedHandler)
     bus.register(CreateOrUpdateSheriffChecks, CreateOrUpdateSheriffChecksHandler)

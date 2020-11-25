@@ -212,32 +212,35 @@ class CreateOrUpdateSheriffVersionHandler:
             tx.commit()
 
 
-class CreateOrUpdateDisqualifiedHandler:
-    @inject.params(
-        uowm=UnitOfWorkManager
-    )
-    def __init__(self, uowm):
-        self._uowm = uowm
-        self._log = logging.getLogger(__name__)
+class CreateOrUpdateDisqualifiedHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateDisqualified):
         with self._uowm.start() as tx:
-            houses: List[House] = [
-                house for house in tx.houses.get_by_game_id(evt.game_id)
-                if house.slot in evt.disqualified_slots
+            houses = self.get_houses(tx=tx, game_id=evt.game_id)
+
+            event_disqualifieds = [
+                houses.get(slot).house_id for slot in evt.disqualified_slots
             ]
+
             disqualifieds: List[Disqualified] = tx.disqualifieds.get_by_game_id(evt.game_id)
-            if not disqualifieds:
-                for house in houses:
+            disqualifieds = sorted(disqualifieds, key=lambda d: d.house)
+            all_disqualifieds = [
+                disqualified.house for disqualified in disqualifieds
+            ]
+
+            for disqualified in event_disqualifieds:
+                if disqualified not in all_disqualifieds:
                     disqualified = Disqualified(
                         disqualified_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
-                        house=house.house_id
+                        house=disqualified
                     )
                     tx.disqualifieds.add(disqualified)
-            else:
-                for sheriff_version, house in zip(disqualifieds, houses):
-                    sheriff_version.house = house.house_id
+
+            for disqualified, disqualified_house in zip(disqualifieds, all_disqualifieds):
+                if disqualified_house not in event_disqualifieds:
+                    tx.disqualifieds.delete(disqualified)
+
             tx.commit()
 
 

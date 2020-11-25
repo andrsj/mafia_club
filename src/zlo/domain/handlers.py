@@ -6,6 +6,7 @@ from collections import namedtuple
 
 import inject
 from zlo.domain.types import GameID
+from zlo.domain.infrastructure import EventHouseModel
 from zlo.domain.events import (
     CreateOrUpdateGame,
     CreateOrUpdateHouse,
@@ -344,9 +345,6 @@ class CreateOrUpdateKillsHandler(BaseHandler):
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
 
             killed_event_houses = []
-            # This object if to replace list of dict with list of namedtuple.
-            # Just to make code more readable and comfortable to write
-            event_house = namedtuple("EventHouse", ['day', 'house_id'])
 
             for day, slot in enumerate(evt.kills_slots, start=1):
                 house = houses.get(slot)
@@ -354,7 +352,7 @@ class CreateOrUpdateKillsHandler(BaseHandler):
                     killed_event_houses.append(None)
                 else:
                     killed_event_houses.append(
-                        event_house(
+                        EventHouseModel(
                             day=day,
                             house_id=house.house_id
                         )
@@ -363,7 +361,7 @@ class CreateOrUpdateKillsHandler(BaseHandler):
             # Get slots which are already saved in db. And check if they are up-to-date
 
             kills: List[Kills] = tx.kills.get_by_game_id(evt.game_id)
-            all_kills_tuples = [event_house(kill.circle_number, kill.killed_house_id) for kill in kills]
+            all_kills_tuples = [EventHouseModel(kill.circle_number, kill.killed_house_id) for kill in kills]
             valid_kills = copy(all_kills_tuples)
 
             # Remove redundant

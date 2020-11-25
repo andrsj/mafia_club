@@ -12,6 +12,9 @@ class WhenKillsIsCreated(BaseTestHandler):
     def examples_slots(cls):
         yield [1, 2]
         yield [1, 2, 3, 4]
+
+        # Test event with misses
+        # at start and in the middle
         yield [1, 0, 2, 3]
         yield [1, 0, 0, 2, 3]
         yield [0, 1, 0, 2]
@@ -54,12 +57,19 @@ class WhenKillsIsUpdated(BaseTestHandler):
 
     @classmethod
     def example_slots(cls):
+        # Test update one slot
         yield [1, 0, 3], [2, 0, 3]
         yield [1, 2], [1, 3]
-        yield [1, 3, 5], [1, 3]
-        yield [1, 0, 4, 0, 2], [1, 0, 0, 2]
-        yield [0, 1, 2], [1, 2, 3]
         yield [0, 0, 1], [0, 0, 2]
+
+        # Test deleting slot
+        yield [1, 3, 5], [1, 3]
+
+        # Test adding slot
+        yield [1, 0, 4, 0, 2], [1, 0, 0, 2]
+
+        # Test full update
+        yield [0, 1, 2], [1, 2, 3]
 
     def given_model_and_event_for_update(self, old_slots, new_slots):
 

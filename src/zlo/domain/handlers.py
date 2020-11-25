@@ -2,7 +2,6 @@ import logging
 import uuid
 from copy import copy
 from typing import List, Dict
-from collections import namedtuple
 
 import inject
 from zlo.domain.types import GameID
@@ -16,7 +15,8 @@ from zlo.domain.events import (
     CreateOrUpdateDisqualified,
     CreateOrUpdateSheriffChecks,
     CreateOrUpdateSheriffVersion,
-    CreateOrUpdateNominatedForBest
+    CreateOrUpdateNominatedForBest,
+    CreateOrUpdateBonusFromPlayers
 )
 from zlo.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import (
@@ -33,7 +33,7 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
-    BonusPointsFromPlayers,
+    BonusFromPlayers,
     BonusTolerantPointFromPlayers
 )
 from zlo.tests.fakes import FakeHouseCacheMemory
@@ -332,6 +332,46 @@ class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
             else:
                 hand_of_mafia.house_hand_id = hand_house.house_id
                 hand_of_mafia.victim_id = victim_house.house_id
+
+            tx.commit()
+
+
+class CreateOrUpdateBonusFromPlayersHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateBonusFromPlayers):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            bonuses_from_players: List[BonusFromPlayers] = tx.bonuses_from_players.get_by_game_id(evt.game_id)
+            bonuses_from_players_tuples = [
+                (bonus.bonus_from, bonus.bonus_to)
+                for bonus in bonuses_from_players
+            ]
+            valid_bonuses_from_players_tuples = copy(bonuses_from_players_tuples)
+
+            bonuses_from_players_event_tuples = []
+            for slot_from, slot_to in evt.bonus.items():
+                house_from = houses.get(slot_from).house_id
+                house_to = houses.get(slot_to).house_id
+                bonuses_from_players_event_tuples.append((house_from, house_to))
+
+            # Remove redundant
+            for bonus, bonus_t in zip(bonuses_from_players, bonuses_from_players_tuples):
+                if bonus_t not in bonuses_from_players_event_tuples:
+                    tx.bonuses_from_players.delete(bonus)
+                    valid_bonuses_from_players_tuples.remove(bonus_t)
+
+            # Add which is missed
+            for bonus_event in bonuses_from_players_event_tuples:
+                if bonus_event not in valid_bonuses_from_players_tuples:
+                    bonus = BonusFromPlayers(
+                        game_id=evt.game_id,
+                        bonus_id=str(uuid.uuid4()),
+                        bonus_from=bonus_event[0],
+                        bonus_to=bonus_event[1]
+                    )
+                    tx.bonuses_from_players.add(bonus)
+
             tx.commit()
 
 

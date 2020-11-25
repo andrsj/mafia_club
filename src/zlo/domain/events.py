@@ -95,9 +95,7 @@ class CreateOrUpdateBonusFromHeading:
 @dataclass
 class CreateOrUpdateBonusFromPlayers:
     game_id: str
-    slot_from: int
-    slot_to: int
-
+    bonus: Dict[int, int]
 
 @dataclass
 class CreateOrUpdateBonusTolerant:

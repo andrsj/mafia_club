@@ -119,14 +119,6 @@ class HandOfMafia:
 
 
 @dataclass
-class BonusPointsFromPlayers:
-    bonus_point_id: str
-    game_id: GameID
-    house_from_id: HouseID
-    house_to_id: HouseID
-
-
-@dataclass
 class BonusTolerantPointFromPlayers:
     bonus_tolerant_point_id: str
     game_id: GameID
@@ -164,3 +156,11 @@ class DonChecks:
     game_id: GameID
     checked_house_id: Optional[HouseID]
     circle_number: int
+
+
+@dataclass
+class BonusFromPlayers:
+    bonus_id: str
+    game_id: GameID
+    bonus_from: Optional[HouseID]
+    bonus_to: Optional[HouseID]

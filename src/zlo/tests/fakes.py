@@ -3,7 +3,7 @@ from typing import List, Dict
 
 
 from zlo.domain.model import (Player, Game, House, BestMove, HandOfMafia, SheriffChecks,
-                              BonusFromPlayers, BonusTolerantFromPlayers, Misses)
+                              BonusFromPlayers, BonusTolerantFromPlayers, Misses, DonChecks)
 
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import Player, Game, House, Voted
@@ -124,6 +124,22 @@ class FakeHandOfMafiaRepo:
         self.hands_of_mafia = {}
 
 
+class FakeDonChecksRepo:
+    don_checks: List[DonChecks] = []
+
+    def add(self, kill: DonChecks):
+        self.don_checks.append(kill)
+
+    def delete(self, kill: DonChecks):
+        self.don_checks.remove(kill)
+
+    def get_by_game_id(self, game_id: GameID) -> List[DonChecks]:
+        return [don_check for don_check in self.don_checks if don_check.game_id == game_id]
+
+    def clean(self):
+        self.don_checks = []
+
+
 class FakeMissesRepo:
     misses: List[Misses] = []
 
@@ -187,6 +203,7 @@ class FakeSheriffChecksRepo:
     def clean(self):
         self.sheriff_checks = []
 
+
 class FakeUnitOfWork(UnitOfWork):
 
     def __init__(self):
@@ -199,6 +216,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.bonuses_from_players = FakeBonusFromPlayersRepo()
         self.sheriff_checks = FakeSheriffChecksRepo()
         self.voted = FakeVotedRepo()
+        self.don_checks = FakeDonChecksRepo()
         self.misses = FakeMissesRepo()
         self.bonuses_tolerant = FakeBonusTolerantRepo()
 
@@ -226,6 +244,7 @@ class FakeUnitOfWork(UnitOfWork):
         self.houses.clean()
         self.players.clean()
         self.voted.clean()
+        self.don_checks.clean()
         self.misses.clean()
         self.best_moves.clean()
         self.hand_of_mafia.clean()

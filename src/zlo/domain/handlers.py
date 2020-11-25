@@ -12,6 +12,7 @@ from zlo.domain.events import (
     CreateOrUpdateVoted,
     CreateOrUpdateMisses,
     CreateOrUpdateBestMove,
+    CreateOrUpdateDonChecks,
     CreateOrUpdateHandOfMafia,
     CreateOrUpdateDisqualified,
     CreateOrUpdateBonusTolerant,
@@ -420,6 +421,58 @@ class CreateOrUpdateBonusFromPlayersHandler(BaseHandler):
                         bonus_to=bonus_event[1]
                     )
                     tx.bonuses_from_players.add(bonus)
+
+            tx.commit()
+
+
+
+
+
+class CreateOrUpdateDonChecksHandler(BaseHandler):
+
+    def __call__(self, evt: CreateOrUpdateDonChecks):
+        with self._uowm.start() as tx:
+            houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            don_checks_event_houses = []
+
+            for day, slot in enumerate(evt.don_checks, start=1):
+                house = houses.get(slot)
+                if house is None:
+                    don_checks_event_houses.append(None)
+                else:
+                    don_checks_event_houses.append(
+                        EventHouseModel(
+                            day=day,
+                            house_id=house.house_id
+                        )
+                    )
+
+            # Get slots which are already saved in db. And check if they are up-to-date
+
+            don_checks: List[DonChecks] = tx.don_checks.get_by_game_id(evt.game_id)
+            all_don_checks_tuples = [
+                EventHouseModel(don_check.circle_number, don_check.checked_house_id)
+                for don_check in don_checks
+            ]
+            valid_don_checks = copy(all_don_checks_tuples)
+
+            # Remove redundant
+            for don_check, don_check_tuple in zip(don_checks, all_don_checks_tuples):
+                if don_check_tuple not in don_checks_event_houses:
+                    tx.don_checks.delete(don_check)
+                    valid_don_checks.remove(don_check_tuple)
+
+            # Add which is missed
+            for don_check_event in don_checks_event_houses:
+                if don_check_event not in valid_don_checks and don_check_event is not None:
+                    don_check = DonChecks(
+                        don_checks_id=str(uuid.uuid4()),
+                        game_id=evt.game_id,
+                        checked_house_id=don_check_event.house_id,
+                        circle_number=don_check_event.day
+                    )
+                    tx.don_checks.add(don_check)
 
             tx.commit()
 

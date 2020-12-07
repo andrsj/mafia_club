@@ -2,7 +2,7 @@ import retrying
 import sqlalchemy
 import sqlalchemy.exc
 import sqlalchemy.orm.exc
-from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData, DateTime, func, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData, DateTime, func, ForeignKey, Float
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
@@ -12,6 +12,7 @@ from zlo.domain.model import (
     Kills,
     Voted,
     Devise,
+    Misses,
     Player,
     BestMove,
     DonChecks,
@@ -20,19 +21,25 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
-    BonusTolerantFromPlayers,
     BonusFromPlayers,
+    BonusTolerantFromPlayers,
 )
 from zlo.adapters.repositories import (
     NominatedForBestRepository,
+    BonusFromPlayersRepository,
     SheriffVersionRepository,
+    SheriffChecksRepository,
+    BonusTolerantRepository,
     DisqualifiedRepository,
+    HandOfMafiaRepository,
+    DonChecksRepository,
     BestMoveRepository,
     PlayerRepository,
+    MissesRepository,
     VotedRepository,
+    KillsRepository,
     HouseRepository,
     GameRepository,
-    BestMove
 )
 
 
@@ -110,6 +117,34 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
     def voted(self):
         return VotedRepository(self.session)
 
+    @property
+    def hand_of_mafia(self):
+        return HandOfMafiaRepository(self.session)
+
+    @property
+    def kills(self):
+        return KillsRepository(self.session)
+
+    @property
+    def misses(self):
+        return MissesRepository(self.session)
+
+    @property
+    def don_checks(self):
+        return DonChecksRepository(self.session)
+
+    @property
+    def sheriff_checks(self):
+        return SheriffChecksRepository(self.session)
+
+    @property
+    def bonuses_tolerant(self):
+        return BonusTolerantRepository(self.session)
+
+    @property
+    def bonuses_from_players(self):
+        return BonusFromPlayersRepository(self.session)
+
 
 class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
 
@@ -157,7 +192,7 @@ class DatabaseSchema:
             ),
             Column("date", DateTime, default=func.now()),
             Column("result", Integer, default=0),
-            Column('advance_result', Integer, nullable=True),
+            Column('advance_result', Integer),
             Column("club", String(40)),
             Column("table", Integer, default=None),
             Column("heading", ForeignKey("players.player_id")),
@@ -175,7 +210,9 @@ class DatabaseSchema:
             Column("player_id", ForeignKey("players.player_id")),
             Column("game_id", ForeignKey("games.game_id")),
             Column("slot", Integer),
-            Column("role", Integer)
+            Column("role", Integer),
+            Column("bonus_mark", Float),
+            Column("fouls", Integer)
         )
         self.best_moves = Table(
             "best_moves",
@@ -204,8 +241,8 @@ class DatabaseSchema:
             Column("game_id", ForeignKey("games.game_id")),
             Column("house", ForeignKey("houses.house_id")),
         )
-        self.sheriffversions = Table(
-            "sheriffversions",
+        self.sheriff_versions = Table(
+            "sheriff_versions",
             self._metadata,
             Column(
                 "sheriff_version_id",
@@ -228,7 +265,7 @@ class DatabaseSchema:
             Column("game_id", ForeignKey("games.game_id")),
             Column("house", ForeignKey("houses.house_id")),
         )
-        self.voted = Table(
+        self.votes = Table(
             "voted",
             self._metadata,
             Column(
@@ -238,8 +275,99 @@ class DatabaseSchema:
                 server_default=sqlalchemy.text("uuid_generate_v4()"),
             ),
             Column("game_id", ForeignKey("games.game_id")),
-            Column("voted_house_id", ForeignKey("houses.house_id")),
-            Column("voted_day", Integer)
+            Column("house_id", ForeignKey("houses.house_id")),
+            Column("day", Integer)
+        )
+        self.hand_of_mafia = Table(
+            "hand_of_mafia",
+            self._metadata,
+            Column(
+                "hand_of_mafia_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("house_hand_id", ForeignKey("houses.house_id")),
+            Column("victim_id", ForeignKey("houses.house_id"))
+        )
+        self.kills = Table(
+            "kills",
+            self._metadata,
+            Column(
+                "kill_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("killed_house_id", ForeignKey("houses.house_id")),
+            Column("circle_number", Integer)
+        )
+        self.misses = Table(
+            "misses",
+            self._metadata,
+            Column(
+                "miss_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("house_id", ForeignKey("houses.house_id")),
+            Column("circle_number", Integer)
+        )
+        self.don_checks = Table(
+            "don_checks",
+            self._metadata,
+            Column(
+                "don_check_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("checked_house_id", ForeignKey("houses.house_id")),
+            Column("circle_number", Integer)
+        )
+        self.sheriff_checks = Table(
+            "sheriff_checks",
+            self._metadata,
+            Column(
+                "sheriff_check_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("checked_house_id", ForeignKey("houses.house_id")),
+            Column("circle_number", Integer)
+        )
+        self.bonuses_tolerant = Table(
+            "bonuses_tolerant",
+            self._metadata,
+            Column(
+                "bonus_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("house_from_id", ForeignKey("houses.house_id")),
+            Column("house_to_id", ForeignKey("houses.house_id")),
+        )
+        self.bonuses_from_players = Table(
+            "bonuses_from_players",
+            self._metadata,
+            Column(
+                "bonus_id",
+                UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sqlalchemy.text("uuid_generate_v4()"),
+            ),
+            Column("game_id", ForeignKey("games.game_id")),
+            Column("bonus_from", ForeignKey("houses.house_id")),
+            Column("bonus_to", ForeignKey("houses.house_id")),
         )
 
 
@@ -252,10 +380,17 @@ def _configure_mappings(metadata):
     mapper(Game, meta.games)
     mapper(House, meta.houses)
     mapper(BestMove, meta.best_moves)
-    mapper(SheriffVersion, meta.sheriffversions)
+    mapper(SheriffVersion, meta.sheriff_versions)
     mapper(Disqualified, meta.disqualifieds)
-    mapper(Voted, meta.voted)
+    mapper(Voted, meta.votes)
     mapper(NominatedForBest, meta.nominated_for_best)
+    mapper(HandOfMafia, meta.hand_of_mafia)
+    mapper(Kills, meta.kills)
+    mapper(Misses, meta.misses)
+    mapper(DonChecks, meta.don_checks)
+    mapper(SheriffChecks, meta.sheriff_checks)
+    mapper(BonusTolerantFromPlayers, meta.bonuses_tolerant)
+    mapper(BonusFromPlayers, meta.bonuses_from_players)
 
     return metadata
 
@@ -263,7 +398,7 @@ def _configure_mappings(metadata):
 class SqlAlchemy:
     def __init__(self, db_engine):
         self.db_engine = db_engine
-        self._session_maker = scoped_session(sessionmaker(self.db_engine))
+        self._session_maker = scoped_session(sessionmaker(self.db_engine, expire_on_commit=False))
 
     def unit_of_work_manager(self):
         return SqlAlchemyUnitOfWorkManager(self._session_maker)

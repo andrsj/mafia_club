@@ -1,14 +1,12 @@
 import datetime
-from typing import List, Dict
+from typing import List, Dict, NamedTuple
 
 
 from zlo.domain.model import (Player, Game, House, BestMove, HandOfMafia, SheriffChecks,
                               BonusFromPlayers, BonusTolerantFromPlayers, Misses, DonChecks,
-                              Kills, Disqualified, NominatedForBest, SheriffVersion)
+                              Kills, Disqualified, NominatedForBest, SheriffVersion, Voted)
 
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager, HouseCacheMemory
-from zlo.domain.model import Player, Game, House, Voted
-
 from zlo.domain.types import HouseID, GameID
 
 
@@ -356,3 +354,23 @@ class FakeHouseCacheMemory(HouseCacheMemory):
 
     def clean(self):
         self.cache = {}
+
+
+class Arguments(NamedTuple):
+    sheet_title: str
+    blank_title: str
+    full: bool = False
+    games: bool = False
+    voted: bool = False
+    kills: bool = False
+    houses: bool = False
+    misses: bool = False
+    best_moves: bool = False
+    don_checks: bool = False
+    hand_of_mafia: bool = False
+    disqualifieds: bool = False
+    bonus_tolerant: bool = False
+    sheriff_checks: bool = False
+    sheriff_versions: bool = False
+    bonus_from_players: bool = False
+    nominated_for_best: bool = False

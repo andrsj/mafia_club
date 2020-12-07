@@ -92,3 +92,7 @@ class WhenNominatedForBestIsIsUpdated(BaseTestHandler):
     def cleanup(self):
         self._uowm.sess.clean_all()
         self.cache.clean()
+
+
+if __name__ == '__main__':
+    contexts.main()

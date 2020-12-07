@@ -88,7 +88,7 @@ class WhenSheriffChecksIsUpdated(BaseTestHandler):
             house = houses.get(slot)
             self._uowm.sess.sheriff_checks.add(
                 SheriffChecks(
-                    sheriff_checks_id=f'sheriff_check_id_{day}',
+                    sheriff_check_id=f'sheriff_check_id_{day}',
                     game_id=self.game.game_id,
                     checked_house_id=house.house_id,
                     circle_number=day

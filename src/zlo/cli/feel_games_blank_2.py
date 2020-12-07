@@ -1,146 +1,117 @@
-import argparse
 import os
-import uuid
+
 
 import inject
+
+from gspread.exceptions import SpreadsheetNotFound
+from zlo.sheet_parser.blank_version_2 import NotFinishedBlank
+
 from zlo.adapters.bootstrap import bootstrap
 from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.cli.setup_env_for_test import setup_env_with_test_database
+from zlo.domain.utils import create_parser, daterangemonth
+from zlo.domain.handlers import MissedPlayerError, MissedHouseError
 
+
+from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
 def update_game_id(worksheet, game_id):
     worksheet.update_cell(8, 4, game_id)
 
+def parse_and_write_in_db(client_parser, args):
+    handlers = (
+        (args.houses, "parse_houses"),
+        (args.voted, "parse_voted"),
+        (args.kills, "parse_kills"),
+        (args.misses, "parse_misses"),
+        (args.best_moves, "parse_best_move"),
+        (args.don_checks, "parse_don_checks"),
+        (args.disqualifieds, "parse_disqualified"),
+        (args.hand_of_mafia, "parse_hand_of_mafia"),
+        (args.sheriff_checks, "parse_sheriff_checks"),
+        (args.sheriff_versions, "parse_sheriff_versions"),
+        (args.nominated_for_best, "parse_nominated_for_best"),
+        (args.bonus_from_players, "get_bonus_points_from_houses_data"),
+        (args.bonus_tolerant, "get_bonus_tolerant_points_from_houses_data"),
+    )
+    bus = inject.instance(MessageBus)
+    sheet = client_parser.client.open(args.sheet_title)
+    for work_sheet in sheet.worksheets():
+
+        print(args.sheet_title, work_sheet.title)
+
+        if args.blank_title and work_sheet.title != args.blank_title:
+            # todo not only one blank
+            continue
+
+        try:
+            matrix = client_parser.parse_worksheet(work_sheet)
+            blank_parser = BlankParser(matrix)
+
+            game_info = blank_parser.parse_game_info()
+            if blank_parser.if_game_is_new():
+                update_game_id(work_sheet, game_info.game_id)
+            else:
+                if args.ready:
+                    continue
+
+            if args.games or args.full:
+                bus.publish(game_info)
+
+            for arg, method_name in handlers:
+                if arg or args.full:
+                    method = getattr(blank_parser, method_name)
+                    event = method()
+                    if not isinstance(event, list) and event is not None:
+                        bus.publish(event)
+                    elif isinstance(event, list):
+                        for event_ in event:
+                            bus.publish(event_)
+
+        except MissedPlayerError:
+            # todo Missed player info
+            print('Miss player')
+            raise
+
+        except MissedHouseError:
+            # todo Missed info about house
+            print('Miss house')
+
+        except NotFinishedBlank:
+            # todo Not finished blanks
+            print('Not finished')
+
+        except ValueError:
+            # todo Check correct input blank
+            print('Value error')
+
+        if args.blank_title:
+            break
+        continue
+
 
 if __name__ == "__main__":
     cfg = os.environ.copy()
-    """
-        return {
-        'host': env.get('DB_HOST', 'localhost'),
-        'port': env.get('DB_PORT', 5432),
-        'user': env.get('SECRET_DB_USER', 'test_zlo'),
-        'password': env.get('SECRET_DB_PASSWORD', 'test_zlo'),
-        'db_name': env.get('DB_NAME', 'test_zlo'),
-    }
-    """
     setup_env_with_test_database(cfg)
     bootstrap(cfg)
-
-    my_parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
-    my_parser.add_argument(
-        '--games',
-        default=False,
-        dest='games',
-        action='store_true',
-        required=False,
-        help="Parse and update game info"
-    )
-    my_parser.add_argument(
-        '--houses',
-        default=False,
-        dest='houses',
-        action='store_true',
-        required=False,
-        help="Parse and update houses info; Slot number. PLayer nick fouls and bonus marks"
-    )
-    my_parser.add_argument(
-        "--best_moves",
-        dest='best_moves',
-        action='store_true',
-        required=False,
-        help="Parse and update best moves"
-    )
-    my_parser.add_argument(
-        '--sheriff_versions',
-        dest='sheriff_versions',
-        action='store_true',
-        required=False,
-        help="Parse and update sheriff versions"
-    )
-    my_parser.add_argument(
-        '--disqualifieds',
-        dest='disqualifieds',
-        action='store_true',
-        required=False,
-        help="Pase and update disqualifieds"
-    )
-    my_parser.add_argument(
-        '--nominated_for_best',
-        dest='nominated_for_best',
-        action='store_true',
-        required=False,
-        help="Parse and update nominated for best"
-    )
-    my_parser.add_argument(
-        '--voted',
-        dest='voted',
-        action='store_true',
-        required=False,
-        help="Pase and update voted"
-    )
-
-    my_parser.add_argument(
-        "--sheet",
-        dest='sheet_title',
-        type=str,
-        required=True
-    )
-
-    my_parser.add_argument(
-        "--blank",
-        dest='blank_title',
-        type=str,
-        required=True
-    )
-
-    args = my_parser.parse_args()
-
-    handlers = [
-        (args.houses, "parse_houses"),
-        (args.best_moves, "parse_best_move"),
-        (args.sheriff_versions, "parse_sheriff_versions"),
-        (args.disqualifieds, "parse_disqualified"),
-        (args.nominated_for_best, "parse_nominated_for_best"),
-        (args.voted, "parse_voted_list"),
-        # ("parse_sheriff_checks")
-        # ("parse_kills")
-        # ("parse_devise")
-        # ("parse_hand_of_mafia")
-        # ("get_bonus_points_from_houses_data")
-        # ("get_bonus_tolerant_points_from_houses_data")
-        # ("get_bonus_points_from_heading")
-        # ("parse_don_checks")
-        # ("parse_breaks")
-        # ("parse_misses")
-    ]
+    my_parser = create_parser()
+    arguments = my_parser.parse_args()
 
     client = inject.instance(SpreadSheetClient)
-    bus = inject.instance(MessageBus)
-    sheet = client.client.open(args.sheet_title)
-    for work_sheet in sheet.worksheets():
 
-        if work_sheet.title != args.blank_title:
-            continue
+    if arguments.sheet_title:
+        parse_and_write_in_db(client, arguments)
 
-        matrix = client.parse_worksheet(work_sheet)
-        blank_parser = BlankParser(matrix)
+    if arguments.month and arguments.year:
+        name_sheets = [
+            single_date.strftime('%d/%m/%Y')
+            for single_date in daterangemonth(arguments.year, arguments.month)
+        ]
 
-        game_info = blank_parser.parse_game_info()
-        if blank_parser.if_game_is_new():
-            game_info.game_id = str(uuid.uuid4())
-            update_game_id(work_sheet, game_info.game_id)
-        if args.games:
-            bus.publish(game_info)
-
-        for arg, method_name in handlers:
-            if arg:
-                method = getattr(blank_parser, method_name)
-                event = method()
-                if not isinstance(event, list) and event is not None:
-                    bus.publish(event)
-                elif isinstance(event, list):
-                    for event_ in event:
-                        bus.publish(event_)
-        break
+        for name in name_sheets:
+            arguments.sheet_title = name
+            try:
+                parse_and_write_in_db(client, arguments)
+            except SpreadsheetNotFound:
+                continue

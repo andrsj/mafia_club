@@ -38,16 +38,7 @@ def create_or_update_player(uowm: UnitOfWorkManager, player_data: dict):
         tx.players.add(player)
         tx.commit()
 
-
-if __name__ == "__main__":
-
-    cfg = os.environ.copy()
-    setup_env_with_test_database(cfg)
-    bootstrap(cfg)
-
-    client = inject.instance(SpreadSheetClient)
-    sheet = client.client.open('СписокГравців1').sheet1
-
+def save_or_update_players_in_sheet(sheet):
     players = sheet.get_all_records()
 
     list_nicknames = []
@@ -83,3 +74,14 @@ if __name__ == "__main__":
         })
 
     sheet.update(f"A2:A{index}", [[i] for i in uuid_players_list])
+
+if __name__ == "__main__":
+
+    cfg = os.environ.copy()
+    setup_env_with_test_database(cfg)
+    bootstrap(cfg)
+
+    client = inject.instance(SpreadSheetClient)
+    sheet_players = client.client.open('СписокГравців1').sheet1
+
+    save_or_update_players_in_sheet(sheet_players)

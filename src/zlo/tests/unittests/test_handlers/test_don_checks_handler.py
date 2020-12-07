@@ -82,7 +82,7 @@ class WhenDonChecksIsUpdated(BaseTestHandler):
             house = houses.get(slot)
             self._uowm.sess.don_checks.add(
                 DonChecks(
-                    don_checks_id=f'don_check_id_{day}',
+                    don_check_id=f'don_check_id_{day}',
                     game_id=self.game.game_id,
                     checked_house_id=house.house_id,
                     circle_number=day

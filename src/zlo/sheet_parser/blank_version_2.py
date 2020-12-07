@@ -95,7 +95,8 @@ class BlankParser:
         return float(value.strip().replace(',', '.')) if value else 0
 
     @staticmethod
-    def get_role_from_string(value):
+    def get_role_from_string(value: str):
+        value = value.upper()
         if value == "":
             return ClassicRole.citizen
         elif value == "М":
@@ -201,9 +202,9 @@ class BlankParser:
             kills_slots=slots
         )
 
-    def parse_voted_list(self) -> Optional[CreateOrUpdateVoted]:
+    def parse_voted(self) -> Optional[CreateOrUpdateVoted]:
         result = {}
-        for i, voted in enumerate(self._matrix[44][2:]):
+        for i, voted in enumerate(self._matrix[44][2:], start=1):
             result[i] = self.get_voted_from_string(voted)
         if all([value is None for value in result.values()]):
             return None
@@ -242,7 +243,6 @@ class BlankParser:
             game_id=self._game_id,
             bonus=slots
         )
-
 
     def get_bonus_tolerant_points_from_houses_data(self) -> CreateOrUpdateBonusTolerant:
         slots = {}

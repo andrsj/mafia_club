@@ -17,20 +17,16 @@ from zlo.domain.events import (
     CreateOrUpdateHandOfMafia,
     CreateOrUpdateDisqualified,
     CreateOrUpdateBonusTolerant,
-    CreateOrUpdateSheriffVersion,
-    CreateOrUpdateNominatedForBest,
     CreateOrUpdateSheriffChecks,
     CreateOrUpdateSheriffVersion,
+    CreateOrUpdateBonusFromPlayers,
     CreateOrUpdateNominatedForBest,
-    CreateOrUpdateBonusFromPlayers
 )
-from zlo.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
 from zlo.domain.model import (
     Game,
     House,
     Kills,
     Voted,
-    Devise,
     Misses,
     Player,
     BestMove,
@@ -40,10 +36,19 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
+    BonusFromPlayers,
     BonusTolerantFromPlayers,
-    BonusFromPlayers
 )
+from zlo.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
 from zlo.tests.fakes import FakeHouseCacheMemory
+
+
+class MissedPlayerError(LookupError):
+    pass
+
+
+class MissedHouseError(LookupError):
+    pass
 
 
 class BaseHandler:
@@ -86,6 +91,12 @@ class CreateOrUpdateGameHandler:
 
         with self._uowm.start() as tx:
             player: Player = tx.players.get_by_nickname(evt.heading)
+
+            if player is None:
+                raise MissedPlayerError(
+                    f'[{self.__class__}]: Missing Player in {evt.game_id} with nickname \'{evt.heading}\''
+                )
+
             game: Game = tx.games.get_by_game_id(evt.game_id)
             if game is None:
                 self._log.info(f"Create new game {evt}")
@@ -123,6 +134,12 @@ class CreateOrUpdateHouseHandler:
     def __call__(self, evt: CreateOrUpdateHouse):
         with self._uowm.start() as tx:
             player: Player = tx.players.get_by_nickname(evt.player_nickname)
+
+            if player is None:
+                raise MissedPlayerError(
+                    f'[{self.__class__}]: Missing Player in {evt.game_id} with nickname \'{evt.player_nickname}\''
+                )
+
             house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.slot)
 
             if house is None:
@@ -155,10 +172,16 @@ class CreateOrUpdateBestMoveHandler(BaseHandler):
 
             houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
 
-            killed_house: House = houses[evt.killed_player_slot]
-            best_1_house: House = houses[evt.best_1_slot]
-            best_2_house: House = houses[evt.best_2_slot]
-            best_3_house: House = houses[evt.best_3_slot]
+            killed_house: House = houses.get(evt.killed_player_slot)
+            best_1_house: House = houses.get(evt.best_1_slot)
+            best_2_house: House = houses.get(evt.best_2_slot)
+            best_3_house: House = houses.get(evt.best_3_slot)
+
+            for house in [
+                killed_house, best_1_house, best_2_house, best_3_house
+            ]:
+                if house is None:
+                    raise MissedHouseError(f'[{self.__class__}]: Missing house in {evt.game_id}')
 
             best_move: BestMove = tx.best_moves.get_by_game_id(evt.game_id)
 
@@ -188,6 +211,9 @@ class CreateOrUpdateSheriffVersionHandler(BaseHandler):
     def __call__(self, evt: CreateOrUpdateSheriffVersion):
         with self._uowm.start() as tx:
             houses = self.get_houses(tx=tx, game_id=evt.game_id)
+
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
 
             event_sheriff_versions = [
                 houses.get(slot).house_id for slot in evt.sheriff_version_slots
@@ -221,6 +247,9 @@ class CreateOrUpdateDisqualifiedHandler(BaseHandler):
         with self._uowm.start() as tx:
             houses = self.get_houses(tx=tx, game_id=evt.game_id)
 
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing house in {evt.game_id}')
+
             event_disqualifieds = [
                 houses.get(slot).house_id for slot in evt.disqualified_slots
             ]
@@ -253,11 +282,14 @@ class CreateOrUpdateNominatedForBestHandler(BaseHandler):
         with self._uowm.start() as tx:
             houses = self.get_houses(tx=tx, game_id=evt.game_id)
 
-            event_nominated_for_best = [houses.get(slot).house_id for slot in evt.nominated_slots]
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
+
+            event_nominated_for_best = [str(houses.get(slot).house_id) for slot in evt.nominated_slots]
 
             nominated_for_bests: List[NominatedForBest] = tx.nominated_for_best.get_by_game_id(evt.game_id)
             nominated_for_bests.sort(key=lambda n: n.house)
-            all_nominated_for_bests = [nominated_for_best for nominated_for_best in nominated_for_bests]
+            all_nominated_for_bests = [nominated_for_best.house for nominated_for_best in nominated_for_bests]
 
             for nominated_for_best in event_nominated_for_best:
                 if nominated_for_best not in all_nominated_for_bests:
@@ -282,6 +314,9 @@ class CreateOrUpdateVotedHandler(BaseHandler):
 
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
 
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
+
             voted_event_houses = []
 
             # Parse voted slots from event
@@ -289,18 +324,15 @@ class CreateOrUpdateVotedHandler(BaseHandler):
                 if slots is None:
                     continue
                 for slot in slots:
-                    try:
-                        house = houses[slot]
-                    except KeyError:
-                        # todo exception should be raised about missing house
+                    if slot == 0:
                         continue
-
-                    voted_event_houses.append(EventHouseModel(day=day, house_id=house.house_id))
+                    house = houses[slot]
+                    voted_event_houses.append(EventHouseModel(day=day, house_id=str(house.house_id)))
 
             # Get slots which are already saved in db. And check if they are up-to-date
 
             votes: List[Voted] = tx.voted.get_by_game_id(evt.game_id)
-            all_votes_tuples = [EventHouseModel(voted.day, voted.house_id) for voted in votes]
+            all_votes_tuples = [EventHouseModel(voted.day, str(voted.house_id)) for voted in votes]
             valid_votes = copy(all_votes_tuples)
 
             # Remove redundant
@@ -329,8 +361,15 @@ class CreateOrUpdateHandOfMafiaHandler(BaseHandler):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
 
-            hand_house = houses[evt.slot_from]  # Who vote
-            victim_house = houses[evt.slot_to]  # Who voted
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
+
+            hand_house = houses.get(evt.slot_from)  # Who vote
+            victim_house = houses.get(evt.slot_to)  # Who voted
+
+            # if hand of mafia doesnt exist in game (one of two houses is None)
+            if hand_house is None or victim_house is None:
+                return
 
             hand_of_mafia: HandOfMafia = tx.hand_of_mafia.get_by_game_id(evt.game_id)
             if hand_of_mafia is None:
@@ -353,6 +392,9 @@ class CreateOrUpdateKillsHandler(BaseHandler):
     def __call__(self, evt: CreateOrUpdateKills):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
 
             killed_event_houses = []
 
@@ -399,6 +441,9 @@ class CreateOrUpdateMissesHandler(BaseHandler):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
 
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
+
             misses_event_houses = []
 
             for day, slot in enumerate(evt.misses_slots, start=1):
@@ -427,7 +472,7 @@ class CreateOrUpdateMissesHandler(BaseHandler):
             for miss_event in misses_event_houses:
                 if miss_event not in valid_misses and miss_event is not None:
                     miss = Misses(
-                        misses_id=str(uuid.uuid4()),
+                        miss_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
                         house_id=miss_event.house_id,
                         circle_number=miss_event.day
@@ -442,6 +487,9 @@ class CreateOrUpdateBonusFromPlayersHandler(BaseHandler):
     def __call__(self, evt: CreateOrUpdateBonusFromPlayers):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
 
             bonuses_from_players: List[BonusFromPlayers] = tx.bonuses_from_players.get_by_game_id(evt.game_id)
             bonuses_from_players_tuples = [
@@ -476,14 +524,14 @@ class CreateOrUpdateBonusFromPlayersHandler(BaseHandler):
             tx.commit()
 
 
-
-
-
 class CreateOrUpdateDonChecksHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateDonChecks):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
 
             don_checks_event_houses = []
 
@@ -516,7 +564,7 @@ class CreateOrUpdateDonChecksHandler(BaseHandler):
             for don_check_event in don_checks_event_houses:
                 if don_check_event not in valid_don_checks and don_check_event is not None:
                     don_check = DonChecks(
-                        don_checks_id=str(uuid.uuid4()),
+                        don_check_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
                         checked_house_id=don_check_event.house_id,
                         circle_number=don_check_event.day
@@ -531,6 +579,9 @@ class CreateOrUpdateSheriffChecksHandler(BaseHandler):
     def __call__(self, evt: CreateOrUpdateSheriffChecks):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, game_id=evt.game_id)
+
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
 
             sheriff_checks_event_houses = []
 
@@ -564,7 +615,7 @@ class CreateOrUpdateSheriffChecksHandler(BaseHandler):
             for sheriff_check_event in sheriff_checks_event_houses:
                 if sheriff_check_event not in valid_sheriff_checks and sheriff_check_event is not None:
                     sheriff_check = SheriffChecks(
-                        sheriff_checks_id=str(uuid.uuid4()),
+                        sheriff_check_id=str(uuid.uuid4()),
                         game_id=evt.game_id,
                         checked_house_id=sheriff_check_event.house_id,
                         circle_number=sheriff_check_event.day
@@ -573,11 +624,15 @@ class CreateOrUpdateSheriffChecksHandler(BaseHandler):
 
             tx.commit()
 
+
 class CreateOrUpdateBonusTolerantHandler(BaseHandler):
 
     def __call__(self, evt: CreateOrUpdateBonusTolerant):
         with self._uowm.start() as tx:
             houses: Dict[int, House] = self.get_houses(tx, evt.game_id)
+
+            if not houses:
+                raise MissedHouseError(f'[{self.__class__}]: Missing houses in {evt.game_id}')
 
             bonuses_tolerant: List[BonusTolerantFromPlayers] = tx.bonuses_tolerant.get_by_game_id(evt.game_id)
             bonuses_tolerant_tuples = [
@@ -610,4 +665,3 @@ class CreateOrUpdateBonusTolerantHandler(BaseHandler):
                     tx.bonuses_tolerant.add(bonus)
 
             tx.commit()
-

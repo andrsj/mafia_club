@@ -8,6 +8,7 @@ from zlo.domain.model import (
     Voted,
     Devise,
     Player,
+    Misses,
     BestMove,
     DonChecks,
     HandOfMafia,
@@ -15,8 +16,8 @@ from zlo.domain.model import (
     SheriffChecks,
     SheriffVersion,
     NominatedForBest,
-    BonusTolerantFromPlayers,
     BonusFromPlayers,
+    BonusTolerantFromPlayers,
 )
 
 
@@ -25,7 +26,7 @@ class PlayerRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_player_nickname(self, nick: str):
+    def get_by_nickname(self, nick: str) -> Player:
         return self._session.query(Player).filter_by(nickname=nick).first()
 
     def get_by_id(self, player_id):
@@ -125,6 +126,11 @@ class NominatedForBestRepository:
     def add(self, nominated_for_best: NominatedForBest):
         self._session.add(nominated_for_best)
 
+    def delete(self, nominated_for_best: NominatedForBest):
+        self._session.query(NominatedForBest).filter_by(
+            nominated_for_best_id=nominated_for_best.nominated_for_best_id
+        ).delete()
+
 
 class VotedRepository:
     def __init__(self, session):
@@ -138,3 +144,104 @@ class VotedRepository:
 
     def delete(self, voted: Voted):
         self._session.query(Voted).filter_by(Voted.voted_id == voted.voted_id).delete()
+
+
+class HandOfMafiaRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[HandOfMafia]:
+        return self._session.query(HandOfMafia).filter_by(game_id=game_id).first()
+
+    def add(self, hand_of_mafia: HandOfMafia):
+        self._session.add(hand_of_mafia)
+
+
+class KillsRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[Kills]:
+        return self._session.query(Kills).filter_by(game_id=game_id).all()
+
+    def add(self, kill: Kills):
+        self._session.add(kill)
+
+    def delete(self, kill: Kills):
+        self._session.query(Kills).filter_by(Kills.kill_id == kill.kill_id).delete()
+
+
+class MissesRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[Misses]:
+        return self._session.query(Misses).filter_by(game_id=game_id).all()
+
+    def add(self, miss: Misses):
+        self._session.add(miss)
+
+    def delete(self, miss: Misses):
+        self._session.query(Misses).filter_by(Misses.miss_id == miss.miss_id).delete()
+
+
+class DonChecksRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[DonChecks]:
+        return self._session.query(DonChecks).filter_by(game_id=game_id).all()
+
+    def add(self, don_check: DonChecks):
+        self._session.add(don_check)
+
+    def delete(self, don_check: DonChecks):
+        self._session.query(DonChecks).filter_by(DonChecks.don_check_id == don_check.don_check_id).delete()
+
+
+class SheriffChecksRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[SheriffChecks]:
+        return self._session.query(SheriffChecks).filter_by(game_id=game_id).all()
+
+    def add(self, sheriff_check: SheriffChecks):
+        self._session.add(sheriff_check)
+
+    def delete(self, sheriff_check: SheriffChecks):
+        self._session.query(SheriffChecks).filter_by(
+            SheriffChecks.sheriff_check_id == sheriff_check.sheriff_check_id
+        ).delete()
+
+
+class BonusTolerantRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[BonusTolerantFromPlayers]:
+        return self._session.query(BonusTolerantFromPlayers).filter_by(game_id=game_id).all()
+
+    def add(self, bonus: BonusTolerantFromPlayers):
+        self._session.add(bonus)
+
+    def delete(self, bonus: BonusTolerantFromPlayers):
+        self._session.query(BonusTolerantFromPlayers).filter_by(
+            BonusTolerantFromPlayers.bonus_id == bonus.bonus_id
+        ).delete()
+
+
+class BonusFromPlayersRepository:
+    def __init__(self, session):
+        self._session = session
+
+    def get_by_game_id(self, game_id) -> List[BonusFromPlayers]:
+        return self._session.query(BonusFromPlayers).filter_by(game_id=game_id).all()
+
+    def add(self, bonus: BonusFromPlayers):
+        self._session.add(bonus)
+
+    def delete(self, bonus: BonusFromPlayers):
+        self._session.query(BonusFromPlayers).filter_by(
+            BonusFromPlayers.bonus_id == bonus.bonus_id
+        ).delete()

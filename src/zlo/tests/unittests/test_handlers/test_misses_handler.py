@@ -78,7 +78,7 @@ class WhenMissesIsUpdated(BaseTestHandler):
             house = houses.get(slot)
             self._uowm.sess.misses.add(
                 Misses(
-                    misses_id=f'miss_id_{day}',
+                    miss_id=f'miss_id_{day}',
                     game_id=self.game.game_id,
                     house_id=house.house_id,
                     circle_number=day

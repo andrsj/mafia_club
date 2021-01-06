@@ -10,7 +10,7 @@ from zlo.adapters.bootstrap import bootstrap
 from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import create_parser, daterangemonth
+from zlo.domain.utils import create_parser_for_blank_feeling, date_range_in_month
 from zlo.domain.handlers import MissedPlayerError, MissedHouseError
 
 
@@ -41,8 +41,8 @@ def parse_and_write_in_db(client_parser, args):
 
         print(args.sheet_title, work_sheet.title)
 
+        # if the blank was specified in parser
         if args.blank_title and work_sheet.title != args.blank_title:
-            # todo not only one blank
             continue
 
         try:
@@ -72,7 +72,6 @@ def parse_and_write_in_db(client_parser, args):
         except MissedPlayerError:
             # todo Missed player info
             print('Miss player')
-            raise
 
         except MissedHouseError:
             # todo Missed info about house
@@ -95,7 +94,7 @@ if __name__ == "__main__":
     cfg = os.environ.copy()
     setup_env_with_test_database(cfg)
     bootstrap(cfg)
-    my_parser = create_parser()
+    my_parser = create_parser_for_blank_feeling()
     arguments = my_parser.parse_args()
 
     client = inject.instance(SpreadSheetClient)
@@ -106,7 +105,7 @@ if __name__ == "__main__":
     if arguments.month and arguments.year:
         name_sheets = [
             single_date.strftime('%d/%m/%Y')
-            for single_date in daterangemonth(arguments.year, arguments.month)
+            for single_date in date_range_in_month(arguments.year, arguments.month)
         ]
 
         for name in name_sheets:

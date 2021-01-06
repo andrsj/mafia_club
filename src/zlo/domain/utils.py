@@ -1,8 +1,23 @@
 from dataclasses import dataclass
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from calendar import monthrange
+from typing import List
 import argparse
 
+months = [
+    'Січень',
+    'Лютий',
+    'Березень',
+    'Квітень',
+    'Травень',
+    'Червень',
+    'Липень',
+    'Серпень',
+    'Вересень',
+    'Жовтень',
+    'Листопад',
+    'Грудень'
+]
 
 @dataclass
 class EventHouseModel:
@@ -13,21 +28,7 @@ def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days + 1)):
         yield start_date + timedelta(n)
 
-def daterangemonth(year, month):
-    months = [
-        'Січень',
-        'Лютий',
-        'Березень',
-        'Квітень',
-        'Травень',
-        'Червень',
-        'Липень',
-        'Серпень',
-        'Вересень',
-        'Жовтень',
-        'Листопад',
-        'Грудень'
-    ]
+def date_range_in_month(year, month):
     month = months.index(month)
     month_days = monthrange(year, month + 1)
     start_date = date(year, month + 1, 1)
@@ -35,7 +36,32 @@ def daterangemonth(year, month):
 
     return daterange(start_date, end_date)
 
-def create_parser():
+def get_month(date_: date) -> str:
+    # Get string month from date
+    return months[date_.month - 1]
+
+def get_the_specified_days_by_dates(start_date: datetime, end_date: datetime) -> List[datetime]:
+    dates = daterange(start_date, end_date)
+    # 1 - Tuesday, 4 - Friday
+    return [one_date for one_date in dates if one_date.weekday() in [1, 4]]
+
+def create_parser_for_blank_generation():
+    parser = argparse.ArgumentParser(description='Generate spreadsheets for new game in date range')
+
+    parser.add_argument(
+        '--start',
+        dest='start_date_of_day',
+        help='Start date (format: DD/MM/YYYY)'
+    )
+    parser.add_argument(
+        '--end',
+        dest='end_date_of_day',
+        help='End date (format: DD/MM/YYYY)'
+    )
+
+    return parser
+
+def create_parser_for_blank_feeling():
     parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
 
     parser.add_argument(

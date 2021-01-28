@@ -92,7 +92,7 @@ class BlankParser:
 
         return CreateOrUpdateGame(
             game_id=self._game_id,
-            heading=self._matrix[1][2],
+            heading=self._matrix[1][2].lower(),
             date=date,
             club=self._matrix[3][2],
             tournament=self._matrix[4][2] or None,
@@ -130,7 +130,7 @@ class BlankParser:
             houses_events.append(
                 CreateOrUpdateHouse(
                     game_id=self._game_id,
-                    player_nickname=self._matrix[row_number][2],
+                    player_nickname=self._matrix[row_number][2].lower(),
                     role=role,
                     slot=int(self._matrix[row_number][1]),
                     bonus_mark=self.get_bonus_mark(self._matrix[row_number][7]),

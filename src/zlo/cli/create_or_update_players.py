@@ -41,6 +41,7 @@ def create_or_update_player(uowm: UnitOfWorkManager, player_data: dict):
 
 def save_or_update_players_in_sheet(sheet):
     players = sheet.get_all_records()
+    players = [str(player).strip().lower() for player in players]
 
     list_nicknames = []
     uuid_players_list = []
@@ -53,7 +54,7 @@ def save_or_update_players_in_sheet(sheet):
             uuid_players_list.append(KEY_DUBLICAT_WORD)
             continue
 
-        if str(player_['Nickname']).startswith(KEY_DUBLICAT_WORD):
+        if player_['Nickname'].startswith(KEY_DUBLICAT_WORD):
             print(f"Oppa, dublicat: {player_['Nickname']} : {index}")
             uuid_players_list.append(KEY_DUBLICAT_WORD)
             continue

@@ -81,7 +81,7 @@ def create_parser_for_blanks_checker():
 
     return parser
 
-def create_parser_for_blank_generation():
+def create_parser_for_date_range():
     parser = argparse.ArgumentParser(description='Generate spreadsheets for new game in date range')
 
     parser.add_argument(
@@ -117,6 +117,17 @@ def create_parser_for_blank_feeling():
         dest='year',
         type=int,
         help='Choose year for parser'
+    )
+
+    parser.add_argument(
+        '--start',
+        dest='start_date_of_day',
+        help='Start date (format: DD/MM/YYYY)'
+    )
+    parser.add_argument(
+        '--end',
+        dest='end_date_of_day',
+        help='End date (format: DD/MM/YYYY)'
     )
 
     parser.add_argument(

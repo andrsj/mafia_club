@@ -1,4 +1,5 @@
 import os
+import argparse
 from typing import Dict, List
 from datetime import datetime
 
@@ -13,6 +14,7 @@ from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.model import Game
 from zlo.domain.types import Result
+from zlo.domain.utils import create_parser_for_date_range
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
 
@@ -122,6 +124,9 @@ class RatingCalculator:
 
 
 if __name__ == '__main__':
+    parser = create_parser_for_date_range()
+    arguments = parser.parse_args()
+
     cfg = os.environ.copy()
     setup_env_with_test_database(cfg)
     bootstrap(cfg)
@@ -131,7 +136,14 @@ if __name__ == '__main__':
 
     with uowm.start() as tx:
         calculator = RatingCalculator(tx)
-        results = calculator.rating_for_all_games()
+        results = None
+        if not (arguments.start_date_of_day and arguments.end_date_of_day):
+            results = calculator.rating_for_all_games()
+        if arguments.start_date_of_day and arguments.end_date_of_day:
+            results = calculator.rating_in_daterange(
+                datetime.strptime(arguments.start_date_of_day, '%d/%m/%Y'),
+                datetime.strptime(arguments.end_date_of_day, '%d/%m/%Y')
+            )
 
         sheet = client.client.open(title='Statistic')
         players = tx.players.all()

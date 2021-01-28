@@ -16,7 +16,8 @@ from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_check
 
 def check_heading(matrix, tx):
     players = tx.players.all()
-    player = next((p for p in players if p.nickname == matrix[1][2]), None)
+    heading_player = matrix[1][2].strip().lower()
+    player = next((p for p in players if p.nickname == heading_player), None)
     if player is None:
         return [f"[Ведучий] Відсутній гравець в базі з ніком '{matrix[1][2]}'"]
 
@@ -56,7 +57,7 @@ def check_players(matrix, tx) -> List[str]:
         except ValueError:
             errors.append(f"Не вірна роль '{matrix[row_number][0]}' в гравця під слотом {i}")
 
-        player = next((p for p in players if p.nickname == matrix[row_number][2]), None)
+        player = next((p for p in players if p.nickname == matrix[row_number][2].lower()), None)
         if player is None:
             errors.append(f"Відсутній гравець в базі з ніком '{matrix[row_number][2]}' за слотом {i}")
 
@@ -120,10 +121,15 @@ if __name__ == '__main__':
 
     client = inject.instance(SpreadSheetClient)
 
-    name_sheets = [
-        single_date.strftime('%d/%m/%Y')
-        for single_date in date_range_in_month(arguments.year, arguments.month)
-    ]
+    name_sheets = None
+    if arguments.year and arguments.month:
+        name_sheets = [
+            single_date.strftime('%d/%m/%Y')
+            for single_date in date_range_in_month(arguments.year, arguments.month)
+        ]
+
+    if arguments.data:
+        name_sheets = [arguments.data]
 
     all_sheets_errors = []
     for name_sheet in name_sheets:
@@ -153,8 +159,14 @@ if __name__ == '__main__':
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()
+
+    title = None
+    if arguments.year and arguments.month:
+        title = f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
+    if arguments.data:
+        title = f'{arguments.data} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
     errors_worksheet = errors_sheet.add_worksheet(
-        f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}',
+        title,
         rows=len(all_sheets_errors),
         cols=4
     )

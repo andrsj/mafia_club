@@ -51,49 +51,91 @@ class BonusForBestMove(enum.Enum):
 
 
 @dataclass
-class PlayerResult:
-    nickname: str
-    games_number: int = 1
-    wins_count: int = 0
-    bonus_marks: float = 0
-    bonus_mark_number: int = 0
-    best_moves_marks: float = 0
-    best_moves_number: int = 0
+class Result:
+    player_uuid: str
+    games_count: int
+    wins_count: int
 
-    def update_by_new_result(self, new_result: PlayerResult):
-        if self.nickname != new_result.nickname:
-            raise TypeError(f" {self} and {new_result} is for different players")
+    @property
+    def win_rate(self):
+        return round(self.wins_count / self.games_count * 100, 2)
 
-        self.games_number += new_result.games_number
+    games_citizen: int
+    games_mafia: int
+    games_don: int
+    games_sheriff: int
+
+    wins_citizen: int
+    wins_mafia: int
+    wins_don: int
+    wins_sheriff: int
+
+    @property
+    def win_rate_citizen(self):
+        return round(self.wins_citizen / self.games_citizen * 100, 2) if self.games_citizen > 0 else 0
+
+    @property
+    def win_rate_mafia(self):
+        return round(self.wins_mafia / self.games_mafia * 100, 2) if self.games_mafia > 0 else 0
+
+    @property
+    def win_rate_don(self):
+        return round(self.wins_don / self.games_don * 100, 2) if self.games_don > 0 else 0
+
+    @property
+    def win_rate_sheriff(self):
+        return round(self.wins_sheriff / self.games_sheriff * 100, 2) if self.games_sheriff > 0 else 0
+
+    win_three_on_three: int
+    win_two_on_two: int
+    win_one_on_one: int
+    win_clear_citizen: int
+    win_guessing_game: int
+
+    first_death: int
+    first_death_sheriff: int
+
+    don_find_sheriff_in_first_night: int
+    don_find_sheriff_in_two_first_night: int
+
+    misses_in_game: int
+
+    def update(self, new_result: Result):
+        if new_result.player_uuid != self.player_uuid:
+            raise TypeError(f"[{self.__class__}]: {new_result} is for different players")
+        self.games_count += new_result.games_count
         self.wins_count += new_result.wins_count
-        self.bonus_marks += new_result.bonus_marks
-        self.bonus_mark_number += new_result.bonus_mark_number
-        self.best_moves_marks += new_result.best_moves_marks
-        self.best_moves_number += new_result.best_moves_number
 
-    def calculate_win_rate(self):
-        if self.games_number == 0:
-            self.win_rate = 0
-            self.middle_best_moves = 0
-            self.middle_mark_on_game = 0
-            self.middle_bonus_mark = 0
-        self.win_rate = (self.wins_count * 100) / self.games_number
-        self.middle_mark_on_game = (self.bonus_marks + self.best_moves_marks + self.wins_count) / self.games_number
-        self.middle_bonus_mark = (self.bonus_marks + self.best_moves_marks) / self.games_number
-        self.middle_best_moves = (self.best_moves_marks / self.best_moves_number) if self.best_moves_number else 0
+        self.games_citizen += new_result.games_citizen
+        self.games_mafia += new_result.games_mafia
+        self.games_don += new_result.games_don
+        self.games_sheriff += new_result.games_sheriff
 
-    def get_repr_of_stats(self):
-        return f"{self.nickname} Кількість ігор {self.games_number}; Кількість Перемог {self.wins_count};" \
-               f" Вінрейт {int(self.win_rate)}% Середній бал за гру {round(self.middle_mark_on_game, 2)}; " \
-               f" Кількість кращих ходів {self.best_moves_number }" \
-               f" Середній бонус за кращий хід {round(self.middle_best_moves, 2)}"
+        self.wins_citizen += new_result.wins_citizen
+        self.wins_mafia += new_result.wins_mafia
+        self.wins_don += new_result.wins_don
+        self.wins_sheriff += new_result.wins_sheriff
 
+        self.win_three_on_three += new_result.win_three_on_three
+        self.win_two_on_two += new_result.win_two_on_two
+        self.win_one_on_one += new_result.win_one_on_one
+        self.win_clear_citizen += new_result.win_clear_citizen
+        self.win_guessing_game += new_result.win_guessing_game
 
-def check_winner(game_result: GameResult, game_role: ClassicRole) -> bool:
-    game_result = GameResult(game_result)
-    game_role = ClassicRole(game_role)
-    if game_result == game_result.citizen and game_role in (ClassicRole.citizen, ClassicRole.sheriff):
-        return True
-    if game_result == game_result.mafia and game_role in (ClassicRole.mafia, ClassicRole.don):
-        return True
-    return False
+        self.first_death += new_result.first_death
+        self.first_death_sheriff += new_result.first_death_sheriff
+
+        self.don_find_sheriff_in_first_night += new_result.don_find_sheriff_in_first_night
+        self.don_find_sheriff_in_two_first_night += new_result.don_find_sheriff_in_two_first_night
+
+        self.misses_in_game += new_result.misses_in_game
+
+    @staticmethod
+    def check_winner(game_result, game_role) -> bool:
+        game_result = GameResult(game_result)
+        game_role = ClassicRole(game_role)
+        if game_result == game_result.citizen and game_role in (ClassicRole.citizen, ClassicRole.sheriff):
+            return True
+        if game_result == game_result.mafia and game_role in (ClassicRole.mafia, ClassicRole.don):
+            return True
+        return False

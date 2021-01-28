@@ -38,4 +38,10 @@ blanks-create-or-update-players:
 	python src/zlo/cli/create_or_update_players.py
 
 blanks-feel-games:
-	python ~/guiding/src/zlo/cli/feel_games_blank_2.py --month=$(month) --year=$(year)
+	python src/zlo/cli/feel_games_blank_2.py --month=$(month) --year=$(year)
+
+blanks-get-all-nicknames:
+	python src/zlo/cli/get_all_nicknames_in_games.py --month=$(month) --year=$(year)
+
+blanks-create-sheet-by-range:
+	python src/zlo/cli/generate_sheets.py --start=$(start) --end=$(end)

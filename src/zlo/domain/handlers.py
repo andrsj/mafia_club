@@ -44,7 +44,9 @@ from zlo.tests.fakes import FakeHouseCacheMemory
 
 
 class MissedPlayerError(LookupError):
-    pass
+    def __init__(self, nickname, message=''):
+        self.nickname = nickname
+        self.message = message
 
 
 class MissedHouseError(LookupError):
@@ -94,7 +96,8 @@ class CreateOrUpdateGameHandler:
 
             if player is None:
                 raise MissedPlayerError(
-                    f'[{self.__class__}]: Missing Player in {evt.game_id} with nickname \'{evt.heading}\''
+                    message=f'[{self.__class__}]: Missing Player in {evt.game_id} with nickname \'{evt.heading}\'',
+                    nickname=evt.heading
                 )
 
             game: Game = tx.games.get_by_game_id(evt.game_id)
@@ -137,7 +140,9 @@ class CreateOrUpdateHouseHandler:
 
             if player is None:
                 raise MissedPlayerError(
-                    f'[{self.__class__}]: Missing Player in {evt.game_id} with nickname \'{evt.player_nickname}\''
+                    message=f'[{self.__class__}]: Missing Player in '
+                            f'{evt.game_id} with nickname \'{evt.player_nickname}\'',
+                    nickname=evt.player_nickname
                 )
 
             house: House = tx.houses.get_by_game_id_and_slot(evt.game_id, evt.slot)

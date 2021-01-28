@@ -29,6 +29,15 @@ class NotFinishedBlank(Exception):
     pass
 
 
+class WrongDateFormat(ValueError):
+    pass
+
+
+class WrongRoleValue(ValueError):
+    def __init__(self, slot: int):
+        self.slot = slot
+
+
 class BlankParser:
     def __init__(self, matrix):
         self._matrix = matrix
@@ -76,13 +85,15 @@ class BlankParser:
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
+        try:
+            date = datetime.strptime(self._matrix[0][2], '%Y-%m-%d')
+        except ValueError:
+            raise WrongDateFormat
+
         return CreateOrUpdateGame(
             game_id=self._game_id,
             heading=self._matrix[1][2],
-
-            # strptime(m[0][2], '%Y-%m-%d') or datetime.fromisoformat(m[0][2])
-            date=datetime.strptime(self._matrix[0][2], '%Y-%m-%d'),
-
+            date=date,
             club=self._matrix[3][2],
             tournament=self._matrix[4][2] or None,
             table=self.get_number_of_table(self._matrix[4][5]),
@@ -106,17 +117,21 @@ class BlankParser:
         elif value == "Д":
             return ClassicRole.don
         else:
-            raise ValueError()
+            raise ValueError
 
     def parse_houses(self) -> List[CreateOrUpdateHouse]:
         houses_events = []
         for i in range(1, 11):
             row_number = i + 9
+            try:
+                role = self.get_role_from_string(self._matrix[row_number][0].strip())
+            except ValueError:
+                raise WrongRoleValue(i)
             houses_events.append(
                 CreateOrUpdateHouse(
                     game_id=self._game_id,
                     player_nickname=self._matrix[row_number][2],
-                    role=self.get_role_from_string(self._matrix[row_number][0].strip()),
+                    role=role,
                     slot=int(self._matrix[row_number][1]),
                     bonus_mark=self.get_bonus_mark(self._matrix[row_number][7]),
                     fouls=len(
@@ -137,7 +152,7 @@ class BlankParser:
         best_1_slot = self.get_slot_or_count_number_from_string(self._matrix[22][2])
         best_2_slot = self.get_slot_or_count_number_from_string(self._matrix[22][3])
         best_3_slot = self.get_slot_or_count_number_from_string(self._matrix[22][4])
-        if not bool(best_1_slot) + bool(best_2_slot) + bool(best_3_slot) > 1:
+        if not (bool(best_1_slot) + bool(best_2_slot) + bool(best_3_slot)) > 1:
             return None
 
         return CreateOrUpdateBestMove(
@@ -149,7 +164,7 @@ class BlankParser:
         )
 
     @staticmethod
-    def get_number_of_table(value: str) -> int:
+    def get_number_of_table(value: str) -> Optional[int]:
         if value.isdigit():
             return int(value)
         return None
@@ -162,11 +177,12 @@ class BlankParser:
         else:
             return 0
 
-    def get_voted_from_string(self, value: str):
+    @classmethod
+    def get_voted_from_string(cls, value: str):
         value = value.strip()
         value.replace(',', ' ').replace('.', ' ')
         if value:
-            return [self.get_slot_or_count_number_from_string(v) for v in value.split(' ')]
+            return [cls.get_slot_or_count_number_from_string(v) for v in value.split(' ')]
         return None
 
     def parse_disqualified(self) -> CreateOrUpdateDisqualified:

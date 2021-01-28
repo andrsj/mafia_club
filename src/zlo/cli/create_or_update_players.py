@@ -82,6 +82,6 @@ if __name__ == "__main__":
     bootstrap(cfg)
 
     client = inject.instance(SpreadSheetClient)
-    sheet_players = client.client.open('СписокГравців1').sheet1
+    sheet_players = client.client.open('СписокГравцівTEST').sheet1
 
     save_or_update_players_in_sheet(sheet_players)

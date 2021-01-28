@@ -73,6 +73,11 @@ def create_parser_for_blanks_checker():
         help='Year of blanks',
         type=int
     )
+    parser.add_argument(
+        '--data',
+        dest='data',
+        help='Spreadsheet by date (Text format DD/MM/YYYY)'
+    )
 
     return parser
 

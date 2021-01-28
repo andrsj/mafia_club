@@ -30,3 +30,12 @@ run-all-tests:
 
 update-fixtures:
 	python src/zlo/cli/create_fixtures_from_sheet.py --sheet ТестовийБланкНеДляПротоколуІРейтингу
+
+blanks-check-for-errors:
+	python src/zlo/cli/blanks_checker.py --month=$(month) --year=$(year)
+
+blanks-create-or-update-players:
+	python src/zlo/cli/create_or_update_players.py
+
+blanks-feel-games:
+	python ~/guiding/src/zlo/cli/feel_games_blank_2.py --month=$(month) --year=$(year)

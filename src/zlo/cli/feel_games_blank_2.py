@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 import inject
 
 from gspread.exceptions import SpreadsheetNotFound
@@ -7,7 +7,7 @@ from zlo.adapters.bootstrap import bootstrap
 from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import create_parser_for_blank_feeling, date_range_in_month
+from zlo.domain.utils import create_parser_for_blank_feeling, date_range_in_month, daterange
 from zlo.cli.blanks_checker import BlankChecker
 
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
@@ -36,6 +36,8 @@ def parse_and_write_in_db(client_parser, args):
     sheet = client_parser.client.open(args.sheet_title)
 
     for work_sheet in sheet.worksheets():
+
+        print('\t', work_sheet.title)
 
         # if the blank was specified in parser
         if args.blank_title and work_sheet.title != args.blank_title:
@@ -92,16 +94,27 @@ if __name__ == "__main__":
         # --sheet="16/10/2020" --full
         parse_and_write_in_db(client, arguments)
 
-    if arguments.month and arguments.year:
+    if (arguments.month and arguments.year) or (arguments.start_date_of_day and arguments.end_date_of_day):
         # Example for this branch IF:
         # --year=2020 --month="Жовтень" --full
-        name_sheets = [
-            single_date.strftime('%d/%m/%Y')
-            for single_date in date_range_in_month(arguments.year, arguments.month)
-        ]
+
+        name_sheets = None
+        if arguments.month and arguments.year:
+            name_sheets = [
+                single_date.strftime('%d/%m/%Y')
+                for single_date in date_range_in_month(arguments.year, arguments.month)
+            ]
+        if arguments.start_date_of_day and arguments.end_date_of_day:
+            name_sheets = [
+                date.strftime('%d/%m/%Y') for date in daterange(
+                    datetime.strptime(arguments.start_date_of_day, '%d/%m/%Y'),
+                    datetime.strptime(arguments.end_date_of_day, '%d/%m/%Y')
+                )
+            ]
 
         # For all data names like DD/MM/YYYY
         for name in name_sheets:
+            print(name)
             arguments.sheet_title = name
             try:
                 parse_and_write_in_db(client, arguments)

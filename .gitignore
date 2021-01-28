@@ -3,4 +3,5 @@
 env
 __pycache__
 
-credentials/
+zlomafiaclub-bf747a844d45.json
+**/credentials/*.json

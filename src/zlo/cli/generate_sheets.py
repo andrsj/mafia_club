@@ -6,7 +6,7 @@ from datetime import datetime
 import gspread
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
-from zlo.domain.utils import get_month, get_the_specified_days_by_dates, create_parser_for_blank_generation
+from zlo.domain.utils import get_month, get_the_specified_days_by_dates, create_parser_for_date_range
 from zlo import credentials
 
 
@@ -204,7 +204,7 @@ def create_copy_spreadsheet(datetime_of_day: datetime):
 
 
 if __name__ == '__main__':
-    parser = create_parser_for_blank_generation()
+    parser = create_parser_for_date_range()
     arguments = parser.parse_args()
 
     dates = get_the_specified_days_by_dates(

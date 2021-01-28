@@ -50,6 +50,9 @@ class GameRepository:
     def get_by_datetime_range(self, start_date, end_date):
         return self._session.query(Game).filter(Game.date >= start_date).filter(Game.date <= end_date).all()
 
+    def get_by_name_club(self, name):
+        return self._session.query(Game).filter(Game.club == name).all()
+
     def get_all_games(self):
         return self._session.query(Game).all()
 
@@ -62,16 +65,16 @@ class HouseRepository:
     def __init__(self, session):
         self._session = session
 
-    def get_by_house_id(self, house_id):
+    def get_by_house_id(self, house_id) -> House:
         return self._session.query(House).filter_by(haouse_id=house_id).first()
 
-    def get_by_game_id(self, game_id):
+    def get_by_game_id(self, game_id) -> List[House]:
         return self._session.query(House).filter_by(game_id=game_id).all()
 
-    def get_by_game_id_and_player_id(self, game_id, player_id):
+    def get_by_game_id_and_player_id(self, game_id, player_id) -> House:
         return self._session.query(House).filter_by(game_id=game_id).filter_by(player_id=player_id).first()
 
-    def get_by_game_id_and_slot(self, game_id, slot):
+    def get_by_game_id_and_slot(self, game_id, slot) -> House:
         return self._session.query(House).filter_by(game_id=game_id).filter_by(slot=slot).first()
 
     def add(self, house: House):

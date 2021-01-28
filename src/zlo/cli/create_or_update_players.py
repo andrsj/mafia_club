@@ -93,5 +93,4 @@ if __name__ == "__main__":
 
     client = inject.instance(SpreadSheetClient)
     sheet_players = client.client.open(args.name).sheet1
-
     save_or_update_players_in_sheet(sheet_players)

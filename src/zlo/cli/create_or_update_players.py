@@ -1,5 +1,6 @@
 import os
 import uuid
+import argparse
 
 
 import inject
@@ -77,11 +78,20 @@ def save_or_update_players_in_sheet(sheet):
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--name',
+        dest='name',
+        help='Name of spreadsheet of players',
+        default='СписокГравців'
+    )
+    args = parser.parse_args()
+
     cfg = os.environ.copy()
     setup_env_with_test_database(cfg)
     bootstrap(cfg)
 
     client = inject.instance(SpreadSheetClient)
-    sheet_players = client.client.open('СписокГравцівTEST').sheet1
+    sheet_players = client.client.open(args.name).sheet1
 
     save_or_update_players_in_sheet(sheet_players)

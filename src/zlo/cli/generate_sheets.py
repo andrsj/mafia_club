@@ -98,10 +98,45 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
                 }
             }],
         }
+    }, {
+        # Autowrite name club
+        # Tuesday: Школа ЗЛО
+        # Friday: ZLO
+        'updateCells': {
+            'fields': 'userEnteredValue',
+            # Cell D5:
+            'range': {
+                # Column D:
+                "startColumnIndex": 3,
+                "endColumnIndex": 4,
+                # Row 5:
+                "startRowIndex": 4,
+                "endRowIndex": 5,
+                "sheetId": 0
+            },
+            'rows': [{
+                'values': {
+                    # Finally we enter this club name
+                    'userEnteredValue': {
+                        'stringValue': 'ZLO' if datetime_of_day.weekday() == 4 else 'Школа ЗЛО'
+                    }
+                }
+            }],
+        }
     }]
 
     # Append requests for duplicate sheets for other games
-    for sheet_index, name in enumerate(['Стіл1Гра2', 'Стіл1Гра3', 'Стіл2Гра1', 'Стіл2Гра2', 'Стіл2Гра3'], start=1):
+    for sheet_index, name in enumerate([
+        'Стіл1Гра2',
+        'Стіл1Гра3',
+        'Стіл1Гра4',
+        'Стіл1Гра5',
+        'Стіл2Гра1',
+        'Стіл2Гра2',
+        'Стіл2Гра3',
+        'Стіл2Гра4',
+        'Стіл2Гра5'
+    ], start=1):
         list_requests.append(
             {
                 'duplicateSheet': {

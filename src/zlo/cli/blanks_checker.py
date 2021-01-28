@@ -120,10 +120,15 @@ if __name__ == '__main__':
 
     client = inject.instance(SpreadSheetClient)
 
-    name_sheets = [
-        single_date.strftime('%d/%m/%Y')
-        for single_date in date_range_in_month(arguments.year, arguments.month)
-    ]
+    name_sheets = None
+    if arguments.year and arguments.month:
+        name_sheets = [
+            single_date.strftime('%d/%m/%Y')
+            for single_date in date_range_in_month(arguments.year, arguments.month)
+        ]
+
+    if arguments.data:
+        name_sheets = [arguments.data]
 
     all_sheets_errors = []
     for name_sheet in name_sheets:
@@ -153,8 +158,14 @@ if __name__ == '__main__':
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()
+
+    title = None
+    if arguments.year and arguments.month:
+        title = f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
+    if arguments.data:
+        title = f'{arguments.data} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
     errors_worksheet = errors_sheet.add_worksheet(
-        f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}',
+        title,
         rows=len(all_sheets_errors),
         cols=4
     )

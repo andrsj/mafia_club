@@ -64,6 +64,9 @@ def parse_and_write_in_db(client_parser, args):
             blank_checker = BlankChecker(blank_matrix)
             errors = blank_checker.check_blank()
 
+            if errors is None:
+                continue
+
             additional_requests.append(make_request_for_marking_blank(
                     worksheet,
                     column=1,

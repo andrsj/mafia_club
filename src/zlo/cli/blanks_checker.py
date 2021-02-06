@@ -1,7 +1,6 @@
 import os
 from typing import List
 from datetime import datetime
-
 import inject
 
 from gspread.exceptions import SpreadsheetNotFound
@@ -9,10 +8,36 @@ from gspread.models import Cell
 from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import get_url
+from zlo.domain.utils import get_url, get_absolute_range, get_submatrix
 from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker
+
+def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: str):
+    return {
+        # Automatically write value in the appropriate field
+        'updateCells': {
+            'fields': 'userEnteredValue',
+            # Cell:
+            'range': {
+                # Column:
+                "startColumnIndex": column - 1,
+                "endColumnIndex": column,
+                # Row:
+                "startRowIndex": row_ - 1,
+                "endRowIndex": row_,
+                "sheetId": work_sheet.id
+            },
+            'rows': [{
+                'values': {
+                    # Finally we enter this value
+                    'userEnteredValue': {
+                        'stringValue': value
+                    }
+                }
+            }],
+        }
+    }
 
 def check_heading(matrix, tx):
     players = tx.players.all()
@@ -57,7 +82,7 @@ def check_players(matrix, tx) -> List[str]:
         except ValueError:
             errors.append(f"Не вірна роль '{matrix[row_number][0]}' в гравця під слотом {i}")
 
-        player = next((p for p in players if p.nickname == matrix[row_number][2].lower()), None)
+        player = next((p for p in players if p.nickname == matrix[row_number][2].lower().strip()), None)
         if player is None:
             errors.append(f"Відсутній гравець в базі з ніком '{matrix[row_number][2]}' за слотом {i}")
 
@@ -133,18 +158,26 @@ if __name__ == '__main__':
 
     all_sheets_errors = []
     for name_sheet in name_sheets:
+        # list of additional requests for batch update cells from one spreadsheet
+        additional_requests = []
         try:
             sheet = client.client.open(name_sheet)
         except SpreadsheetNotFound:
             continue
 
         print(name_sheet)
+        worksheets = sheet.worksheets()
 
-        for worksheet in sheet.worksheets():
-            blank_matrix = client.parse_worksheet(worksheet)
+        worksheets_values = client.get_matrixs_from_sheet(sheet, worksheets)
+
+        for worksheet, worksheet_range in zip(
+                sorted(worksheets, key=lambda w: w.title),
+                sorted([get_absolute_range(worksheet.title) for worksheet in worksheets])
+        ):
+            rows = worksheets_values[get_absolute_range(worksheet.title)]
+            blank_matrix = get_submatrix(rows)
             blank_checker = BlankChecker(blank_matrix)
             blank_errors = blank_checker.check_blank()
-
             for blank_error in blank_errors:
                 all_sheets_errors.append((
                     name_sheet,
@@ -153,9 +186,28 @@ if __name__ == '__main__':
                     get_url(worksheet.url)
                 ))
 
-            worksheet.update_cell(1, 1, 'Перевірено')
+            print('\t', worksheet.title)
+
+            additional_requests.append(make_request_for_marking_blank(
+                    worksheet,
+                    column=1,
+                    row_=1,
+                    value='Перевірено'
+                )
+            )
             if blank_errors:
-                worksheet.update_cell(2, 1, 'Виявлено помилки')
+                additional_requests.append(make_request_for_marking_blank(
+                        worksheet,
+                        column=2,
+                        row_=1,
+                        value='Виявлено помилки'
+                    )
+                )
+
+        if additional_requests:
+            sheet.batch_update(body={
+                'requests': additional_requests
+            })
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()

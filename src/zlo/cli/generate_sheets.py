@@ -30,7 +30,7 @@ def get_all_files_in_folder(folder_id) -> List[Dict]:
     nextPageToken = response.get('nextPageToken')
 
     while nextPageToken:
-        response = drive.files().list(q=f'parents = {folder_id}').execute()
+        response = drive.files().list(q=f'parents = {folder_id}', pageToken=nextPageToken).execute()
         files.extend(response.get('files'))
         nextPageToken = response.get('nextPageToken')
 

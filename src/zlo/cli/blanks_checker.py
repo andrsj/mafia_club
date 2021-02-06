@@ -108,7 +108,7 @@ class BlankChecker:
 
     __checkers_without_db = [
         check_data,
-        check_club,
+        # check_club,  # Club name checker removed
         check_winner,
         check_correct_game
     ]

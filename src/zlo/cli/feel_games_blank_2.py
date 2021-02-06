@@ -7,8 +7,14 @@ from zlo.adapters.bootstrap import bootstrap
 from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import create_parser_for_blank_feeling, date_range_in_month, daterange
-from zlo.cli.blanks_checker import BlankChecker
+from zlo.domain.utils import (
+    create_parser_for_blank_feeling,
+    date_range_in_month,
+    get_absolute_range,
+    get_submatrix,
+    daterange
+)
+from zlo.cli.blanks_checker import BlankChecker, make_request_for_marking_blank
 
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
@@ -35,27 +41,50 @@ def parse_and_write_in_db(client_parser, args):
     bus = inject.instance(MessageBus)
     sheet = client_parser.client.open(args.sheet_title)
 
-    for work_sheet in sheet.worksheets():
+    # list of additional requests for batch update cells from one spreadsheet
+    additional_requests = []
 
-        print('\t', work_sheet.title)
+    worksheets = sheet.worksheets()
+    worksheets_values = client.get_matrixs_from_sheet(sheet, worksheets)
+    for worksheet, worksheet_range in zip(
+            sorted(worksheets, key=lambda w: w.title),
+            sorted([get_absolute_range(worksheet.title) for worksheet in worksheets])
+    ):
+        print('\t', worksheet.title)
 
         # if the blank was specified in parser
-        if args.blank_title and work_sheet.title != args.blank_title:
+        if args.blank_title and worksheet.title != args.blank_title:
             continue
 
-        matrix = client_parser.parse_worksheet(work_sheet)
+        rows = worksheets_values[get_absolute_range(worksheet.title)]
+
+        blank_matrix = get_submatrix(rows)
+
         if args.check:
-            blank_checker = BlankChecker(matrix)
+            blank_checker = BlankChecker(blank_matrix)
             errors = blank_checker.check_blank()
-            work_sheet.update_cell(1, 1, 'Перевірено')
+
+            additional_requests.append(make_request_for_marking_blank(
+                    worksheet,
+                    column=1,
+                    row_=1,
+                    value='Перевірено'
+                )
+            )
             if errors:
-                work_sheet.update_cell(2, 1, 'Виявлено помилки')
+                additional_requests.append(make_request_for_marking_blank(
+                        worksheet,
+                        column=2,
+                        row_=1,
+                        value='Виявлено помилки'
+                    )
+                )
                 continue
 
-        blank_parser = BlankParser(matrix)
+        blank_parser = BlankParser(blank_matrix)
         game_info = blank_parser.parse_game_info()
         if blank_parser.if_game_is_new():
-            update_game_id(work_sheet, game_info.game_id)
+            update_game_id(worksheet, game_info.game_id)
         else:
             if args.ready:
                 # Skip game if is already have GameID
@@ -79,6 +108,11 @@ def parse_and_write_in_db(client_parser, args):
             break
         continue
 
+    if additional_requests:
+        sheet.batch_update(body={
+            'requests': additional_requests
+        })
+
 
 if __name__ == "__main__":
     cfg = os.environ.copy()
@@ -90,6 +124,8 @@ if __name__ == "__main__":
     client = inject.instance(SpreadSheetClient)
 
     if arguments.sheet_title:
+        print(arguments.sheet_title)
+
         # Example for this branch IF:
         # --sheet="16/10/2020" --full
         parse_and_write_in_db(client, arguments)

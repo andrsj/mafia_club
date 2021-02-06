@@ -51,7 +51,7 @@ class WhenGameParserFromSheet:
         game_id = worksheet.acell('D8').value
 
         with self.unit_of_work.start() as tx:
-            matrix = self.client.parse_worksheet(worksheet)
+            matrix = self.client.get_matrix_for_one_worksheet(worksheet)
 
             # todo Creating all models for ALL games
 

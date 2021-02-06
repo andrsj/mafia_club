@@ -40,7 +40,7 @@ if __name__ == '__main__':
             spreadsheet = client.client.open(name)
 
             for worksheet in spreadsheet.worksheets():
-                matrix = client.parse_worksheet(worksheet)
+                matrix = client.get_matrix_for_one_worksheet(worksheet)
 
                 # Heading [1] [2], other players: [10-19] [2]
                 nicknames = [matrix[1][2]] + [matrix[i][2] for i in range(10, 20)]

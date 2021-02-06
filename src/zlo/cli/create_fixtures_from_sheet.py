@@ -22,6 +22,6 @@ if __name__ == "__main__":
     sheet = client.client.open(args.sheet_title)
     fixtures_path = os.path.dirname(fixtures.__file__)
     for worksheet in sheet.worksheets():
-        data = client.parse_worksheet(worksheet)
+        data = client.get_matrix_for_one_worksheet(worksheet)
         path = os.path.join(fixtures_path, f"{worksheet.title}.json")
         client.store_data_in_json_file(data, path)

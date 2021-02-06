@@ -19,6 +19,14 @@ months = [
     'Грудень'
 ]
 
+def get_absolute_range(title):
+    return f"'{title}'!A1:AC1001"
+
+def get_submatrix(rows: List[List]) -> List[List]:
+    max_len = len(max(rows, key=len))
+    all_values = [row + [''] * (max_len - len(row)) for row in rows]
+    return [row[1:12] for row in all_values[1:46]]
+
 def get_url(url: str):
     """
     Change URL from API to people-like url
@@ -101,10 +109,10 @@ def create_parser_for_blank_feeling():
     parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
 
     parser.add_argument(
-        '--check',
+        '--no-check',
         dest='check',
-        default=True,
-        action='store_true'
+        help='Argument for skipping check blanks',
+        action='store_false'
     )
 
     parser.add_argument(

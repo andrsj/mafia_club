@@ -11,7 +11,7 @@ from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.model import Player
 
 
-KEY_DUBLICAT_WORD = '--Dublicat--'
+KEY_DUBLICAT_WORD = '--dublicat--'
 
 
 @inject.params(
@@ -41,7 +41,9 @@ def create_or_update_player(uowm: UnitOfWorkManager, player_data: dict):
 
 def save_or_update_players_in_sheet(sheet):
     players = sheet.get_all_records()
-    players = [str(player).strip().lower() for player in players]
+
+    for player in players:
+        player['Nickname'] = str(player['Nickname']).strip().lower()
 
     list_nicknames = []
     uuid_players_list = []

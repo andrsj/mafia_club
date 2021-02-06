@@ -1,11 +1,13 @@
 import json
 from os.path import dirname
+from typing import Dict, List
 
 import gspread
-import numpy
+from gspread.models import Worksheet, Spreadsheet
 from oauth2client.service_account import ServiceAccountCredentials
 
 from zlo import credentials
+from zlo.domain.utils import get_absolute_range
 
 
 class SpreadSheetClient:
@@ -16,10 +18,43 @@ class SpreadSheetClient:
             dirname(credentials.__file__) + "/zlomafiaclub-bf747a844d45.json", scope)
         self.client = gspread.authorize(creds)
 
-    def parse_worksheet(self, worksheet):
-        game_data = [cell.value for cell in worksheet.range('B2:L46')]
-        return numpy.asarray(game_data).reshape(45, 11).tolist()
+    @staticmethod
+    def get_matrix_for_one_worksheet(worksheet: Worksheet):
+        all_values = worksheet.get_all_values()
+        return [row[1:12] for row in all_values[1:46]]
 
-    def store_data_in_json_file(self, game_data, path_to_file):
+    @staticmethod
+    def get_matrixs_from_sheet(sheet: Spreadsheet, worksheets: List[Worksheet]) -> Dict[str, List[List]]:
+        """
+        Return dictionary, when keys - absolute names of worksheets,
+        values - matrix from all values in this worksheet
+        """
+        ranges = [get_absolute_range(worksheet.title) for worksheet in worksheets]
+        response = sheet.values_batch_get(ranges)
+        """
+        response = {
+            spreadsheet: '***',
+            valueRanges: [
+                {
+                    ranges: '***',
+                    majorDimension: 'ROWS',
+                    values: [
+                        [],
+                        [],
+                        [],
+                        ...
+                    ]
+                }
+            ]
+        }
+        """
+        worksheets_values = {}
+        for worksheet_range in response['valueRanges']:
+            worksheets_values[worksheet_range['range']] = worksheet_range['values']
+
+        return worksheets_values
+
+    @staticmethod
+    def store_data_in_json_file(game_data, path_to_file):
         with open(path_to_file, 'w') as f:
             json.dump(game_data, f, indent=4)

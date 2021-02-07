@@ -44,10 +44,11 @@ def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: st
         }
     }
 
-def check_empty_blank(matrix):
+def check_empty_blank(matrix) -> bool:
     nicknames = [matrix[i][2] for i in range(10, 20)]
     heading = matrix[1][2]
     win = matrix[0][9] or matrix[1][9]
+    # if all was empty - return True
     return not any(nicknames + [heading, win])
 
 def check_heading(matrix, tx):
@@ -132,16 +133,24 @@ class BlankChecker:
         self._uowm = uowm
 
     def check_blank(self):
+        """
+        Return list of errors for blank
+        If blank was empty - return None
+        (Useful for handling such exceptions)
+        """
         if check_empty_blank(self.matrix):
+            # Return None if blank was empty for game
             return
 
         all_errors = []
         with self._uowm.start() as tx:
+            # Checkers with DB utils
             for checker in self.__checkers_with_db:
                 errors = checker(self.matrix, tx)
                 if errors is not None:
                     all_errors.extend(errors)
 
+        # Checkers only correct filling of the blank
         for checker in self.__checkers_without_db:
             errors = checker(self.matrix)
             if errors is not None:

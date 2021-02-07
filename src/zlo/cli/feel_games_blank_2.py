@@ -42,10 +42,8 @@ def parse_and_write_in_db(client_parser, args, list_files):
         (args.bonus_tolerant, "get_bonus_tolerant_points_from_houses_data"),
     )
     bus = inject.instance(MessageBus)
-    sheet = client_parser.client.open_by_key(
-        [file['id'] for file in list_files if file['name'] == args.sheet_title][0]
-    )
-    # sheet = client_parser.client.open(args.sheet_title)
+    # Open spreadsheet by key, filter by name
+    sheet = client_parser.client.open_by_key([file['id'] for file in list_files if file['name'] == args.sheet_title][0])
 
     # list of additional requests for batch update cells from one spreadsheet
     additional_requests = []
@@ -137,8 +135,10 @@ if __name__ == "__main__":
     drive = build(API_NAME, API_VERSION, credentials=credentials)
     files = drive.files()
 
+    # Get all files from DRIVE, that visible for bot
     file_list = drive_file_list(files)
 
+    # Filter files by permisions and type of file
     filtered_spreadsheets = [
         file for file in file_list
         if len(file['permissions']) > 1

@@ -23,6 +23,11 @@ months = [
 ]
 
 def drive_file_list(files: Resource, fields: str = "files(id, mimeType, name, permissions), nextPageToken"):
+    """
+    Get list of files (with metadata) from Google Drive API
+    Default: we check files metadata: id, type, name, permissions
+    For response we check only files and pageToken for search
+    """
     response = files.list(
         orderBy='name, folder',
         fields=fields

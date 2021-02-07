@@ -4,6 +4,9 @@ from calendar import monthrange
 from typing import List
 import argparse
 
+
+from googleapiclient.discovery import Resource
+
 months = [
     'Січень',
     'Лютий',
@@ -18,6 +21,26 @@ months = [
     'Листопад',
     'Грудень'
 ]
+
+def drive_file_list(files: Resource, fields: str = "files(id, mimeType, name, permissions), nextPageToken"):
+    response = files.list(
+        orderBy='name, folder',
+        fields=fields
+    ).execute()
+
+    files_list = response.get('files')
+    nextPageToken = response.get('nextPageToken')
+
+    while nextPageToken:
+        response = files.list(
+            orderBy='name, folder',
+            fields=fields,
+            pageToken=nextPageToken
+        ).execute()
+        files_list.extend(response.get('files'))
+        nextPageToken = response.get('nextPageToken')
+
+    return files_list
 
 def get_absolute_range(title):
     return f"'{title}'!A1:AC1001"

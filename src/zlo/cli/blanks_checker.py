@@ -5,13 +5,18 @@ import inject
 
 from gspread.exceptions import SpreadsheetNotFound
 from gspread.models import Cell
+from googleapiclient.discovery import build
+
 from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import get_url, get_absolute_range, get_submatrix
+from zlo.domain.utils import get_url, get_absolute_range, get_submatrix, drive_file_list
 from zlo.domain.infrastructure import UnitOfWorkManager
-from zlo.cli.setup_env_for_test import setup_env_with_test_database
+from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker
+
+from zlo.cli.setup_env_for_test import setup_env_with_test_database
+
 
 def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: str):
     return {
@@ -154,6 +159,16 @@ if __name__ == '__main__':
     arguments = my_parser.parse_args()
 
     client = inject.instance(SpreadSheetClient)
+    drive = build(API_NAME, API_VERSION, credentials=credentials)
+    files = drive.files()
+
+    file_list = drive_file_list(files)
+
+    filtered_spreadsheet = [
+        file for file in file_list
+        if len(file['permissions']) > 1
+        and file['mimeType'] == 'application/vnd.google-apps.spreadsheet'
+    ]
 
     name_sheets = None
     if arguments.year and arguments.month:
@@ -169,8 +184,15 @@ if __name__ == '__main__':
     for name_sheet in name_sheets:
         # list of additional requests for batch update cells from one spreadsheet
         additional_requests = []
+
+        if name_sheet not in [file['name'] for file in filtered_spreadsheet]:
+            continue
+
         try:
-            sheet = client.client.open(name_sheet)
+            sheet = client.client.open_by_key(
+                [file['id'] for file in filtered_spreadsheet if file['name'] == name_sheet][0]
+            )
+
         except SpreadsheetNotFound:
             continue
 
@@ -189,6 +211,7 @@ if __name__ == '__main__':
             blank_errors = blank_checker.check_blank()
 
             if blank_errors is None:
+                print(f'Empty worksheet: \'{worksheet.title}\'')
                 continue
 
             for blank_error in blank_errors:

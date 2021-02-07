@@ -1,23 +1,18 @@
-from os.path import dirname
 from typing import Dict, List, Optional
 from datetime import datetime
 
 
 import gspread
 from googleapiclient.discovery import build
-from oauth2client.service_account import ServiceAccountCredentials
 from zlo.domain.utils import get_month, get_the_specified_days_by_dates, create_parser_for_date_range
-from zlo import credentials
+from zlo.credentials.config import (
+    API_NAME,
+    API_VERSION,
+    SOURCE_FILE_ID,
+    FOLDER_ID,
+    credentials
+)
 
-
-CLIENT_SECRET_FILE = dirname(credentials.__file__) + "/zlomafiaclub-bf747a844d45.json"
-API_NAME = 'drive'
-API_VERSION = 'v3'
-SCOPES = ['https://www.googleapis.com/auth/drive']
-FOLDER_ID = '1Q7lFrQISWZ6mvJBiPsJvLBSk4kGmcou4'  # Рейтинг/Бланки
-SOURCE_FILE_ID = '1aaRjI_imeO5VGjDeygHQBXk-YzeKPgjaYu66R7zMqgo'
-
-credentials = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_SECRET_FILE, SCOPES)
 drive = build(API_NAME, API_VERSION, credentials=credentials)
 
 # create new client for this script (not our Spreadsheet class)

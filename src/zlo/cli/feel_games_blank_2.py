@@ -82,8 +82,8 @@ def parse_and_write_in_db(client_parser, args, list_files):
                 print('\t', worksheet.title, 'has errors!')
                 additional_requests.append(make_request_for_marking_blank(
                         worksheet,
-                        column=2,
-                        row_=1,
+                        column=1,
+                        row_=2,
                         value='Виявлено помилки'
                     )
                 )

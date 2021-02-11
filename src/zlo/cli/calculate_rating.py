@@ -110,8 +110,8 @@ class RatingCalculator:
                 win_clear_citizen=1 if game.advance_result == 4 and winner else 0,
                 win_guessing_game=1 if game.advance_result == 5 and winner else 0,
 
-                first_death=1 if best_move.killed_house == house.house_id else 0,  # First death at game statistic
-                first_death_sheriff=1 if best_move.killed_house == house.house_id and house.role == 2 else 0,
+                first_death=1 if best_move and best_move.killed_house == house.house_id else 0,  # First death at game statistic
+                first_death_sheriff=1 if best_move and best_move.killed_house == house.house_id and house.role == 2 else 0,
 
                 don_find_sheriff_in_first_night=int(first_night_don_check),  # Don check sheriff
                 don_find_sheriff_in_two_first_night=int(first_two_nights_don_check),
@@ -177,8 +177,13 @@ if __name__ == '__main__':
             'don_find_sheriff_in_two_first_night': 'Дон знайшов шерифа в перші дві ночі'
         }
 
+        name_worksheet = f"Range [{arguments.start_date_of_day} - {arguments.end_date_of_day}] "\
+                         + time_now.strftime('%d-%m-%Y %H:%M:%S') \
+                         if arguments.start_date_of_day and arguments.end_date_of_day \
+                         else 'All ' + time_now.strftime('%d-%m-%Y %H:%M:%S')
+
         worksheet = sheet.add_worksheet(
-            time_now.strftime('%d-%m-%Y %H:%M:%S'),
+            name_worksheet,
             cols=len(attribute_mapper),
             rows=len(players)
         )
@@ -189,7 +194,13 @@ if __name__ == '__main__':
                 cells.append(Cell(row, col, getattr(results[player_uuid], attribute)))
 
             # Use nickname (no UUID)
-            cells.append(Cell(row, 1, [player for player in players if player.player_id == player_uuid][0].nickname))
+            cells.append(
+                Cell(
+                    row,
+                    1,
+                    [player for player in players if player.player_id == player_uuid][0].nickname.capitalize()
+                )
+            )
 
         worksheet.update_cells(cells)
 

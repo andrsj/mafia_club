@@ -3,6 +3,8 @@ from datetime import datetime
 import inject
 
 from gspread.exceptions import SpreadsheetNotFound
+from googleapiclient.discovery import build
+
 from zlo.adapters.bootstrap import bootstrap
 from zlo.adapters.infrastructure import MessageBus
 from zlo.sheet_parser.blank_version_2 import BlankParser
@@ -10,19 +12,20 @@ from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.utils import (
     create_parser_for_blank_feeling,
     date_range_in_month,
+    drive_file_list,
     get_absolute_range,
     get_submatrix,
-    daterange
+    daterange,
 )
 from zlo.cli.blanks_checker import BlankChecker, make_request_for_marking_blank
-
+from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
 
 def update_game_id(worksheet, game_id):
     worksheet.update_cell(8, 4, game_id)
 
-def parse_and_write_in_db(client_parser, args):
+def parse_and_write_in_db(client_parser, args, list_files):
     handlers = (
         (args.houses, "parse_houses"),
         (args.voted, "parse_voted"),
@@ -39,7 +42,8 @@ def parse_and_write_in_db(client_parser, args):
         (args.bonus_tolerant, "get_bonus_tolerant_points_from_houses_data"),
     )
     bus = inject.instance(MessageBus)
-    sheet = client_parser.client.open(args.sheet_title)
+    # Open spreadsheet by key, filter by name
+    sheet = client_parser.client.open_by_key([file['id'] for file in list_files if file['name'] == args.sheet_title][0])
 
     # list of additional requests for batch update cells from one spreadsheet
     additional_requests = []
@@ -50,7 +54,6 @@ def parse_and_write_in_db(client_parser, args):
             sorted(worksheets, key=lambda w: w.title),
             sorted([get_absolute_range(worksheet.title) for worksheet in worksheets])
     ):
-        print('\t', worksheet.title)
 
         # if the blank was specified in parser
         if args.blank_title and worksheet.title != args.blank_title:
@@ -64,6 +67,10 @@ def parse_and_write_in_db(client_parser, args):
             blank_checker = BlankChecker(blank_matrix)
             errors = blank_checker.check_blank()
 
+            if errors is None:
+                # if blank is empty
+                continue
+
             additional_requests.append(make_request_for_marking_blank(
                     worksheet,
                     column=1,
@@ -72,6 +79,7 @@ def parse_and_write_in_db(client_parser, args):
                 )
             )
             if errors:
+                print('\t', worksheet.title, 'has errors!')
                 additional_requests.append(make_request_for_marking_blank(
                         worksheet,
                         column=2,
@@ -103,6 +111,8 @@ def parse_and_write_in_db(client_parser, args):
                     for event_ in event:
                         bus.publish(event_)
 
+        print('\t', worksheet.title, 'done :)')
+
         if args.blank_title:
             # Stop iteration, if script was runned by only one title worksheet
             break
@@ -122,24 +132,47 @@ if __name__ == "__main__":
     arguments = my_parser.parse_args()
 
     client = inject.instance(SpreadSheetClient)
+    drive = build(API_NAME, API_VERSION, credentials=credentials)
+    files = drive.files()
+
+    # Get all files from DRIVE, that visible for bot
+    file_list = drive_file_list(files)
+
+    # Filter files by permisions and type of file
+    filtered_spreadsheets = [
+        file for file in file_list
+        if len(file['permissions']) > 1
+        and file['mimeType'] == 'application/vnd.google-apps.spreadsheet'
+    ]
 
     if arguments.sheet_title:
-        print(arguments.sheet_title)
-
         # Example for this branch IF:
         # --sheet="16/10/2020" --full
-        parse_and_write_in_db(client, arguments)
+        print(arguments.sheet_title)
+
+        if arguments.sheet_title not in [file['name'] for file in filtered_spreadsheets]:
+            print(f'Not found spreadsheet by title {arguments.sheet_title}')
+        else:
+            try:
+                parse_and_write_in_db(client, arguments, filtered_spreadsheets)
+
+            except SpreadsheetNotFound:
+                print(f'Not found spreadsheet by title {arguments.sheet_title}')
 
     if (arguments.month and arguments.year) or (arguments.start_date_of_day and arguments.end_date_of_day):
-        # Example for this branch IF:
-        # --year=2020 --month="Жовтень" --full
 
         name_sheets = None
+
+        # Example for this branch IF:
+        # --year=2020 --month="Жовтень" --full
         if arguments.month and arguments.year:
             name_sheets = [
                 single_date.strftime('%d/%m/%Y')
                 for single_date in date_range_in_month(arguments.year, arguments.month)
             ]
+
+        # Example for this branch IF:
+        # --start="01/01/2020" --end="31/12/2020"
         if arguments.start_date_of_day and arguments.end_date_of_day:
             name_sheets = [
                 date.strftime('%d/%m/%Y') for date in daterange(
@@ -150,10 +183,16 @@ if __name__ == "__main__":
 
         # For all data names like DD/MM/YYYY
         for name in name_sheets:
+
+            # If spreadsheet not found in filtered sheets
+            if name not in [file['name'] for file in filtered_spreadsheets]:
+                # Skip
+                continue
+
             print(name)
             arguments.sheet_title = name
             try:
-                parse_and_write_in_db(client, arguments)
+                parse_and_write_in_db(client, arguments, filtered_spreadsheets)
 
             # Not found sheet by title 'DD/MM/YYYY'
             except SpreadsheetNotFound:

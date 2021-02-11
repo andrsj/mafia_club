@@ -5,13 +5,18 @@ import inject
 
 from gspread.exceptions import SpreadsheetNotFound
 from gspread.models import Cell
+from googleapiclient.discovery import build
+
 from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import get_url, get_absolute_range, get_submatrix
+from zlo.domain.utils import get_url, get_absolute_range, get_submatrix, drive_file_list
 from zlo.domain.infrastructure import UnitOfWorkManager
-from zlo.cli.setup_env_for_test import setup_env_with_test_database
+from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker
+
+from zlo.cli.setup_env_for_test import setup_env_with_test_database
+
 
 def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: str):
     return {
@@ -38,6 +43,13 @@ def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: st
             }],
         }
     }
+
+def check_empty_blank(matrix) -> bool:
+    nicknames = [matrix[i][2] for i in range(10, 20)]
+    heading = matrix[1][2]
+    win = matrix[0][9] or matrix[1][9]
+    # if all was empty - return True
+    return not any(nicknames + [heading, win])
 
 def check_heading(matrix, tx):
     players = tx.players.all()
@@ -108,7 +120,7 @@ class BlankChecker:
 
     __checkers_without_db = [
         check_data,
-        check_club,
+        # check_club,  # Club name checker removed
         check_winner,
         check_correct_game
     ]
@@ -121,13 +133,24 @@ class BlankChecker:
         self._uowm = uowm
 
     def check_blank(self):
+        """
+        Return list of errors for blank
+        If blank was empty - return None
+        (Useful for handling such exceptions)
+        """
+        if check_empty_blank(self.matrix):
+            # Return None if blank was empty for game
+            return
+
         all_errors = []
         with self._uowm.start() as tx:
+            # Checkers with DB utils
             for checker in self.__checkers_with_db:
                 errors = checker(self.matrix, tx)
                 if errors is not None:
                     all_errors.extend(errors)
 
+        # Checkers only correct filling of the blank
         for checker in self.__checkers_without_db:
             errors = checker(self.matrix)
             if errors is not None:
@@ -145,6 +168,16 @@ if __name__ == '__main__':
     arguments = my_parser.parse_args()
 
     client = inject.instance(SpreadSheetClient)
+    drive = build(API_NAME, API_VERSION, credentials=credentials)
+    files = drive.files()
+
+    file_list = drive_file_list(files)
+
+    filtered_spreadsheet = [
+        file for file in file_list
+        if len(file['permissions']) > 1
+        and file['mimeType'] == 'application/vnd.google-apps.spreadsheet'
+    ]
 
     name_sheets = None
     if arguments.year and arguments.month:
@@ -160,8 +193,15 @@ if __name__ == '__main__':
     for name_sheet in name_sheets:
         # list of additional requests for batch update cells from one spreadsheet
         additional_requests = []
+
+        if name_sheet not in [file['name'] for file in filtered_spreadsheet]:
+            continue
+
         try:
-            sheet = client.client.open(name_sheet)
+            sheet = client.client.open_by_key(
+                [file['id'] for file in filtered_spreadsheet if file['name'] == name_sheet][0]
+            )
+
         except SpreadsheetNotFound:
             continue
 
@@ -178,6 +218,11 @@ if __name__ == '__main__':
             blank_matrix = get_submatrix(rows)
             blank_checker = BlankChecker(blank_matrix)
             blank_errors = blank_checker.check_blank()
+
+            if blank_errors is None:
+                print(f'Empty worksheet: \'{worksheet.title}\'')
+                continue
+
             for blank_error in blank_errors:
                 all_sheets_errors.append((
                     name_sheet,

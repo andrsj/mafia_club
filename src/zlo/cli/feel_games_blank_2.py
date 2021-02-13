@@ -82,8 +82,8 @@ def parse_and_write_in_db(client_parser, args, list_files):
                 print('\t', worksheet.title, 'has errors!')
                 additional_requests.append(make_request_for_marking_blank(
                         worksheet,
-                        column=2,
-                        row_=1,
+                        column=1,
+                        row_=2,
                         value='Виявлено помилки'
                     )
                 )
@@ -111,7 +111,7 @@ def parse_and_write_in_db(client_parser, args, list_files):
                     for event_ in event:
                         bus.publish(event_)
 
-        print('\t', worksheet.title, 'done :)')
+        print('\t', worksheet.title, 'saved')
 
         if args.blank_title:
             # Stop iteration, if script was runned by only one title worksheet

@@ -51,10 +51,10 @@ blanks-check-for-errors-for-date:
 	python src/zlo/cli/blanks_checker.py --data=$(data)
 
 blanks-feel-games-month:
-	python src/zlo/cli/feel_games_blank_2.py --month=$(month) --year=$(year)
+	python src/zlo/cli/feel_games_blank_2.py --month=$(month) --year=$(year) --full
 
 blanks-feel-games-range:
-	python src/zlo/cli/feel_games_blank_2.py --start=$(start) --end=$(end)
+	python src/zlo/cli/feel_games_blank_2.py --start=$(start) --end=$(end) --full
 
 blanks-calculate-rating-date-range: 
 	python src/zlo/cli/calculate_rating.py --start=$(start) --end=$(end)

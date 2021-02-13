@@ -85,6 +85,9 @@ class BlankParser:
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
+
+        # TODO remove date from blank (use title)
+
         try:
             date = datetime.strptime(self._matrix[0][2], '%Y-%m-%d')
         except ValueError:
@@ -180,9 +183,12 @@ class BlankParser:
     @classmethod
     def get_voted_from_string(cls, value: str):
         value = value.strip()
-        value.replace(',', ' ').replace('.', ' ')
+        value.replace(' ', '')
         if value:
-            return [cls.get_slot_or_count_number_from_string(v) for v in value.split(' ')]
+            if '10' in value:
+                return [10] + [cls.get_slot_or_count_number_from_string(v) for v in value.replace('10', '')]
+            return [cls.get_slot_or_count_number_from_string(v) for v in value]
+
         return None
 
     def parse_disqualified(self) -> CreateOrUpdateDisqualified:

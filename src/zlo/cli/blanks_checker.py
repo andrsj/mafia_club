@@ -1,4 +1,5 @@
 import os
+from time import sleep
 from typing import List
 from datetime import datetime
 import inject
@@ -251,6 +252,8 @@ if __name__ == '__main__':
             sheet.batch_update(body={
                 'requests': additional_requests
             })
+
+        sleep(60)
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()

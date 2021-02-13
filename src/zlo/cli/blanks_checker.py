@@ -77,7 +77,7 @@ def check_correct_game(matrix):
     errors = []
     for votes in voted:
         for vote in votes:
-            if vote in kills:
+            if vote and vote in kills:
                 errors.append(f'Заголосований і вбитий мають один і той же слот {vote}')
 
     return errors

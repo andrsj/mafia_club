@@ -111,7 +111,7 @@ def parse_and_write_in_db(client_parser, args, list_files):
                     for event_ in event:
                         bus.publish(event_)
 
-        print('\t', worksheet.title, 'done :)')
+        print('\t', worksheet.title, 'saved')
 
         if args.blank_title:
             # Stop iteration, if script was runned by only one title worksheet

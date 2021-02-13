@@ -76,9 +76,10 @@ def check_correct_game(matrix):
 
     errors = []
     for votes in voted:
-        for vote in votes:
-            if vote in kills:
-                errors.append(f'Заголосований і вбитий мають один і той же слот {vote}')
+        if votes is not None:
+            for vote in votes:
+                if vote and vote in kills:
+                    errors.append(f'Заголосований і вбитий мають один і той же слот {vote}')
 
     return errors
 
@@ -210,11 +211,8 @@ if __name__ == '__main__':
 
         worksheets_values = client.get_matrixs_from_sheet(sheet, worksheets)
 
-        for worksheet, worksheet_range in zip(
-                sorted(worksheets, key=lambda w: w.title),
-                sorted([get_absolute_range(worksheet.title) for worksheet in worksheets])
-        ):
-            rows = worksheets_values[get_absolute_range(worksheet.title)]
+        for worksheet in sorted(worksheets, key=lambda w: w.title):
+            rows = worksheets_values[worksheet.title]
             blank_matrix = get_submatrix(rows)
             blank_checker = BlankChecker(blank_matrix)
             blank_errors = blank_checker.check_blank()
@@ -243,8 +241,8 @@ if __name__ == '__main__':
             if blank_errors:
                 additional_requests.append(make_request_for_marking_blank(
                         worksheet,
-                        column=2,
-                        row_=1,
+                        column=1,
+                        row_=2,
                         value='Виявлено помилки'
                     )
                 )
@@ -257,17 +255,6 @@ if __name__ == '__main__':
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()
 
-    title = None
-    if arguments.year and arguments.month:
-        title = f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
-    if arguments.data:
-        title = f'{arguments.data} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
-    errors_worksheet = errors_sheet.add_worksheet(
-        title,
-        rows=len(all_sheets_errors),
-        cols=4
-    )
-
     cells = []
     for row, error in enumerate(all_sheets_errors, start=1):
         for col, info in enumerate(error, start=1):
@@ -275,20 +262,38 @@ if __name__ == '__main__':
                 row, col, info
             ))
 
-    errors_worksheet.update_cells(cells)
-    errors_sheet.batch_update(body={
-        'requests': [
-            {
-                "autoResizeDimensions": {
-                    "dimensions": {
-                        "sheetId": errors_worksheet.id,
-                        "dimension": "COLUMNS",
-                        "startIndex": 0,
-                        "endIndex": 4
+    if cells:
+
+        title = None
+        if arguments.year and arguments.month:
+            title = f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
+        if arguments.data:
+            title = f'{arguments.data} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
+        errors_worksheet = errors_sheet.add_worksheet(
+            title,
+            rows=len(all_sheets_errors),
+            cols=4
+        )
+
+        errors_worksheet.update_cells(cells)
+
+        errors_sheet.batch_update(body={
+            'requests': [
+                {
+                    "autoResizeDimensions": {
+                        "dimensions": {
+                            "sheetId": errors_worksheet.id,
+                            "dimension": "COLUMNS",
+                            "startIndex": 0,
+                            "endIndex": 4
+                        }
                     }
                 }
-            }
-        ]
-    })
+            ]
+        })
 
-    print(errors_sheet.url)
+        # print(errors_sheet.url)
+        print(get_url(errors_worksheet.url))
+
+    else:
+        print('No errors')

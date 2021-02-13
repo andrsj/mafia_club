@@ -50,7 +50,8 @@ class SpreadSheetClient:
         """
         worksheets_values = {}
         for worksheet_range in response['valueRanges']:
-            worksheets_values[worksheet_range['range']] = worksheet_range['values']
+            if 'values' in worksheet_range:
+                worksheets_values[worksheet_range['range'].split("'")[1]] = worksheet_range['values']
 
         return worksheets_values
 

@@ -47,10 +47,8 @@ def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: st
 
 def check_empty_blank(matrix) -> bool:
     nicknames = [matrix[i][2] for i in range(10, 20)]
-    heading = matrix[1][2]
-    win = matrix[0][9] or matrix[1][9]
     # if all was empty - return True
-    return not any(nicknames + [heading, win])
+    return not any(nicknames)
 
 def check_heading(matrix, tx):
     players = tx.players.all()

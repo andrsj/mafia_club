@@ -110,6 +110,16 @@ def create_parser_for_blanks_checker():
         type=int
     )
     parser.add_argument(
+        '--start',
+        dest='start_date_of_day',
+        help='Start date (format: DD/MM/YYYY)'
+    )
+    parser.add_argument(
+        '--end',
+        dest='end_date_of_day',
+        help='End date (format: DD/MM/YYYY)'
+    )
+    parser.add_argument(
         '--data',
         dest='data',
         help='Spreadsheet by date (Text format DD/MM/YYYY)'

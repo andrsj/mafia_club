@@ -1,4 +1,5 @@
 import os
+from time import sleep
 from typing import List
 from datetime import datetime
 import inject
@@ -10,10 +11,10 @@ from googleapiclient.discovery import build
 from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
-from zlo.domain.utils import get_url, get_absolute_range, get_submatrix, drive_file_list
+from zlo.domain.utils import get_url, get_submatrix, drive_file_list
 from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.credentials.config import credentials, API_VERSION, API_NAME
-from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker
+from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker, daterange
 
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
@@ -46,10 +47,8 @@ def make_request_for_marking_blank(work_sheet, column: int, row_: int, value: st
 
 def check_empty_blank(matrix) -> bool:
     nicknames = [matrix[i][2] for i in range(10, 20)]
-    heading = matrix[1][2]
-    win = matrix[0][9] or matrix[1][9]
     # if all was empty - return True
-    return not any(nicknames + [heading, win])
+    return not any(nicknames)
 
 def check_heading(matrix, tx):
     players = tx.players.all()
@@ -187,6 +186,12 @@ if __name__ == '__main__':
             for single_date in date_range_in_month(arguments.year, arguments.month)
         ]
 
+    if arguments.end_date_of_day and arguments.start_date_of_day:
+        name_sheets = [
+            single_date.strftime('%d/%m/%Y')
+            for single_date in daterange(arguments.start_date_of_day, arguments.end_date_of_day)
+        ]
+
     if arguments.data:
         name_sheets = [arguments.data]
 
@@ -251,6 +256,9 @@ if __name__ == '__main__':
             sheet.batch_update(body={
                 'requests': additional_requests
             })
+
+        if arguments.end_date_of_day and arguments.start_date_of_day:
+            sleep(60)
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()

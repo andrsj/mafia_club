@@ -243,8 +243,8 @@ if __name__ == '__main__':
             if blank_errors:
                 additional_requests.append(make_request_for_marking_blank(
                         worksheet,
-                        column=2,
-                        row_=1,
+                        column=1,
+                        row_=2,
                         value='Виявлено помилки'
                     )
                 )

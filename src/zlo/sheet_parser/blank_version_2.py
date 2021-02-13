@@ -85,6 +85,9 @@ class BlankParser:
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
+
+        # TODO remove date from blank (use title)
+
         try:
             date = datetime.strptime(self._matrix[0][2], '%Y-%m-%d')
         except ValueError:

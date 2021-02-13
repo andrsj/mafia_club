@@ -211,12 +211,7 @@ if __name__ == '__main__':
 
         worksheets_values = client.get_matrixs_from_sheet(sheet, worksheets)
 
-        for worksheet, worksheet_range in zip(
-                sorted(worksheets, key=lambda w: w.title),
-                sorted([get_absolute_range(worksheet.title) for worksheet in worksheets])
-        ):
-            # titles = [title for title in worksheets_values.keys() if title.startswith(f"'{worksheet.title}'")]
-            # rows = worksheets_values[get_absolute_range(worksheet.title)]
+        for worksheet in sorted(worksheets, key=lambda w: w.title):
             rows = worksheets_values[worksheet.title]
             blank_matrix = get_submatrix(rows)
             blank_checker = BlankChecker(blank_matrix)

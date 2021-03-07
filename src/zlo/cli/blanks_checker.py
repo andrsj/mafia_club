@@ -13,6 +13,7 @@ from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.utils import get_url, get_submatrix, drive_file_list
 from zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.domain.config import DATA_FORMAT
 from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker, daterange
 
@@ -60,7 +61,7 @@ def check_heading(matrix, tx):
 def check_club(matrix):
     if not matrix[3][2]:
         return ['Не вказаний клуб гри']
-    clubs = ['ZLO', 'Школа Зло', 'Зло']
+    clubs = ['ZLO', 'Школа Зло']
     if matrix[3][2].lower() not in [club.lower() for club in clubs]:
         return [f"Не вірна назва клубу '{matrix[3][2]}'"]
 
@@ -103,6 +104,20 @@ def check_players(matrix, tx) -> List[str]:
 
     return errors
 
+def check_bonuses(matrix) -> List[str]:
+    errors = []
+
+    for i in range(1, 11):
+        row_number = i + 9
+        try:
+            BlankParser.get_bonus_mark(matrix[row_number][7])
+            BlankParser.get_bonus_mark(matrix[row_number][9])
+        except ValueError:
+            errors.append(f'Не вірна оцінка від ведучого для слоту {i}')
+
+    return errors
+
+
 def check_data(matrix):
     if not matrix[0][2]:
         return ['Відсутня дата в бланку']
@@ -119,10 +134,10 @@ class BlankChecker:
     ]
 
     __checkers_without_db = [
-        check_data,
         # check_club,  # Club name checker removed
         check_winner,
-        check_correct_game
+        check_correct_game,
+        check_bonuses
     ]
 
     @inject.params(
@@ -182,14 +197,17 @@ if __name__ == '__main__':
     name_sheets = None
     if arguments.year and arguments.month:
         name_sheets = [
-            single_date.strftime('%d/%m/%Y')
+            single_date.strftime(DATA_FORMAT)
             for single_date in date_range_in_month(arguments.year, arguments.month)
         ]
 
     if arguments.end_date_of_day and arguments.start_date_of_day:
         name_sheets = [
-            single_date.strftime('%d/%m/%Y')
-            for single_date in daterange(arguments.start_date_of_day, arguments.end_date_of_day)
+            single_date.strftime(DATA_FORMAT)
+            for single_date in daterange(
+                datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
+                datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
+            )
         ]
 
     if arguments.data:
@@ -258,7 +276,7 @@ if __name__ == '__main__':
             })
 
         if arguments.end_date_of_day and arguments.start_date_of_day:
-            sleep(60)
+            sleep(5)
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()
@@ -272,9 +290,11 @@ if __name__ == '__main__':
 
     if cells:
 
-        title = None
+        title = f'{time_now.strftime("%d-%m-%Y %H:%M:%S")}'
         if arguments.year and arguments.month:
             title = f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
+        if arguments.end_date_of_day and arguments.start_date_of_day:
+            title = f'From {arguments.start_date_of_day} to {arguments.end_date_of_day}'
         if arguments.data:
             title = f'{arguments.data} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
         errors_worksheet = errors_sheet.add_worksheet(
@@ -300,7 +320,6 @@ if __name__ == '__main__':
             ]
         })
 
-        # print(errors_sheet.url)
         print(get_url(errors_worksheet.url))
 
     else:

@@ -10,7 +10,7 @@ class WhenDevisesParsed(BlankParserMixin):
         self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
-        self.devises_event = self.blank_parser.parse_devise()
+        self.devises_event = self.blank_parser.parse_devises()
         print(self.devises_event)
 
     def it_should_get_proper_values(self):

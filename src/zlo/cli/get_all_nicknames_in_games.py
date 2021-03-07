@@ -5,6 +5,7 @@ from gspread.models import Cell
 from gspread.exceptions import SpreadsheetNotFound
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.utils import date_range_in_month, get_url
+from zlo.domain.config import DATA_FORMAT
 
 
 if __name__ == '__main__':
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
 
     name_sheets = [
-        single_date.strftime('%d/%m/%Y')
+        single_date.strftime(DATA_FORMAT)
         for single_date in date_range_in_month(arguments.year, arguments.month)
     ]
 

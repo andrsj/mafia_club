@@ -97,6 +97,7 @@ class CreateOrUpdateBonusFromPlayers:
     game_id: str
     bonus: Dict[int, int]
 
+
 @dataclass
 class CreateOrUpdateBonusTolerant:
     game_id: str

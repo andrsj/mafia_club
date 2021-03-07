@@ -3,26 +3,13 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from zlo.domain.types import (
-    GameID,
-    HouseID,
-    PlayerID,
-    ClassicRole,
-    ClubID,
-    TournamentID,
-    BestMoveID,
-    DeviseID,
-    HandOfMafiaID,
-    SheriffVersionID,
-    DisqualifiedID,
-    NominatedForBestID
-)
+from zlo.domain import types
 
 
 @dataclass
 class Player:
 
-    def __init__(self, nickname: str, name: str, club: str, player_id: PlayerID = None):
+    def __init__(self, nickname: str, name: str, club: str, player_id: types.PlayerID = None):
         self.nickname = nickname
         self.name = name
         self.club = club
@@ -42,12 +29,12 @@ class Player:
 
 @dataclass
 class Game:
-    game_id: GameID
+    game_id: types.GameID
     date: datetime.datetime
     result: int
-    club: Optional[ClubID]
+    club: Optional[types.ClubID]
     table: Optional[int]
-    tournament: Optional[TournamentID]
+    tournament: Optional[types.TournamentID]
     heading: Player
     advance_result: int
 
@@ -72,11 +59,11 @@ class Game:
 
 @dataclass
 class House:
-    house_id: HouseID
-    player_id: PlayerID
-    role: ClassicRole
+    house_id: types.HouseID
+    player_id: types.PlayerID
+    role: types.ClassicRole
     slot: int
-    game_id: GameID
+    game_id: types.GameID
     bonus_mark: float
     fouls: int
 
@@ -100,12 +87,12 @@ class House:
 
 @dataclass
 class BestMove:
-    best_move_id: BestMoveID
-    game_id: GameID
-    killed_house: HouseID
-    best_1: Optional[HouseID]
-    best_2: Optional[HouseID]
-    best_3: Optional[HouseID]
+    best_move_id: types.BestMoveID
+    game_id: types.GameID
+    killed_house: types.HouseID
+    best_1: Optional[types.HouseID]
+    best_2: Optional[types.HouseID]
+    best_3: Optional[types.HouseID]
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -123,9 +110,9 @@ class BestMove:
 
 @dataclass
 class Disqualified:
-    disqualified_id: DisqualifiedID
-    game_id: GameID
-    house: HouseID
+    disqualified_id: types.DisqualifiedID
+    game_id: types.GameID
+    house: types.HouseID
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -140,9 +127,9 @@ class Disqualified:
 
 @dataclass
 class SheriffVersion:
-    sheriff_version_id: SheriffVersionID
-    game_id: GameID
-    house: HouseID
+    sheriff_version_id: types.SheriffVersionID
+    game_id: types.GameID
+    house: types.HouseID
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -157,9 +144,9 @@ class SheriffVersion:
 
 @dataclass
 class NominatedForBest:
-    nominated_for_best_id: NominatedForBestID
-    game_id: GameID
-    house: HouseID
+    nominated_for_best_id: types.NominatedForBestID
+    game_id: types.GameID
+    house: types.HouseID
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -174,12 +161,12 @@ class NominatedForBest:
 
 @dataclass
 class Devise:
-    devise_id: DeviseID
-    game_id: GameID
-    killed_house: HouseID
-    house_1: Optional[HouseID]
-    house_2: Optional[HouseID]
-    house_3: Optional[HouseID]
+    devise_id: types.DeviseID
+    game_id: types.GameID
+    killed_house: types.HouseID
+    house_1: Optional[types.HouseID]
+    house_2: Optional[types.HouseID]
+    house_3: Optional[types.HouseID]
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -197,10 +184,10 @@ class Devise:
 
 @dataclass
 class HandOfMafia:
-    hand_of_mafia_id: HandOfMafiaID
-    game_id: GameID
-    house_hand_id: HouseID
-    victim_id: Optional[HouseID]
+    hand_of_mafia_id: types.HandOfMafiaID
+    game_id: types.GameID
+    house_hand_id: types.HouseID
+    victim_id: Optional[types.HouseID]
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -217,9 +204,9 @@ class HandOfMafia:
 @dataclass
 class BonusTolerantFromPlayers:
     bonus_id: str
-    game_id: GameID
-    house_from_id: HouseID
-    house_to_id: HouseID
+    game_id: types.GameID
+    house_from_id: types.HouseID
+    house_to_id: types.HouseID
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -234,10 +221,50 @@ class BonusTolerantFromPlayers:
 
 
 @dataclass
+class Break:
+    break_id: str
+    game_id: types.GameID
+    count: int
+    house_from: types.HouseID
+    house_to: types.HouseID
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            raise ValueError(f'Cant compare {self.__class__} with {type(other)}')
+        return all(
+            (
+                str(self.game_id) == str(other.game_id),
+                str(self.house_from) == str(other.house_from),
+                str(self.house_to) == str(other.house_to),
+                self.count == other.count
+            )
+        )
+
+
+@dataclass
+class BonusHeading:
+    bonus_id: str
+    game_id: types.GameID
+    house_id: types.HouseID
+    value: float
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            raise ValueError(f'Cant compare {self.__class__} with {type(other)}')
+        return all(
+            (
+                str(self.game_id) == str(other.game_id),
+                str(self.house_id) == str(other.house_id),
+                self.value == other.value
+            )
+        )
+
+
+@dataclass
 class Kills:
     kill_id: str
-    game_id: GameID
-    killed_house_id: HouseID
+    game_id: types.GameID
+    killed_house_id: types.HouseID
     circle_number: int
 
     def __eq__(self, other):
@@ -255,8 +282,8 @@ class Kills:
 @dataclass
 class Voted:
     voted_id: str
-    game_id: GameID
-    house_id: HouseID
+    game_id: types.GameID
+    house_id: types.HouseID
     day: int
 
     def __eq__(self, other):
@@ -274,8 +301,8 @@ class Voted:
 @dataclass
 class SheriffChecks:
     sheriff_check_id: str
-    game_id: GameID
-    checked_house_id: Optional[HouseID]
+    game_id: types.GameID
+    checked_house_id: Optional[types.HouseID]
     circle_number: int
 
     def __eq__(self, other):
@@ -293,8 +320,8 @@ class SheriffChecks:
 @dataclass
 class DonChecks:
     don_check_id: str
-    game_id: GameID
-    checked_house_id: Optional[HouseID]
+    game_id: types.GameID
+    checked_house_id: Optional[types.HouseID]
     circle_number: int
 
     def __eq__(self, other):
@@ -312,8 +339,8 @@ class DonChecks:
 @dataclass
 class Misses:
     miss_id: str
-    game_id: GameID
-    house_id: Optional[HouseID]
+    game_id: types.GameID
+    house_id: Optional[types.HouseID]
     circle_number: int
 
     def __eq__(self, other):
@@ -331,9 +358,9 @@ class Misses:
 @dataclass
 class BonusFromPlayers:
     bonus_id: str
-    game_id: GameID
-    bonus_from: Optional[HouseID]
-    bonus_to: Optional[HouseID]
+    game_id: types.GameID
+    bonus_from: Optional[types.HouseID]
+    bonus_to: Optional[types.HouseID]
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -345,3 +372,19 @@ class BonusFromPlayers:
                 str(self.bonus_to) == str(other.bonus_to)
             )
         )
+
+
+@dataclass
+class Rating:
+    rating_id: str
+    mmr: int
+    player: types.PlayerID
+    season: str
+
+
+@dataclass
+class Season:
+    season_id: str
+    name: str
+    start: datetime
+    end: datetime

@@ -1,5 +1,4 @@
 import os
-import argparse
 from typing import Dict, List
 from datetime import datetime
 
@@ -15,6 +14,7 @@ from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.model import Game
 from zlo.domain.types import Result
 from zlo.domain.utils import create_parser_for_date_range
+from zlo.domain.config import DATA_FORMAT
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
 
@@ -71,20 +71,22 @@ class RatingCalculator:
 
         # Code below: don's attempts to find the sheriff
         first_night_don_check, first_two_nights_don_check = False, False
-        sheriff_house = next(house for house in houses if house.role == 2)
-        don_checks = self.uow.don_checks.get_by_game_id(game.game_id)
-        for don_check in don_checks:
-            # First night and find sheriff
-            first_night_don_check = (
-                don_check.circle_number == 1
-                and don_check.checked_house_id == sheriff_house.house_id
-            )
-            # First two nights and find sheriff
-            first_two_nights_don_check = (
-                don_check.circle_number in (1, 2)
-                and don_check.checked_house_id == sheriff_house.house_id
-            )
-        # End done checks code block
+        sheriff_house = next((house for house in houses if house.role == 2), None)
+
+        if sheriff_house is not None:
+            don_checks = self.uow.don_checks.get_by_game_id(game.game_id)
+            for don_check in don_checks:
+                # First night and find sheriff
+                first_night_don_check = (
+                    don_check.circle_number == 1
+                    and don_check.checked_house_id == sheriff_house.house_id
+                )
+                # First two nights and find sheriff
+                first_two_nights_don_check = (
+                    don_check.circle_number in (1, 2)
+                    and don_check.checked_house_id == sheriff_house.house_id
+                )
+            # End done checks code block
 
         # Generate resultats for every player in one game
         for house in houses:
@@ -141,8 +143,8 @@ if __name__ == '__main__':
             results = calculator.rating_for_all_games()
         if arguments.start_date_of_day and arguments.end_date_of_day:
             results = calculator.rating_in_daterange(
-                datetime.strptime(arguments.start_date_of_day, '%d/%m/%Y'),
-                datetime.strptime(arguments.end_date_of_day, '%d/%m/%Y')
+                datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
+                datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
             )
 
         sheet = client.client.open(title='Statistic')

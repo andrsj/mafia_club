@@ -13,7 +13,7 @@ class WhenGameWasParsed(BlankParserMixin):
         self.blank_parser = BlankParser(matrix)
 
     def because_we_parse_game_info(self):
-        self.game_event = self.blank_parser.parse_game_info()
+        self.game_event = self.blank_parser.parse_game_info('18/01/2020')  # 2020-01-18
 
     def it_should_get_game_info(self):
         assert self.game_event.date == datetime(2020, 1, 18, 0, 0)  # 2020-01-18

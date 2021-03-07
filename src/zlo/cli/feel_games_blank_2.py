@@ -13,10 +13,10 @@ from zlo.domain.utils import (
     create_parser_for_blank_feeling,
     date_range_in_month,
     drive_file_list,
-    get_absolute_range,
     get_submatrix,
     daterange,
 )
+from zlo.domain.config import DATA_FORMAT
 from zlo.cli.blanks_checker import BlankChecker, make_request_for_marking_blank
 from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
@@ -30,7 +30,9 @@ def parse_and_write_in_db(client_parser, args, list_files):
         (args.houses, "parse_houses"),
         (args.voted, "parse_voted"),
         (args.kills, "parse_kills"),
+        (args.breaks, "parse_breaks"),
         (args.misses, "parse_misses"),
+        (args.devises, "parse_devises"),
         (args.best_moves, "parse_best_move"),
         (args.don_checks, "parse_don_checks"),
         (args.disqualifieds, "parse_disqualified"),
@@ -38,6 +40,7 @@ def parse_and_write_in_db(client_parser, args, list_files):
         (args.sheriff_checks, "parse_sheriff_checks"),
         (args.sheriff_versions, "parse_sheriff_versions"),
         (args.nominated_for_best, "parse_nominated_for_best"),
+        (args.bonus_from_heading, "get_bonus_points_from_heading"),
         (args.bonus_from_players, "get_bonus_points_from_houses_data"),
         (args.bonus_tolerant, "get_bonus_tolerant_points_from_houses_data"),
     )
@@ -50,16 +53,13 @@ def parse_and_write_in_db(client_parser, args, list_files):
 
     worksheets = sheet.worksheets()
     worksheets_values = client.get_matrixs_from_sheet(sheet, worksheets)
-    for worksheet, worksheet_range in zip(
-            sorted(worksheets, key=lambda w: w.title),
-            sorted([get_absolute_range(worksheet.title) for worksheet in worksheets])
-    ):
+    for worksheet in sorted(worksheets, key=lambda w: w.title):
 
         # if the blank was specified in parser
         if args.blank_title and worksheet.title != args.blank_title:
             continue
 
-        rows = worksheets_values[get_absolute_range(worksheet.title)]
+        rows = worksheets_values[worksheet.title]
 
         blank_matrix = get_submatrix(rows)
 
@@ -90,7 +90,7 @@ def parse_and_write_in_db(client_parser, args, list_files):
                 continue
 
         blank_parser = BlankParser(blank_matrix)
-        game_info = blank_parser.parse_game_info()
+        game_info = blank_parser.parse_game_info(sheet.title)
         if blank_parser.if_game_is_new():
             update_game_id(worksheet, game_info.game_id)
         else:
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         # --year=2020 --month="Жовтень" --full
         if arguments.month and arguments.year:
             name_sheets = [
-                single_date.strftime('%d/%m/%Y')
+                single_date.strftime(DATA_FORMAT)
                 for single_date in date_range_in_month(arguments.year, arguments.month)
             ]
 
@@ -175,9 +175,9 @@ if __name__ == "__main__":
         # --start="01/01/2020" --end="31/12/2020"
         if arguments.start_date_of_day and arguments.end_date_of_day:
             name_sheets = [
-                date.strftime('%d/%m/%Y') for date in daterange(
-                    datetime.strptime(arguments.start_date_of_day, '%d/%m/%Y'),
-                    datetime.strptime(arguments.end_date_of_day, '%d/%m/%Y')
+                date.strftime(DATA_FORMAT) for date in daterange(
+                    datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
+                    datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
                 )
             ]
 

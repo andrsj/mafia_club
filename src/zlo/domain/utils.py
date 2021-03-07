@@ -318,6 +318,29 @@ def create_parser_for_blank_feeling():
         required=False,
         help='Parse and update bonus from players'
     )
-
+    parser.add_argument(
+        '--bonus_from_heading',
+        default=False,
+        dest='bonus_from_heading',
+        action='store_true',
+        required=False,
+        help='Parse and update bonus from heading'
+    )
+    parser.add_argument(
+        '--devises',
+        default=False,
+        dest='devises',
+        action='store_true',
+        required=False,
+        help='Parse and update devises'
+    )
+    parser.add_argument(
+        '--breaks',
+        default=False,
+        dest='breaks',
+        action='store_true',
+        required=False,
+        help='Parse and update breaks'
+    )
 
     return parser

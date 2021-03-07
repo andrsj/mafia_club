@@ -2,27 +2,10 @@ import uuid
 from typing import List, Optional
 from datetime import datetime
 
-from zlo.domain.events import (
-    CreateOrUpdateGame,
-    CreateOrUpdateHouse,
-    CreateOrUpdateBestMove,
-    CreateOrUpdateDisqualified,
-    CreateOrUpdateSheriffVersion,
-    CreateOrUpdateNominatedForBest,
-    CreateOrUpdateVoted,
-    CreateOrUpdateSheriffChecks,
-    CreateOrUpdateKills,
-    CreateOrUpdateDonChecks,
-    CreateOrUpdateMisses,
-    CreateOrUpdateBonusFromHeading,
-    CreateOrUpdateBonusFromPlayers,
-    CreateOrUpdateBonusTolerant,
-    CreateOrUpdateHandOfMafia,
-    CreateOrUpdateBreaks,
-    CreateOrUpdateDevises
-)
+from zlo.domain import events
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
+from zlo.domain.config import DATA_FORMAT
 
 
 class NotFinishedBlank(Exception):
@@ -80,20 +63,18 @@ class BlankParser:
 
         return game_result, advanced_game_result
 
-    def parse_game_info(self) -> CreateOrUpdateGame:
+    def parse_game_info(self, sheet_title: str) -> events.CreateOrUpdateGame:
         """
         Get general stats about game
         """
         game_result, advanced_game_result = self.parse_game_result()
 
-        # TODO remove date from blank (use title)
-
         try:
-            date = datetime.strptime(self._matrix[0][2], '%Y-%m-%d')
+            date = datetime.strptime(sheet_title, DATA_FORMAT)
         except ValueError:
             raise WrongDateFormat
 
-        return CreateOrUpdateGame(
+        return events.CreateOrUpdateGame(
             game_id=self._game_id,
             heading=self._matrix[1][2].lower().strip(),
             date=date,
@@ -106,7 +87,9 @@ class BlankParser:
 
     @staticmethod
     def get_bonus_mark(value):
-        return float(value.strip().replace(',', '.')) if value else 0
+        if value.strip():
+            return float(value.strip().replace(',', '.'))
+        return 0
 
     @staticmethod
     def get_role_from_string(value: str):
@@ -122,7 +105,7 @@ class BlankParser:
         else:
             raise ValueError
 
-    def parse_houses(self) -> List[CreateOrUpdateHouse]:
+    def parse_houses(self) -> List[events.CreateOrUpdateHouse]:
         houses_events = []
         for i in range(1, 11):
             row_number = i + 9
@@ -131,7 +114,7 @@ class BlankParser:
             except ValueError:
                 raise WrongRoleValue(i)
             houses_events.append(
-                CreateOrUpdateHouse(
+                events.CreateOrUpdateHouse(
                     game_id=self._game_id,
                     player_nickname=self._matrix[row_number][2].lower().strip(),
                     role=role,
@@ -147,7 +130,7 @@ class BlankParser:
 
         return houses_events
 
-    def parse_best_move(self) -> Optional[CreateOrUpdateBestMove]:
+    def parse_best_move(self) -> Optional[events.CreateOrUpdateBestMove]:
         killed_player_slot = self.get_slot_or_count_number_from_string(self._matrix[22][1])
         if not killed_player_slot:
             return None
@@ -158,7 +141,7 @@ class BlankParser:
         if not (bool(best_1_slot) + bool(best_2_slot) + bool(best_3_slot)) > 1:
             return None
 
-        return CreateOrUpdateBestMove(
+        return events.CreateOrUpdateBestMove(
             game_id=self._game_id,
             killed_player_slot=killed_player_slot,
             best_1_slot=self.get_slot_or_count_number_from_string(self._matrix[22][2]),
@@ -191,69 +174,69 @@ class BlankParser:
 
         return None
 
-    def parse_disqualified(self) -> CreateOrUpdateDisqualified:
+    def parse_disqualified(self) -> events.CreateOrUpdateDisqualified:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[21][7:]]
         slots = [slot for slot in slots if bool(slot)]
-        return CreateOrUpdateDisqualified(
+        return events.CreateOrUpdateDisqualified(
             game_id=self._game_id,
             disqualified_slots=slots
         )
 
-    def parse_sheriff_versions(self) -> CreateOrUpdateSheriffVersion:
+    def parse_sheriff_versions(self) -> events.CreateOrUpdateSheriffVersion:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[22][7:]]
         slots = [slot for slot in slots if bool(slot)]
-        return CreateOrUpdateSheriffVersion(
+        return events.CreateOrUpdateSheriffVersion(
             game_id=self._game_id,
             sheriff_version_slots=slots
         )
 
-    def parse_nominated_for_best(self) -> CreateOrUpdateNominatedForBest:
+    def parse_nominated_for_best(self) -> events.CreateOrUpdateNominatedForBest:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[24][2:]]
         slots = [slot for slot in slots if bool(slot)]
-        return CreateOrUpdateNominatedForBest(
+        return events.CreateOrUpdateNominatedForBest(
             game_id=self._game_id,
             nominated_slots=slots
         )
 
-    def parse_kills(self) -> CreateOrUpdateKills:
+    def parse_kills(self) -> events.CreateOrUpdateKills:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[33][2:]]
         while slots and slots[-1] == 0:
             slots.pop()
-        return CreateOrUpdateKills(
+        return events.CreateOrUpdateKills(
             game_id=self._game_id,
             kills_slots=slots
         )
 
-    def parse_voted(self) -> Optional[CreateOrUpdateVoted]:
+    def parse_voted(self) -> Optional[events.CreateOrUpdateVoted]:
         result = {}
         for i, voted in enumerate(self._matrix[44][2:], start=1):
             result[i] = self.get_voted_from_string(voted)
         if all([value is None for value in result.values()]):
             return None
-        return CreateOrUpdateVoted(
+        return events.CreateOrUpdateVoted(
             game_id=self._game_id,
             voted_slots=result
         )
 
-    def parse_sheriff_checks(self) -> Optional[CreateOrUpdateSheriffChecks]:
+    def parse_sheriff_checks(self) -> Optional[events.CreateOrUpdateSheriffChecks]:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[37][2:]]
         while slots and slots[-1] == 0:
             slots.pop()
-        return CreateOrUpdateSheriffChecks(
+        return events.CreateOrUpdateSheriffChecks(
             game_id=self._game_id,
             sheriff_checks=slots
         )
 
-    def parse_don_checks(self) -> CreateOrUpdateDonChecks:
+    def parse_don_checks(self) -> events.CreateOrUpdateDonChecks:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[40][2:]]
         while slots and slots[-1] == 0:
             slots.pop()
-        return CreateOrUpdateDonChecks(
+        return events.CreateOrUpdateDonChecks(
             game_id=self._game_id,
             don_checks=slots
         )
 
-    def get_bonus_points_from_houses_data(self) -> CreateOrUpdateBonusFromPlayers:
+    def get_bonus_points_from_houses_data(self) -> events.CreateOrUpdateBonusFromPlayers:
         slots = {}
         for i in range(1, 11):
             row_number = i + 9
@@ -261,12 +244,12 @@ class BlankParser:
             if slot != 0:
                 slots[i] = slot
 
-        return CreateOrUpdateBonusFromPlayers(
+        return events.CreateOrUpdateBonusFromPlayers(
             game_id=self._game_id,
             bonus=slots
         )
 
-    def get_bonus_tolerant_points_from_houses_data(self) -> CreateOrUpdateBonusTolerant:
+    def get_bonus_tolerant_points_from_houses_data(self) -> events.CreateOrUpdateBonusTolerant:
         slots = {}
         for i in range(1, 11):
             row_number = i + 9
@@ -274,12 +257,12 @@ class BlankParser:
             if slot != 0:
                 slots[i] = slot
 
-        return CreateOrUpdateBonusTolerant(
+        return events.CreateOrUpdateBonusTolerant(
             game_id=self._game_id,
             bonuses=slots
         )
 
-    def get_bonus_points_from_heading(self) -> List[CreateOrUpdateBonusFromHeading]:
+    def get_bonus_points_from_heading(self) -> List[events.CreateOrUpdateBonusFromHeading]:
         bonus_points = {}
         for i in range(1, 11):
             row_number = i + 9
@@ -287,30 +270,30 @@ class BlankParser:
             if point != 0:
                 bonus_points[i] = point
 
-        events = [
-            CreateOrUpdateBonusFromHeading(
+        events_ = [
+            events.CreateOrUpdateBonusFromHeading(
                 game_id=self._game_id,
                 house_slot=slot,
                 value=point
             ) for slot, point in bonus_points.items()
         ]
-        return events
+        return events_
 
-    def parse_hand_of_mafia(self) -> CreateOrUpdateHandOfMafia:
+    def parse_hand_of_mafia(self) -> events.CreateOrUpdateHandOfMafia:
         voted_from = self.get_slot_or_count_number_from_string(self._matrix[6][8])
         voted_to = self.get_slot_or_count_number_from_string(self._matrix[6][9])
-        return CreateOrUpdateHandOfMafia(
+        return events.CreateOrUpdateHandOfMafia(
             game_id=self._game_id,
             slot_from=voted_from,
             slot_to=voted_to
         )
 
-    def parse_devise(self):
+    def parse_devises(self):
         devises = []
         for row in range(27, 31):
             if self.get_slot_or_count_number_from_string(self._matrix[row][7]):
                 devises.append(
-                    CreateOrUpdateDevises(
+                    events.CreateOrUpdateDevises(
                         game_id=self._game_id,
                         killed_slot=self.get_slot_or_count_number_from_string(self._matrix[row][7]),
                         first_slot=self.get_slot_or_count_number_from_string(self._matrix[row][8]),
@@ -321,11 +304,11 @@ class BlankParser:
 
         return devises
 
-    def parse_misses(self) -> CreateOrUpdateMisses:
+    def parse_misses(self) -> events.CreateOrUpdateMisses:
         slots = [self.get_slot_or_count_number_from_string(value) for value in self._matrix[34][2:]]
         while slots and slots[-1] == 0:
             slots.pop()
-        return CreateOrUpdateMisses(
+        return events.CreateOrUpdateMisses(
             game_id=self._game_id,
             misses_slots=slots
         )
@@ -335,7 +318,7 @@ class BlankParser:
         for row in range(27, 31):
             if self.get_slot_or_count_number_from_string(self._matrix[row][2]):
                 breaks.append(
-                    CreateOrUpdateBreaks(
+                    events.CreateOrUpdateBreaks(
                         game_id=self._game_id,
                         count=self.get_slot_or_count_number_from_string(self._matrix[row][2]),
                         slot_from=self.get_slot_or_count_number_from_string(self._matrix[row][3]),

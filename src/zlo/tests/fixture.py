@@ -72,7 +72,7 @@ def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
         houses.append(
             House(
                 player_id=player.player_id,
-                role=ClassicRole.citizen,
+                role=ClassicRole.citizen.value,
                 game_id=game_id,
                 slot=i,
                 house_id=f'{i}_house_id_test',
@@ -86,15 +86,15 @@ def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
     # This 4 roles will be updated on slots based on number
     if randomize_roles:
         roles = random.sample(range(1, 11), k=4)
-        houses[roles[0]].role = ClassicRole.sheriff
-        houses[roles[1]].role = ClassicRole.don
-        houses[roles[2]].role = ClassicRole.mafia
-        houses[roles[3]].role = ClassicRole.mafia
+        houses[roles[0]].role = ClassicRole.sheriff.value
+        houses[roles[1]].role = ClassicRole.don.value
+        houses[roles[2]].role = ClassicRole.mafia.value
+        houses[roles[3]].role = ClassicRole.mafia.value
     else:
-        houses[0].role = ClassicRole.sheriff
-        houses[1].role = ClassicRole.don
-        houses[2].role = ClassicRole.mafia
-        houses[3].role = ClassicRole.mafia
+        houses[0].role = ClassicRole.sheriff.value
+        houses[1].role = ClassicRole.don.value
+        houses[2].role = ClassicRole.mafia.value
+        houses[3].role = ClassicRole.mafia.value
 
     return houses
 

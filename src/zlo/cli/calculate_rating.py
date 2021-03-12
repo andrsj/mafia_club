@@ -14,7 +14,7 @@ from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.model import Game
 from zlo.domain.types import Result
 from zlo.domain.utils import create_parser_for_date_range
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
 
@@ -143,8 +143,8 @@ if __name__ == '__main__':
             results = calculator.rating_for_all_games()
         if arguments.start_date_of_day and arguments.end_date_of_day:
             results = calculator.rating_in_daterange(
-                datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
-                datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
+                datetime.strptime(arguments.start_date_of_day, DATE_FORMAT),
+                datetime.strptime(arguments.end_date_of_day, DATE_FORMAT)
             )
 
         sheet = client.client.open(title='Statistic')

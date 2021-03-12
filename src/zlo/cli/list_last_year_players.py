@@ -11,7 +11,7 @@ from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.adapters.bootstrap import bootstrap
 from zlo.domain import model
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     )
 
     arguments = parser.parse_args()
-    day = datetime.strptime(arguments.start_date_of_day, DATA_FORMAT)
+    day = datetime.strptime(arguments.start_date_of_day, DATE_FORMAT)
 
     with uowm.start() as tx:
         players: List[model.Player] = tx.players.all()
@@ -81,7 +81,7 @@ if __name__ == '__main__':
             Cell(
                 row=i,
                 col=2,
-                value=info[1].strftime(DATA_FORMAT),
+                value=info[1].strftime(DATE_FORMAT),
             )
         )
 

@@ -16,7 +16,7 @@ from zlo.domain.utils import (
     get_submatrix,
     daterange,
 )
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 from zlo.cli.blanks_checker import BlankChecker, make_request_for_marking_blank
 from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         # --year=2020 --month="Жовтень" --full
         if arguments.month and arguments.year:
             name_sheets = [
-                single_date.strftime(DATA_FORMAT)
+                single_date.strftime(DATE_FORMAT)
                 for single_date in date_range_in_month(arguments.year, arguments.month)
             ]
 
@@ -175,9 +175,9 @@ if __name__ == "__main__":
         # --start="01/01/2020" --end="31/12/2020"
         if arguments.start_date_of_day and arguments.end_date_of_day:
             name_sheets = [
-                date.strftime(DATA_FORMAT) for date in daterange(
-                    datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
-                    datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
+                date.strftime(DATE_FORMAT) for date in daterange(
+                    datetime.strptime(arguments.start_date_of_day, DATE_FORMAT),
+                    datetime.strptime(arguments.end_date_of_day, DATE_FORMAT)
                 )
             ]
 

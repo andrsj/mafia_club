@@ -13,7 +13,7 @@ from zlo.sheet_parser.blank_version_2 import BlankParser
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.domain.utils import get_url, get_submatrix, drive_file_list
 from zlo.domain.infrastructure import UnitOfWorkManager
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker, daterange
 
@@ -197,16 +197,16 @@ if __name__ == '__main__':
     name_sheets = None
     if arguments.year and arguments.month:
         name_sheets = [
-            single_date.strftime(DATA_FORMAT)
+            single_date.strftime(DATE_FORMAT)
             for single_date in date_range_in_month(arguments.year, arguments.month)
         ]
 
     if arguments.end_date_of_day and arguments.start_date_of_day:
         name_sheets = [
-            single_date.strftime(DATA_FORMAT)
+            single_date.strftime(DATE_FORMAT)
             for single_date in daterange(
-                datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
-                datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
+                datetime.strptime(arguments.start_date_of_day, DATE_FORMAT),
+                datetime.strptime(arguments.end_date_of_day, DATE_FORMAT)
             )
         ]
 

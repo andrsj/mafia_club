@@ -12,7 +12,7 @@ from zlo.credentials.config import (
     FOLDER_ID,
     credentials
 )
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 
 drive = build(API_NAME, API_VERSION, credentials=credentials)
 
@@ -148,7 +148,7 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
     })
 
 def create_copy_spreadsheet(datetime_of_day: datetime):
-    date_string = datetime_of_day.strftime(DATA_FORMAT)
+    date_string = datetime_of_day.strftime(DATE_FORMAT)
     files_in_parent_folder = get_all_files_in_folder(folder_id=FOLDER_ID)
 
     # We get files from root folder 'Рейтинг/Бланки'
@@ -204,8 +204,8 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
 
     dates = get_the_specified_days_by_dates(
-        start_date=datetime.strptime(arguments.start_date_of_day, DATA_FORMAT),
-        end_date=datetime.strptime(arguments.end_date_of_day, DATA_FORMAT)
+        start_date=datetime.strptime(arguments.start_date_of_day, DATE_FORMAT),
+        end_date=datetime.strptime(arguments.end_date_of_day, DATE_FORMAT)
     )
     for date in dates:
         create_copy_spreadsheet(datetime_of_day=date)

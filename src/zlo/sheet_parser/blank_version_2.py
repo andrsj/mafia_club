@@ -5,7 +5,7 @@ from datetime import datetime
 from zlo.domain import events
 from zlo.domain.types import AdvancedGameResult, ClassicRole
 from zlo.domain.types import GameResult
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 
 
 class NotFinishedBlank(Exception):
@@ -70,7 +70,7 @@ class BlankParser:
         game_result, advanced_game_result = self.parse_game_result()
 
         try:
-            date = datetime.strptime(sheet_title, DATA_FORMAT)
+            date = datetime.strptime(sheet_title, DATE_FORMAT)
         except ValueError:
             raise WrongDateFormat
 

@@ -10,7 +10,7 @@ import inject
 from zlo.domain.utils import create_parser_for_date_range
 from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.adapters.bootstrap import bootstrap
-from zlo.domain.config import DATA_FORMAT
+from zlo.domain.config import DATE_FORMAT
 from zlo.domain import model
 
 from zlo.cli.setup_env_for_test import setup_env_with_test_database

@@ -5,6 +5,7 @@ from collections import defaultdict
 
 from zlo.domain import model
 from zlo.domain.mmr_calculators.base_rule import BaseRuleMMR
+from zlo.domain import types
 from zlo.domain.mmr_calculators.constants import (
     BONUS_FOR_2_GUESS_MAFIA_IN_BEST_MOVE,
     BONUS_FOR_3_GUESS_MAFIA_IN_BEST_MOVE
@@ -33,10 +34,20 @@ class BestMoveRule(BaseRuleMMR):
             ]
 
             best_house = next(house for house in self.houses if house.house_id == self.best_move.killed_house)
-            if len([house for house in houses_from_best_move if house.role in (1, 3)]) == 2:
+            if len(
+                [
+                    house for house in houses_from_best_move
+                    if house.role in (types.ClassicRole.don.value, types.ClassicRole.mafia.value)
+                ]
+            ) == 2:
                 result[best_house.player_id] += self.bonus_mmr_2
 
-            if len([house for house in houses_from_best_move if house.role in (1, 3)]) == 3:
+            if len(
+                [
+                    house for house in houses_from_best_move
+                    if house.role in (types.ClassicRole.don.value, types.ClassicRole.mafia.value)
+                ]
+            ) == 3:
                 result[best_house.player_id] += self.bonus_mmr_3
 
         return result

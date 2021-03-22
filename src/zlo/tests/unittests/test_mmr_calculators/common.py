@@ -2,6 +2,7 @@ from typing import List
 
 
 from zlo.domain.model import House
+from zlo.domain.game_info_builder import GameInfoBuilder
 from zlo.tests.fakes import FakeUnitOfWorkManager
 from zlo.tests.fixture import prepare_game, generate_ten_slots_for_game
 
@@ -20,3 +21,7 @@ class BaseTestMMRCalculator:
 
         for house in self.houses:
             self._uowm.sess.houses.add(house)
+
+        self.game_builder = GameInfoBuilder().\
+            with_game(game=self.game).\
+            with_houses(houses=self.houses)

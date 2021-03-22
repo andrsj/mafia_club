@@ -1,7 +1,7 @@
 import datetime
 import uuid
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Optional, List
 
 from zlo.domain import types
 
@@ -388,3 +388,24 @@ class Season:
     name: str
     start: datetime
     end: datetime
+
+
+@dataclass
+class GameInfo:
+    game: Optional[Game] = None
+    best_move: Optional[BestMove] = None
+    hand_of_mafia: Optional[HandOfMafia] = None
+    kills: List[Kills] = field(default_factory=list)
+    votes: List[Voted] = field(default_factory=list)
+    houses: List[House] = field(default_factory=list)
+    breaks: List[Break] = field(default_factory=list)
+    misses: List[Misses] = field(default_factory=list)
+    devises: List[Devise] = field(default_factory=list)
+    don_checks: List[DonChecks] = field(default_factory=list)
+    disqualifieds: List[Disqualified] = field(default_factory=list)
+    sheriff_checks: List[SheriffChecks] = field(default_factory=list)
+    sheriff_versions: List[SheriffVersion] = field(default_factory=list)
+    bonuses_from_heading: List[BonusHeading] = field(default_factory=list)
+    nominated_for_best: List[NominatedForBest] = field(default_factory=list)
+    bonuses_from_players: List[BonusFromPlayers] = field(default_factory=list)
+    bonuses_for_tolerant: List[BonusTolerantFromPlayers] = field(default_factory=list)

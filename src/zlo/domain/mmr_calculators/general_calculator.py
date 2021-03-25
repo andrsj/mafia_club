@@ -9,7 +9,8 @@ from zlo.domain.model import Game
 
 class GameMMRCalculator:
     rules = [
-        mmr.BestMoveRule
+        mmr.BestMoveRule,
+        mmr.ThreeVotedRule
     ]
 
     def __init__(self, uowm: UnitOfWorkManager):

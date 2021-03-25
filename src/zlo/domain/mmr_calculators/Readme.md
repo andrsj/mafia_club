@@ -8,4 +8,14 @@ List of this rules:
    Points for this rule (`constants.py`):  
    `BONUS_FOR_2_GUESS_MAFIA_IN_BEST_MOVE` for 2 guessing  
    `BONUS_FOR_3_GUESS_MAFIA_IN_BEST_MOVE` for 3 guessing
+   
+ - Three voted:
+   Calculate MMR for this rule:  
+   In round with 9 players 3 citizens were voted  
+   Citizens will get -2 MMR points (without first killed)  
+   Mafias will get +2 MMR to points  
+   
+   Points for this rule (`constants.py`):  
+   `BONUS_FOR_VOTED_THREE_CITIZEN_TO_MAFIA` for mafias bonus  
+   `BONUS_FOR_VOTED_THREE_CITIZEN_TO_CITIZEN` for citizen  
  - e.t.c.

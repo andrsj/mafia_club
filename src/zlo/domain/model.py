@@ -84,6 +84,9 @@ class House:
             )
         )
 
+    def __hash__(self):
+        return hash((self.house_id, self.player_id, self.role, self.slot, self.game_id))
+
 
 @dataclass
 class BestMove:

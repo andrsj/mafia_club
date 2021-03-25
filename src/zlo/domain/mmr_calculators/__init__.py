@@ -1,1 +1,2 @@
 from zlo.domain.mmr_calculators.best_move_calculator import BestMoveRule
+from zlo.domain.mmr_calculators.three_voted_calculator import ThreeVotedRule

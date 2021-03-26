@@ -1,4 +1,4 @@
-This module package has a lot of rules for calculating MMR for games
+This module package has a lot of rules for calculating MMR for games  
 List of this rules:  
  - Best Move:  
    Calculate MMR for this rule:  
@@ -7,11 +7,19 @@ List of this rules:
    
    Points for this rule (`constants.py`):  
    `BONUS_FOR_2_GUESS_MAFIA_IN_BEST_MOVE` for 2 guessing  
-   `BONUS_FOR_3_GUESS_MAFIA_IN_BEST_MOVE` for 3 guessing
-
- - Sheriff play:
+   `BONUS_FOR_3_GUESS_MAFIA_IN_BEST_MOVE` for 3 guessing  
+ 
+ - Best Player:  
    Calculate MMR for this rule:  
-   If sheriff player won game - he will get 1 point MMR bonus
+   If player get 3 and more bonuses from other player  
+   He will get 1 point bonus to his MMR  
+   
+   Points for this rule ():  
+   `BONUS_FOR_BEST_PLAYER` for 3 bonuses from other  
+
+ - Sheriff play:  
+   Calculate MMR for this rule:  
+   If sheriff player won game - he will get 1 point MMR bonus  
    
    Points for this rule (`constants.py`):  
    `BONUS_FOR_SHERIFF_PLAY` for sheriff play  
@@ -27,10 +35,10 @@ List of this rules:
    Calculate MMR bonus for this rule:  
    If mafia play like sheriff and her team win - he will get 1 mmr point  
    
-   Points for this rule (`constants.py`):
-   `BONUS_FOR_PLAYING_LIKE_SHERIFF` for playing and winning
+   Points for this rule (`constants.py`):  
+   `BONUS_FOR_PLAYING_LIKE_SHERIFF` for playing and winning  
    
- - Three voted:
+ - Three voted:  
    Calculate MMR for this rule:  
    In round with 9 players 3 citizens were voted  
    Citizens will get -2 MMR points (without first killed)  
@@ -40,4 +48,4 @@ List of this rules:
    `BONUS_FOR_VOTED_THREE_CITIZEN_TO_MAFIA` for mafias bonus  
    `BONUS_FOR_VOTED_THREE_CITIZEN_TO_CITIZEN` for citizen  
 
- - e.t.c.
+ - e.t.c.  

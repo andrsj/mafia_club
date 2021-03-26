@@ -8,6 +8,13 @@ List of this rules:
    Points for this rule (`constants.py`):  
    `BONUS_FOR_2_GUESS_MAFIA_IN_BEST_MOVE` for 2 guessing  
    `BONUS_FOR_3_GUESS_MAFIA_IN_BEST_MOVE` for 3 guessing
+
+ - Sheriff play:
+   Calculate MMR for this rule:  
+   If sheriff player won game - he will get 1 point MMR bonus
+   
+   Points for this rule (`constants.py`):  
+   `BONUS_FOR_SHERIFF_PLAY` for sheriff play  
    
  - Miss:  
    Calculate MMR for this rule:  
@@ -32,5 +39,5 @@ List of this rules:
    Points for this rule (`constants.py`):  
    `BONUS_FOR_VOTED_THREE_CITIZEN_TO_MAFIA` for mafias bonus  
    `BONUS_FOR_VOTED_THREE_CITIZEN_TO_CITIZEN` for citizen  
- 
+
  - e.t.c.

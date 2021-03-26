@@ -1,5 +1,6 @@
 This module package has a lot of rules for calculating MMR for games  
 List of this rules:  
+
  - Best Move:  
    Calculate MMR for this rule:  
    If in best move player has 2 mafia - he will get 2 MMR bonus  
@@ -8,13 +9,24 @@ List of this rules:
    Points for this rule (`constants.py`):  
    `BONUS_FOR_2_GUESS_MAFIA_IN_BEST_MOVE` for 2 guessing  
    `BONUS_FOR_3_GUESS_MAFIA_IN_BEST_MOVE` for 3 guessing  
+   
+ - Bonus heading:
+   Calculate MMR for this rule:  
+   If player got 0.1 - 0.2 points from heading - we will get 1 point MMR  
+   Else if player got 0.3 - 0.4 points from heading - we will get 2 point MMR  
+   Else if player got more than 0.5 points from heading - we will get 3 point MMR  
+   
+   Points for this rule (`constants.py`):  
+   `LOW_BONUS_FROM_HEADING` for 0.1-0.2 points  
+   `MIDDLE_BONUS_FROM_HEADING` for 0.3-0.4 points  
+   `HIGH_BONUS_FROM_HEADING` for > 0.5 points  
  
  - Best Player:  
    Calculate MMR for this rule:  
    If player get 3 and more bonuses from other player  
    He will get 1 point bonus to his MMR  
    
-   Points for this rule ():  
+   Points for this rule (`constants.py`):  
    `BONUS_FOR_BEST_PLAYER` for 3 bonuses from other  
 
  - Sheriff play:  

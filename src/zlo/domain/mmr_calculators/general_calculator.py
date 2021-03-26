@@ -10,6 +10,7 @@ from zlo.domain.model import Game
 class GameMMRCalculator:
     rules = [
         mmr.BestMoveRule,
+        mmr.BonusFromHeadingRule,
         mmr.BestPlayerRule,
         mmr.SheriffPlayRule,
         mmr.MissRule,

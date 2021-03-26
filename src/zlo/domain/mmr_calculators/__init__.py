@@ -1,4 +1,5 @@
 from zlo.domain.mmr_calculators.best_move_calculator import BestMoveRule
+from zlo.domain.mmr_calculators.sheriff_play_calculator import SheriffPlayRule
 from zlo.domain.mmr_calculators.miss_calculator import MissRule
 from zlo.domain.mmr_calculators.sheriff_version_calculator import SheriffVersionRule
 from zlo.domain.mmr_calculators.three_voted_calculator import ThreeVotedRule

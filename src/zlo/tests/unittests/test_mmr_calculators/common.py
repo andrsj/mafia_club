@@ -1,4 +1,5 @@
 from typing import List
+import uuid
 
 
 from zlo.domain.model import House
@@ -25,3 +26,10 @@ class BaseTestMMRCalculator:
         self.game_builder = GameInfoBuilder().\
             with_game(game=self.game).\
             with_houses(houses=self.houses)
+
+    def cleanup(self):
+        self._uowm.sess.clean_all()
+
+
+def generate_uuid():
+    return str(uuid.uuid4())

@@ -10,6 +10,7 @@ from zlo.domain.model import Game
 class GameMMRCalculator:
     rules = [
         mmr.BestMoveRule,
+        mmr.SheriffVersionRule,
         mmr.ThreeVotedRule
     ]
 

@@ -3,7 +3,7 @@ from expects import expect, equal, have_key
 
 from zlo.domain.model import Voted, Kills
 from zlo.domain.mmr_calculators import ThreeVotedRule
-from zlo.tests.unittests.test_mmr_calculators.common import BaseTestMMRCalculator
+from zlo.tests.unittests.test_mmr_calculators.common import BaseTestMMRCalculator, generate_uuid
 
 
 class WhenMafiaWinWithFirstNightKill(BaseTestMMRCalculator):
@@ -12,14 +12,14 @@ class WhenMafiaWinWithFirstNightKill(BaseTestMMRCalculator):
         self.game.result = 2  # Mafia
         first_night_kill = Kills(
             game_id=self.game.game_id,
-            kill_id='kill_id_1',
+            kill_id=generate_uuid(),
             circle_number=1,
             killed_house_id=self.houses[5].house_id
         )
         votes = [
             Voted(
                 game_id=self.game.game_id,
-                voted_id=f'voted_id_{i}',
+                voted_id=generate_uuid(),
                 day=2,
                 house_id=self.houses[i].house_id
             )
@@ -54,7 +54,7 @@ class WhenMafiaWinWithoutFirstNightKill(BaseTestMMRCalculator):
         votes = [
             Voted(
                 game_id=self.game.game_id,
-                voted_id=f'voted_id_{i}',
+                voted_id=generate_uuid(),
                 day=2,
                 house_id=self.houses[i].house_id
             )
@@ -84,7 +84,7 @@ class WhenCitizenWin(BaseTestMMRCalculator):
         votes = [
             Voted(
                 game_id=self.game.game_id,
-                voted_id=f'voted_id_{i}',
+                voted_id=generate_uuid(),
                 day=2,
                 house_id=self.houses[i].house_id
             )

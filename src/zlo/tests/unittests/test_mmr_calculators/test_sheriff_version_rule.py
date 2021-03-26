@@ -3,7 +3,7 @@ from expects import expect, equal, have_key
 
 from zlo.domain.model import SheriffVersion
 from zlo.domain.mmr_calculators import SheriffVersionRule
-from zlo.tests.unittests.test_mmr_calculators.common import BaseTestMMRCalculator
+from zlo.tests.unittests.test_mmr_calculators.common import BaseTestMMRCalculator, generate_uuid
 
 
 class WhenMafiaWin(BaseTestMMRCalculator):
@@ -13,7 +13,7 @@ class WhenMafiaWin(BaseTestMMRCalculator):
         sheriff_versions = [
             SheriffVersion(
                 game_id=self.game.game_id,
-                sheriff_version_id=f'sheriff_version_id_{i}',
+                sheriff_version_id=generate_uuid(),
                 house=self.houses[i].house_id
             )
             for i in range(3)
@@ -41,7 +41,7 @@ class WhenCitizenWin(BaseTestMMRCalculator):
         sheriff_versions = [
             SheriffVersion(
                 game_id=self.game.game_id,
-                sheriff_version_id=f'sheriff_version_id_{i}',
+                sheriff_version_id=generate_uuid(),
                 house=self.houses[i].house_id
             )
             for i in range(3)

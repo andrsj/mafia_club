@@ -1,4 +1,4 @@
-from expects import expect, equal, have_key
+from expects import expect, equal, have_key, have_keys
 
 
 from zlo.domain.mmr_calculators import SheriffPlayRule
@@ -16,6 +16,11 @@ class WhenSheriffWon(BaseTestMMRCalculator):
 
     def it_should_add_mmr_points_to_sheriff(self):
         expect(self.new_rating[self.houses[0].player_id]).to(equal(SheriffPlayRule.bonus_mmr))
+
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) != 0)
+        ))
 
 
 class WhenSheriffLost(BaseTestMMRCalculator):

@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 from datetime import timedelta, date, datetime
 from calendar import monthrange
-from typing import List
+from typing import List, Optional
 import argparse
 
 
 from googleapiclient.discovery import Resource
+
+
+from zlo.domain.model import House, Game
+from zlo.domain.types import GameResult, ClassicRole
 
 months = [
     'Січень',
@@ -21,6 +25,27 @@ months = [
     'Листопад',
     'Грудень'
 ]
+
+def get_houses_from_list_of_house_ids(houses: List[House], ids: List[str]) -> List[House]:
+    return list(filter(lambda h: h.house_id in ids, houses))
+
+def get_house_from_list_by_house_id(houses: List[House], house_id: str) -> Optional[House]:
+    return next(filter(lambda h: h.house_id == house_id, houses), None)
+
+def is_sheriff(house: House) -> bool:
+    return house.role == ClassicRole.sheriff.value
+
+def is_citizen(house: House) -> bool:
+    return house.role in (ClassicRole.citizen.value, ClassicRole.sheriff.value)
+
+def is_mafia(house: House) -> bool:
+    return house.role in (ClassicRole.don.value, ClassicRole.mafia.value)
+
+def is_mafia_win(game: Game) -> bool:
+    return game.result == GameResult.mafia.value
+
+def is_citizen_win(game: Game) -> bool:
+    return game.result == GameResult.citizen.value
 
 def drive_file_list(files: Resource, fields: str = "files(id, mimeType, name, permissions), nextPageToken"):
     """

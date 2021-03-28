@@ -29,7 +29,7 @@ def get_mmr(uowm: UnitOfWorkManager, start_date: datetime, end_date: datetime, c
     gameMMRcalculator = GameMMRCalculator(uowm=uowm)
     for game in filter(lambda g: g.club == clubname, games):
 
-        delta_rating = gameMMRcalculator.calculate_mmr(game)
+        delta_rating = gameMMRcalculator.calculate_mmr(game, final_result)
 
         for uuid in delta_rating:
             final_result[uuid] += delta_rating[uuid]
@@ -58,7 +58,8 @@ if __name__ == '__main__':
         start_date=start,
         # end_date=datetime.strptime(args.end_date_of_day, DATA_FORMAT),
         end_date=end,
-        clubname='ZLO'  # ZLO | Школа Зло
+        clubname='Школа Зло'  # ZLO | Школа Зло
     )
 
-    pprint(rating)
+    for i, j in sorted(rating.items(), key=lambda x: x[1]):
+        print(i, j)

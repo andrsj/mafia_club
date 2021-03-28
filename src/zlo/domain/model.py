@@ -97,6 +97,10 @@ class BestMove:
     best_2: Optional[types.HouseID]
     best_3: Optional[types.HouseID]
 
+    @property
+    def choosen_houses(self):
+        return self.best_1, self.best_2, self.best_3
+
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             raise ValueError(f'Cant compare {self.__class__} with {type(other)}')
@@ -170,6 +174,10 @@ class Devise:
     house_1: Optional[types.HouseID]
     house_2: Optional[types.HouseID]
     house_3: Optional[types.HouseID]
+
+    @property
+    def choosen_houses(self):
+        return self.house_1, self.house_2, self.house_3
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

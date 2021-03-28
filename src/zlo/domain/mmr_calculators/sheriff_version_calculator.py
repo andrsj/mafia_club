@@ -1,17 +1,18 @@
-from typing import List
+from typing import List, Optional
 from collections import defaultdict
 
-from zlo.domain import model, types
-from zlo.domain.mmr_calculators.base_rule import BaseRuleMMR
+from zlo.domain.model import House
+from zlo.domain.mmr_calculators.base_rule import BaseRuleMMR, Rating
 from zlo.domain.mmr_calculators.constants import BONUS_FOR_PLAYING_LIKE_SHERIFF
+from zlo.domain.utils import is_mafia_win, is_mafia
 
 
 class SheriffVersionRule(BaseRuleMMR):
 
     bonus_mmr = BONUS_FOR_PLAYING_LIKE_SHERIFF
 
-    def calculate_mmr(self):
-        if self.game_info.game.result != types.GameResult.mafia.value:
+    def calculate_mmr(self, rating: Optional[Rating] = None):
+        if not is_mafia_win(self.game_info.game):
             return {}
 
         if not self.game_info.sheriff_versions:
@@ -20,15 +21,9 @@ class SheriffVersionRule(BaseRuleMMR):
         result = defaultdict(int)
 
         # Get all mafias
-        black_houses_for_game: List[model.House] = [
-            house for house in self.game_info.houses
-            if house.role in (
-                types.ClassicRole.mafia.value,
-                types.ClassicRole.don.value
-            )
-        ]
+        black_houses: List[House] = [house for house in self.game_info.houses if is_mafia(house)]
 
-        for house in black_houses_for_game:
+        for house in black_houses:
             # Check if mafia house was in sheriff version
             if house.house_id in [version.house for version in self.game_info.sheriff_versions]:
                 result[house.player_id] += self.bonus_mmr

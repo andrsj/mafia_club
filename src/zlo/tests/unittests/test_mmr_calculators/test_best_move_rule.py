@@ -1,4 +1,4 @@
-from expects import expect, equal
+from expects import expect, equal, have_keys
 
 
 from zlo.domain.model import BestMove
@@ -6,7 +6,7 @@ from zlo.domain.mmr_calculators import BestMoveRule
 from zlo.tests.unittests.test_mmr_calculators.common import BaseTestMMRCalculator, generate_uuid
 
 
-class WhenBestMoveHasThreeMafiaIsCalculating(BaseTestMMRCalculator):
+class WhenBestMoveHasThreeMafia(BaseTestMMRCalculator):
 
     def given_game_for_rating(self):
         best_move = BestMove(
@@ -25,11 +25,16 @@ class WhenBestMoveHasThreeMafiaIsCalculating(BaseTestMMRCalculator):
     def because_rule_process_game(self):
         self.new_rating = self.rule.calculate_mmr()
 
-    def it_should_calculate_rating(self):
+    def it_should_add_rating_to_killed_player(self):
         expect(self.new_rating[self.houses[4].player_id]).to(equal(BestMoveRule.bonus_mmr_3))
 
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) != 4)
+        ))
 
-class WhenBestMoveHasTwoMafiaIsCalculating(BaseTestMMRCalculator):
+
+class WhenBestMoveHasTwoMafia(BaseTestMMRCalculator):
 
     def given_game_for_rating(self):
         best_move = BestMove(
@@ -47,11 +52,16 @@ class WhenBestMoveHasTwoMafiaIsCalculating(BaseTestMMRCalculator):
     def because_rule_process_game(self):
         self.new_rating = self.rule.calculate_mmr()
 
-    def it_should_calculate_rating(self):
+    def it_should_add_rating_to_killed_player(self):
         expect(self.new_rating[self.houses[4].player_id]).to(equal(BestMoveRule.bonus_mmr_2))
 
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) != 4)
+        ))
 
-class WhenBestMoveHasOneEmptyIsCalculating(BaseTestMMRCalculator):
+
+class WhenBestMoveHasOneEmpty(BaseTestMMRCalculator):
 
     def given_game_for_rating(self):
         best_move = BestMove(
@@ -69,11 +79,16 @@ class WhenBestMoveHasOneEmptyIsCalculating(BaseTestMMRCalculator):
     def because_rule_process_game(self):
         self.new_rating = self.rule.calculate_mmr()
 
-    def it_should_calculate_rating(self):
+    def it_should_add_rating_to_killed_player(self):
         expect(self.new_rating[self.houses[4].player_id]).to(equal(BestMoveRule.bonus_mmr_2))
 
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) != 4)
+        ))
 
-class WhenBestMoveNoOneGuessedIsCalculating(BaseTestMMRCalculator):
+
+class WhenBestMoveNoOneGuessed(BaseTestMMRCalculator):
 
     def given_game_for_rating(self):
         best_move = BestMove(
@@ -95,7 +110,7 @@ class WhenBestMoveNoOneGuessedIsCalculating(BaseTestMMRCalculator):
         expect(self.new_rating).to(equal({}))
 
 
-class WhenBestMoveOnlyOneGuessedIsCalculating(BaseTestMMRCalculator):
+class WhenBestMoveOnlyOneGuessed(BaseTestMMRCalculator):
 
     def given_game_for_rating(self):
         best_move = BestMove(

@@ -1,3 +1,5 @@
+from uuid import UUID
+from typing import Dict
 from collections import defaultdict
 
 
@@ -9,13 +11,18 @@ from zlo.domain.model import Game
 
 class GameMMRCalculator:
     rules = [
-        mmr.BestMoveRule,
-        mmr.BonusFromHeadingRule,
-        mmr.BestPlayerRule,
-        mmr.SheriffPlayRule,
+        mmr.GameWinnerRule,  # First RULE!
         mmr.MissRule,
+        mmr.DeviseRule,
+        mmr.BestMoveRule,
+        mmr.ThreeVotedRule,
+        mmr.WrongBreakRule,
+        mmr.BestPlayerRule,
+        mmr.HandOfMafiaRule,
+        mmr.SheriffPlayRule,
+        mmr.DisqualifieldRule,
         mmr.SheriffVersionRule,
-        mmr.ThreeVotedRule
+        mmr.BonusFromHeadingRule,
     ]
 
     def __init__(self, uowm: UnitOfWorkManager):
@@ -44,13 +51,13 @@ class GameMMRCalculator:
                 with_bonuses_for_tolerant(bonuses=tx.bonuses_tolerant.get_by_game_id(game.game_id)).\
                 build()
 
-    def calculate_mmr(self, game: Game):
+    def calculate_mmr(self, game: Game, rating: Dict[UUID, int]):
         delta_rating = defaultdict(int)
 
         game_info = self.get_game_info(game)
 
         for rule in self.rules:
-            delta_by_one_rule = rule(game_info).calculate_mmr()
+            delta_by_one_rule = rule(game_info).calculate_mmr(rating)
 
             for uuid in delta_by_one_rule:
                 delta_rating[uuid] += delta_by_one_rule[uuid]

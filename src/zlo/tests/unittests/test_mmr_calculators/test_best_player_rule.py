@@ -1,4 +1,4 @@
-from expects import expect, equal
+from expects import expect, equal, have_keys
 
 
 from zlo.domain.model import BonusFromPlayers
@@ -28,6 +28,11 @@ class WhenPlayerGetThreeAndMoreBonuses(BaseTestMMRCalculator):
 
     def it_should_add_points_to_best_player(self):
         expect(self.new_rating[self.houses[4].player_id]).to(equal(BestPlayerRule.bonus_mmr))
+
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) != 4)
+        ))
 
 
 class WhenBestPLayersWereTwo(BaseTestMMRCalculator):
@@ -61,3 +66,8 @@ class WhenBestPLayersWereTwo(BaseTestMMRCalculator):
     def it_should_add_points_to_best_player(self):
         expect(self.new_rating[self.houses[4].player_id]).to(equal(BestPlayerRule.bonus_mmr))
         expect(self.new_rating[self.houses[5].player_id]).to(equal(BestPlayerRule.bonus_mmr))
+
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) not in (4, 5))
+        ))

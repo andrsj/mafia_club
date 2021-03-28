@@ -1,4 +1,4 @@
-from expects import expect, equal, have_key
+from expects import expect, equal, have_key, have_keys
 
 
 from zlo.domain.model import SheriffVersion
@@ -32,6 +32,11 @@ class WhenMafiaWin(BaseTestMMRCalculator):
 
     def it_should_skip_real_sheriff(self):
         expect(self.new_rating).not_to(have_key(self.houses[0].player_id))
+
+    def it_should_miss_other_players(self):
+        expect(self.new_rating).not_to(have_keys(
+            (house.player_id for house in self.houses if self.houses.index(house) not in (1, 2))
+        ))
 
 
 class WhenCitizenWin(BaseTestMMRCalculator):

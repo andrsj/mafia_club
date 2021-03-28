@@ -1,4 +1,4 @@
-from expects import expect, equal, have_key
+from expects import expect, equal, have_key, have_keys
 
 
 from zlo.domain.model import Voted, Kills
@@ -40,11 +40,14 @@ class WhenMafiaWinWithFirstNightKill(BaseTestMMRCalculator):
 
     def it_should_remove_points_to_citizens_players(self):
         for house in filter(lambda h: h.slot != 6 and h.role in (0, 2), self.houses):  # Citizen
-            expect(self.new_rating[house.player_id]).to(equal(ThreeVotedRule.minus_bonus_mmr))
+            expect(self.new_rating[house.player_id]).to(equal(ThreeVotedRule.correlation_mmr))
 
     def it_should_add_points_to_mafias_players(self):
         for house in filter(lambda h: h.role in (1, 3), self.houses):  # Mafia
             expect(self.new_rating[house.player_id]).to(equal(ThreeVotedRule.plus_bonus_mmr))
+
+    def it_should_miss_first_killed_player(self):
+        expect(self.new_rating).not_to(have_key(self.houses[5].player_id))
 
 
 class WhenMafiaWinWithoutFirstNightKill(BaseTestMMRCalculator):
@@ -69,8 +72,8 @@ class WhenMafiaWinWithoutFirstNightKill(BaseTestMMRCalculator):
         self.new_rating = self.rule.calculate_mmr()
 
     def it_should_remove_points_to_citizens_players(self):
-        for house in filter(lambda h: h.slot != 6 and h.role in (0, 2), self.houses):  # Citizen
-            expect(self.new_rating[house.player_id]).to(equal(ThreeVotedRule.minus_bonus_mmr))
+        for house in filter(lambda h: h.role in (0, 2), self.houses):  # Citizen
+            expect(self.new_rating[house.player_id]).to(equal(ThreeVotedRule.correlation_mmr))
 
     def it_should_add_points_to_mafias_players(self):
         for house in filter(lambda h: h.role in (1, 3), self.houses):  # Mafia

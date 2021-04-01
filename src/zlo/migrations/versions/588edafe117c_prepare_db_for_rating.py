@@ -51,8 +51,17 @@ def upgrade():
         remote_cols=['season_id'],
         ondelete='CASCADE'
     )
+    op.add_column(
+        'seasons',
+        sa.Column(
+            'prew_season',
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey('seasons.season_id')
+        )
+    )
 
 def downgrade():
     op.drop_column('rating', 'club')
     op.drop_column('games', 'calculated')
     op.drop_column('games', 'season')
+    op.drop_column('seasons', 'prew_season')

@@ -56,6 +56,11 @@ class Game:
             )
         )
 
+    def __str__(self):
+        return f"Game:\n" \
+               f"\tResult: {self.result}    Club: {self.club}\n" \
+               f"\tTable: {self.table}    Heading: {self.heading}\n" \
+               f"\tDate: {self.date}"
 
 @dataclass
 class House:

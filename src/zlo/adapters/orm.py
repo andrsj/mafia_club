@@ -387,7 +387,7 @@ class DatabaseSchema:
             "breaks",
             self._metadata,
             Column(
-                "devise_id",
+                "break_id",
                 UUID(as_uuid=True),
                 primary_key=True,
                 server_default=sqlalchemy.text("uuid_generate_v4()"),

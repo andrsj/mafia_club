@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import inject
+from time import sleep
 
 from gspread.exceptions import SpreadsheetNotFound
 from googleapiclient.discovery import build
@@ -122,6 +123,8 @@ def parse_and_write_in_db(client_parser, args, list_files):
         sheet.batch_update(body={
             'requests': additional_requests
         })
+
+    sleep(5)
 
 
 if __name__ == "__main__":

@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # args = parser.parse_args()
 
     # start = datetime.strptime(args.start_date_of_day, DATA_FORMAT)
-    start = datetime(2020, 1, 1)
+    start = datetime(2021, 1, 1)
 
     # end = datetime.strptime(args.end_date_of_day, DATA_FORMAT)
     end = datetime(2021, 1, 31)

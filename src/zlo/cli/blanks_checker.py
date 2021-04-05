@@ -118,14 +118,6 @@ def check_bonuses(matrix) -> List[str]:
     return errors
 
 
-def check_data(matrix):
-    if not matrix[0][2]:
-        return ['Відсутня дата в бланку']
-    try:
-        datetime.strptime(matrix[0][2], '%Y-%m-%d')
-    except ValueError:
-        return ['Не вірна дата в бланку']
-
 class BlankChecker:
 
     __checkers_with_db = [
@@ -278,7 +270,7 @@ if __name__ == '__main__':
         if arguments.end_date_of_day and arguments.start_date_of_day:
             sleep(5)
 
-    errors_sheet = client.client.open('Errors')
+    errors_sheet = client.client.open_by_key('1rNX_PVdrTVr2z9N5jCcxoVWLGamByzz18lO6yyg33jQ')
     time_now = datetime.now()
 
     cells = []

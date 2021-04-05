@@ -8,6 +8,7 @@ from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 from zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.credentials.config import LIST_OF_PLAYERS_SPREADSHEET
 from zlo.domain.model import Player
 
 
@@ -83,10 +84,10 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--name',
-        dest='name',
-        help='Name of spreadsheet of players',
-        default='СписокГравців'
+        '--key',
+        dest='key',
+        help='ID of spreadsheet of players',
+        default=LIST_OF_PLAYERS_SPREADSHEET
     )
     args = parser.parse_args()
 
@@ -95,5 +96,5 @@ if __name__ == "__main__":
     bootstrap(cfg)
 
     client = inject.instance(SpreadSheetClient)
-    sheet_players = client.client.open(args.name).sheet1
+    sheet_players = client.client.open_by_key(args.key).sheet1
     save_or_update_players_in_sheet(sheet_players)

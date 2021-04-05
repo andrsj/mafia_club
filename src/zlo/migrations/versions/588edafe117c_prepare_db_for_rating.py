@@ -26,6 +26,13 @@ depends_on = None
 
 def upgrade():
 
+    # Prepare players for data migration
+    players_ids = list()
+
+    # Dates of first season
+    start_day = date(day=1, month=1, year=2021)
+    end_day = date(day=31, month=1, year=2021)
+
     # Table with clubnames
     clubs = op.create_table(
         'clubs',
@@ -58,6 +65,66 @@ def upgrade():
 
     # Update games
     # Add foreign key to club
+
+    session = Session(bind=op.get_bind())
+
+    with session.begin(subtransactions=True):
+
+        # Add player id to update rating table
+        for game in session.query(Game) \
+                .filter(Game.date >= start_day) \
+                .filter(Game.date <= end_day):
+            for house in session.query(House).filter_by(game_id=game.game_id):
+                players_ids.append(house.player_id)
+
+        # Fix [ZLO_CORPORATION to ZLO]
+        for game in session.query(Game):
+            if game.club != "Школа Зло":
+                game.club = "ZLO"
+
+        # Write first season:
+        season = Season(
+            season_id=str(uuid4()),
+            name="First season",
+            start=start_day,
+            end=end_day,
+        )
+        session.add(season)
+
+    # Add rating [default 1200 for 2 clubs]
+    ratings = [
+        Rating(
+            rating_id=str(uuid4()),
+            mmr=1200,
+            player=player_id,
+            season=season.season_id,
+            club='Школа Зло'
+        ) for player_id in list(set(players_ids))
+    ] + [
+        Rating(
+            rating_id=str(uuid4()),
+            mmr=1200,
+            player=player_id,
+            season=season.season_id,
+            club='ZLO'
+        ) for player_id in list(set(players_ids))
+    ]
+
+    # PUSH INTO [without any fkng errors!]
+    op.execute("INSERT INTO rating (rating_id, mmr, player, season, club) VALUES  " + ",".join(
+        [
+            "(\'{}\', {}, \'{}\', \'{}\', \'{}\')".format(
+                rating.rating_id,
+                rating.mmr,
+                rating.player,
+                rating.season,
+                rating.club
+            )
+            for rating in ratings
+        ]
+    ))
+
+    # Add foreign key to club for games
     op.create_foreign_key(
         'fk_clubname_for_games',
         'games',
@@ -66,6 +133,7 @@ def upgrade():
         remote_cols=['name'],
         ondelete='CASCADE'
     )
+
     # Add boolean column to games
     op.add_column(
         'games',
@@ -78,6 +146,7 @@ def upgrade():
     )
     op.execute("UPDATE games SET calculated = false")
     op.alter_column('games', 'calculated', nullable=False)
+
     # Add foreign key to season
     op.add_column(
         'games',
@@ -105,29 +174,6 @@ def upgrade():
         )
     )
 
-    # Write rating for first season:
-
-    players_ids = []
-
-    start_day = date(day=1, month=1, year=2021)
-    end_day = date(day=31, month=1, year=2021)
-
-    session = Session(bind=op.get_bind())
-    with session.begin(subtransactions=True):
-        for game in session.query(Game)\
-                .filter(Game.date >= start_day)\
-                .filter(Game.date <= end_day):
-            for house in session.query(House).filter_by(game_id=game.game_id):
-                players_ids.append(house.player_id)
-
-        season = Season(
-            season_id=str(uuid4()),
-            name="First season",
-            start=start_day,
-            end=end_day,
-        )
-
-    # TODO insert rating
 
 def downgrade():
     op.drop_constraint(constraint_name='fk_clubname_for_games', table_name='games', type_="foreignkey")
@@ -136,4 +182,5 @@ def downgrade():
     op.drop_column('rating', 'club')
     op.drop_column('games', 'calculated')
     op.drop_column('games', 'season')
+    op.execute("TRUNCATE seasons CASCADE")
     op.drop_column('seasons', 'prew_season')

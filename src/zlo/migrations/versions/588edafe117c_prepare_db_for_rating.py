@@ -111,18 +111,19 @@ def upgrade():
     ]
 
     # PUSH INTO [without any fkng errors!]
-    op.execute("INSERT INTO rating (rating_id, mmr, player, season, club) VALUES  " + ",".join(
-        [
-            "(\'{}\', {}, \'{}\', \'{}\', \'{}\')".format(
-                rating.rating_id,
-                rating.mmr,
-                rating.player,
-                rating.season,
-                rating.club
-            )
-            for rating in ratings
-        ]
-    ))
+    if ratings:
+        op.execute("INSERT INTO rating (rating_id, mmr, player, season, club) VALUES  " + ",".join(
+            [
+                "(\'{}\', {}, \'{}\', \'{}\', \'{}\')".format(
+                    rating.rating_id,
+                    rating.mmr,
+                    rating.player,
+                    rating.season,
+                    rating.club
+                )
+                for rating in ratings
+            ]
+        ))
 
     # Add foreign key to club for games
     op.create_foreign_key(

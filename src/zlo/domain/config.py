@@ -3,7 +3,7 @@ from zlo.domain import events
 from zlo.domain import handlers
 
 
-DATE_FORMAT = "%d/%m/%Y"
+DATE_FORMAT = "%d_%m_%Y"
 
 
 def map_handlers(bus: MessageBus):

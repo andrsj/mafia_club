@@ -63,3 +63,12 @@ if __name__ == '__main__':
 
     for i, j in sorted(rating.items(), key=lambda x: x[1]):
         print(i, j)
+
+    with uowm.start() as tx:
+        players = tx.players.all()
+
+    rating = {next(filter(lambda p: p.player_id == i, players)).nickname: j for i, j in rating.items()}
+
+    import json
+    with open('rating.json', 'w') as json_file:
+        json.dump(rating, json_file, indent=4, ensure_ascii=False)

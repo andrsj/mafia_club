@@ -49,7 +49,7 @@ if __name__ == '__main__':
     start = datetime(2021, 1, 1)
 
     # end = datetime.strptime(args.end_date_of_day, DATA_FORMAT)
-    end = datetime(2021, 1, 31)
+    end = datetime(2021, 4, 4)
 
     uowm = inject.instance(UnitOfWorkManager)
     rating = get_mmr(
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         start_date=start,
         # end_date=datetime.strptime(args.end_date_of_day, DATA_FORMAT),
         end_date=end,
-        clubname='Школа Зло'  # ZLO | Школа Зло
+        clubname='ZLO'  # ZLO | Школа Зло
     )
 
     for i, j in sorted(rating.items(), key=lambda x: x[1]):

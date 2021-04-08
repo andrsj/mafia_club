@@ -46,10 +46,10 @@ if __name__ == '__main__':
     # args = parser.parse_args()
 
     # start = datetime.strptime(args.start_date_of_day, DATA_FORMAT)
-    start = datetime(2020, 1, 1)
+    start = datetime(2021, 1, 1)
 
     # end = datetime.strptime(args.end_date_of_day, DATA_FORMAT)
-    end = datetime(2021, 1, 31)
+    end = datetime(2021, 4, 4)
 
     uowm = inject.instance(UnitOfWorkManager)
     rating = get_mmr(
@@ -58,8 +58,17 @@ if __name__ == '__main__':
         start_date=start,
         # end_date=datetime.strptime(args.end_date_of_day, DATA_FORMAT),
         end_date=end,
-        clubname='Школа Зло'  # ZLO | Школа Зло
+        clubname='ZLO'  # ZLO | Школа Зло
     )
 
     for i, j in sorted(rating.items(), key=lambda x: x[1]):
         print(i, j)
+
+    with uowm.start() as tx:
+        players = tx.players.all()
+
+    rating = {next(filter(lambda p: p.player_id == i, players)).nickname: j for i, j in rating.items()}
+
+    import json
+    with open('rating.json', 'w') as json_file:
+        json.dump(rating, json_file, indent=4, ensure_ascii=False)

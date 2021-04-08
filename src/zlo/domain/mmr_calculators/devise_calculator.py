@@ -58,6 +58,8 @@ class DeviseRule(BaseRuleMMR):
                 continue
 
             amount_of_houses_in_devise = len(choosed_houses)
+            if not amount_of_houses_in_devise:
+                continue
             # If all houses is Mafia or Don and Won citizen
             # If device is right and team win -> big bonus
             if all(map(is_mafia, choosed_houses)) and is_citizen_win(self.game_info.game):

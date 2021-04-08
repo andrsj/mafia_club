@@ -152,8 +152,8 @@ class CreateOrUpdateBestMoveHandler(BaseHandler):
             best_3_house: model.House = houses.get(evt.best_3_slot)
 
             for house, name in zip(
-                    [killed_house, best_1_house, best_2_house, best_3_house],
-                    ['Вбитий в кращому', 'Перший в кращому', 'Другий в кращому', 'Третій в кращому']
+                [killed_house, best_1_house, best_2_house],
+                ['Вбитий в кращому', 'Перший в кращому', 'Другий в кращому']
             ):
                 if house is None:
                     raise MissedHouseError(f'[{self.__class__}]: Missing house \'{name}\' in {evt.game_id}')
@@ -168,7 +168,7 @@ class CreateOrUpdateBestMoveHandler(BaseHandler):
                     killed_house=killed_house.house_id,
                     best_1=best_1_house.house_id,
                     best_2=best_2_house.house_id,
-                    best_3=best_3_house.house_id,
+                    best_3=best_3_house.house_id if best_3_house else None,
                 )
                 tx.best_moves.add(best_move)
             else:

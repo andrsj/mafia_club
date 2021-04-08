@@ -276,7 +276,7 @@ if __name__ == '__main__':
             })
 
         if arguments.end_date_of_day and arguments.start_date_of_day:
-            sleep(5)
+            sleep(10)
 
     errors_sheet = client.client.open('Errors')
     time_now = datetime.now()

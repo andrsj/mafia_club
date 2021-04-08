@@ -44,7 +44,7 @@ blanks-get-all-nicknames:
 blanks-create-sheet-by-range:
 	python src/zlo/cli/generate_sheets.py --start=$(start) --end=$(end)
 
-blanks-check-for-errors-by-range:
+blanks-check-for-errors-by-month:
 	python src/zlo/cli/blanks_checker.py --month=$(month) --year=$(year)
 
 blanks-check-for-errors-for-date:

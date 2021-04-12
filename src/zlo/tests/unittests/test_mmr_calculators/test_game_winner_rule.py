@@ -13,42 +13,56 @@ class WhenGameFinished(BaseTestMMRCalculator):
             'rating': 1000,
             'points_lose': -6,
             'points_win': 9,
-            'roles': (0, 2)
+            'win_roles': (0, 2)
         }
         yield {  # Mafia won
             'result': 2,
             'rating': 1000,
             'points_lose': -6,
             'points_win': 9,
-            'roles': (1, 3)
+            'win_roles': (1, 3)
         }
         yield {
             'result': 1,
-            'rating': 1750,
+            'rating': 1675,
             'points_lose': -6,
             'points_win': 8,
-            'roles': (0, 2)
+            'win_roles': (0, 2)
         }
         yield {
             'result': 1,
-            'rating': 1850,
+            'rating': 1725,
             'points_lose': -7,
             'points_win': 7,
-            'roles': (0, 2)
+            'win_roles': (0, 2)
         }
         yield {
             'result': 1,
-            'rating': 1950,
+            'rating': 1775,
             'points_lose': -7,
             'points_win': 6,
-            'roles': (0, 2)
+            'win_roles': (0, 2)
         }
         yield {
             'result': 1,
-            'rating': 2050,
+            'rating': 1825,
             'points_lose': -8,
             'points_win': 5,
-            'roles': (0, 2)
+            'win_roles': (0, 2)
+        }
+        yield {
+            'result': 1,
+            'rating': 1875,
+            'points_lose': -8,
+            'points_win': 4,
+            'win_roles': (0, 2)
+        }
+        yield {
+            'result': 1,
+            'rating': 1925,
+            'points_lose': -9,
+            'points_win': 3,
+            'win_roles': (0, 2)
         }
 
     def given_game_for_rating(self, data):
@@ -62,5 +76,5 @@ class WhenGameFinished(BaseTestMMRCalculator):
 
     def it_should_calculate_rating(self, data):
         for house in self.houses:
-            value = data['points_win'] if house.role in data['roles'] else data['points_lose']
+            value = data['points_win'] if house.role in data['win_roles'] else data['points_lose']
             expect(self.new_rating[house.player_id]).to(equal(value))

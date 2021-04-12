@@ -2,24 +2,46 @@ from uuid import UUID
 from typing import Optional
 from collections import defaultdict
 
-
 from zlo.domain.mmr_calculators.base_rule import BaseRuleMMR, Rating
 from zlo.domain.utils import is_citizen_win, is_citizen, is_mafia, is_mafia_win
+from zlo.domain.mmr_calculators.constants import (
+    START_BONUS_MMR_CORRELATION_FOR_LOSE,  # -6
+    START_BONUS_MMR_FOR_WIN,  # 9
+    LOSE_CORRELATION_STEP,  # 100
+    WIN_CORRELATION_STEP,  # 50
+    START_LIMIT_MMR,  # 1600
+)
 
 
 class GameWinnerRule(BaseRuleMMR):
 
     @staticmethod
     def get_mmr_for_win(current_mmr: int):
-        if current_mmr <= 1700:
-            return 9
-        return max(1, 9 + -1 * ((current_mmr - 1600) // 100))
+        """
+        1600: START_BONUS_MMR_FOR_WIN
+        1650: START_BONUS_MMR_FOR_WIN - START LIMIT MMR // WIN CORRELATION STEP
+        ...
+        1900: 3
+        1950: 2
+        2000: 1
+        """
+        if current_mmr <= START_LIMIT_MMR:
+            return START_BONUS_MMR_FOR_WIN
+        return max(1, START_BONUS_MMR_FOR_WIN + -1 * ((current_mmr - START_LIMIT_MMR) // WIN_CORRELATION_STEP))
 
     @staticmethod
     def get_mmr_for_lose(current_mmr: int):
-        if current_mmr < 1700:
-            return -6
-        return max(-15, -6 + -1 * ((current_mmr - 1600) // 200))
+        """
+        1600: -6
+        1700: -7
+        1800: -8
+        1900: -9
+        ...
+        """
+        if current_mmr <= START_LIMIT_MMR:
+            return START_BONUS_MMR_CORRELATION_FOR_LOSE
+        return max(-15, START_BONUS_MMR_CORRELATION_FOR_LOSE + -1 *
+                   ((current_mmr - START_LIMIT_MMR) // LOSE_CORRELATION_STEP))
 
     def calculate_mmr(self, rating: Optional[Rating] = None):
 

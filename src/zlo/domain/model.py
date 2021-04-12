@@ -396,6 +396,7 @@ class Rating:
     mmr: int
     player: types.PlayerID
     season: str
+    club: str
 
 
 @dataclass
@@ -404,6 +405,7 @@ class Season:
     name: str
     start: datetime
     end: datetime
+    prew_season: Optional[str]
 
 
 @dataclass

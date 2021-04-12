@@ -409,7 +409,8 @@ class DatabaseSchema:
             ),
             Column('name', String),
             Column('start', DateTime, default=func.now()),
-            Column('end', DateTime, default=func.now())
+            Column('end', DateTime, default=func.now()),
+            Column('prew_season', ForeignKey("seasons.season_id"))
         )
         self.rating = Table(
             'rating',
@@ -423,6 +424,7 @@ class DatabaseSchema:
             Column("player", ForeignKey("players.player_id")),
             Column("mmr", Integer),
             Column("season", ForeignKey("seasons.season_id")),
+            Column("club", ForeignKey("clubs.name"))
         )
 
 

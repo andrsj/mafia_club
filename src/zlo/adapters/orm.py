@@ -2,7 +2,8 @@ import retrying
 import sqlalchemy
 import sqlalchemy.exc
 import sqlalchemy.orm.exc
-from sqlalchemy import Table, Column, Integer, String, create_engine, MetaData, DateTime, func, ForeignKey, Float
+from sqlalchemy import (Table, Column, Integer, String, create_engine,
+                        MetaData, DateTime, func, ForeignKey, Float, Boolean)
 from sqlalchemy.orm import mapper, scoped_session, sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 from zlo.domain.infrastructure import UnitOfWork, UnitOfWorkManager
@@ -164,6 +165,7 @@ class DatabaseSchema:
                 server_default=sqlalchemy.text("uuid_generate_v4()"),
             ),
             Column("nickname", String(40), unique=True, nullable=False),
+            Column("displayname", String(40)),
             Column("name", String(40)),
             Column("club", String(40)),
         )
@@ -179,7 +181,10 @@ class DatabaseSchema:
             Column("date", DateTime, default=func.now()),
             Column("result", Integer, default=0),
             Column('advance_result', Integer),
-            Column("club", String(40)),
+            # Column("club", String(40)),
+            Column("club",  ForeignKey('clubs.name', name='fk_clubname_for_games')),
+            Column("season", ForeignKey('seasons.season_id', name='fk_season_game')),
+            Column("calculated", Boolean, nullable=False),
             Column("table", Integer, default=None),
             Column("heading", ForeignKey("players.player_id")),
             Column("tournament", String(40))
@@ -424,7 +429,17 @@ class DatabaseSchema:
             Column("player", ForeignKey("players.player_id")),
             Column("mmr", Integer),
             Column("season", ForeignKey("seasons.season_id")),
-            Column("club", ForeignKey("clubs.name"))
+            Column("club", ForeignKey("clubs.name", name='fk_clubname_for_rating'), nullable=False)
+        )
+        self.clubs = Table(
+            'clubs',
+            self._metadata,
+            Column(
+                'name',
+                String,
+                unique=True,
+                nullable=False
+            )
         )
 
 

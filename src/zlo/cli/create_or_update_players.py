@@ -8,6 +8,7 @@ from zlo.adapters.bootstrap import bootstrap
 from zlo.sheet_parser.client import SpreadSheetClient
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 from zlo.domain.infrastructure import UnitOfWorkManager
+from zlo.credentials.config import LIST_OF_PLAYERS_SPREADSHEET
 from zlo.domain.model import Player
 
 
@@ -128,5 +129,5 @@ if __name__ == "__main__":
 
     client = inject.instance(SpreadSheetClient)
     # sheet_players = client.client.open(args.name).sheet1
-    sheet_players = client.client.open_by_key('1ZYS2QWlzwobBhpKpIIfwARRTVYPy26HT92t-0l1bRJ0').sheet1
+    sheet_players = client.client.open_by_key(LIST_OF_PLAYERS_SPREADSHEET).sheet1
     save_or_update_players_in_sheet(sheet_players)

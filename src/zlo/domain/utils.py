@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import timedelta, date, datetime
 from calendar import monthrange
-from typing import List, Optional
+from typing import List, Dict, Optional
 import argparse
 
 
@@ -26,6 +26,7 @@ months = [
     'Грудень'
 ]
 
+
 def get_houses_from_list_of_house_ids(houses: List[House], ids: List[str]) -> List[House]:
     return list(filter(lambda h: h.house_id in ids, houses))
 
@@ -46,6 +47,24 @@ def is_mafia_win(game: Game) -> bool:
 
 def is_citizen_win(game: Game) -> bool:
     return game.result == GameResult.citizen.value
+
+def get_spreadsheet_url(sheet_id: str):
+    return f'https://docs.google.com/spreadsheets/d/{sheet_id}'
+
+def get_folder_url(folder_id: str):
+    return f'https://drive.google.com/drive/folders/{folder_id}'
+
+def get_all_files_in_folder(api_files: Resource, folder_id) -> List[Dict]:
+    response = api_files.list(q=f"parents = '{folder_id}'").execute()
+    files = response.get('files')
+    nextPageToken = response.get('nextPageToken')
+
+    while nextPageToken:
+        response = api_files.list(q=f'parents = {folder_id}', pageToken=nextPageToken).execute()
+        files.extend(response.get('files'))
+        nextPageToken = response.get('nextPageToken')
+
+    return files
 
 def drive_file_list(files: Resource, fields: str = "files(id, mimeType, name, permissions), nextPageToken"):
     """

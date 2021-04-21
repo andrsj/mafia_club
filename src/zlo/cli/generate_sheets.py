@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 from datetime import datetime
+from time import sleep
 
 
 import gspread
@@ -66,7 +67,7 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
         # Change title for first sheet
         'updateSheetProperties': {
             'properties': {
-                'sheetId': 0,
+                'sheetId': spreadsheet.sheet1.id,
                 'title': 'Стіл1Гра1'
             },
             'fields': 'title'
@@ -83,7 +84,7 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
                 # Row 2:
                 "startRowIndex": 1,
                 "endRowIndex": 2,
-                "sheetId": 0
+                "sheetId": spreadsheet.sheet1.id
             },
             'rows': [{
                 'values': {
@@ -108,13 +109,13 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
                 # Row 5:
                 "startRowIndex": 4,
                 "endRowIndex": 5,
-                "sheetId": 0
+                "sheetId": spreadsheet.sheet1.id
             },
             'rows': [{
                 'values': {
                     # Finally we enter this club name
                     'userEnteredValue': {
-                        'stringValue': 'ZLO' if datetime_of_day.weekday() == 4 else 'Школа ЗЛО'
+                        'stringValue': 'ZLO' if datetime_of_day.weekday() == 4 else 'Школа Зло'
                     }
                 }
             }],
@@ -136,7 +137,7 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
         list_requests.append(
             {
                 'duplicateSheet': {
-                    'sourceSheetId': 0,
+                    'sourceSheetId': spreadsheet.sheet1.id,
                     'insertSheetIndex': sheet_index,
                     'newSheetName': name
                 }
@@ -184,8 +185,6 @@ def create_copy_spreadsheet(datetime_of_day: datetime):
     if file_in_month_folder is None:
         new_file = copy_file(
             folder_id=folder_by_month['id'],
-            # The clean file to be copied, which is an example
-            # https://docs.google.com/spreadsheets/d/1aaRjI_imeO5VGjDeygHQBXk-YzeKPgjaYu66R7zMqgo
             source_file_id=SOURCE_FILE_ID,
             new_name=date_string
         )
@@ -197,6 +196,8 @@ def create_copy_spreadsheet(datetime_of_day: datetime):
     else:
         print(f"File '{date_string}' already exist by this url: "
               f"https://docs.google.com/spreadsheets/d/{file_in_month_folder['id']}")
+
+    sleep(5)
 
 
 if __name__ == '__main__':

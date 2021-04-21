@@ -173,8 +173,9 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_constraint(constraint_name='fk_clubname_for_games', table_name='games', type_="foreignkey")
-    op.drop_constraint(constraint_name='fk_clubname_for_rating', table_name='rating', type_="foreignkey")
+    op.drop_constraint('fk_season_game', 'games', type_='foreignkey')
+    op.drop_constraint('fk_clubname_for_games', 'games', type_="foreignkey")
+    op.drop_constraint('fk_clubname_for_rating', 'rating', type_="foreignkey")
     op.drop_table('clubs')
     op.drop_column('rating', 'club')
     op.drop_column('games', 'calculated')

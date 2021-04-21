@@ -9,11 +9,12 @@ from zlo.domain import types
 @dataclass
 class Player:
 
-    def __init__(self, nickname: str, name: str, club: str, player_id: types.PlayerID = None):
+    def __init__(self, nickname: str, name: str, club: str, displayname: str, player_id: types.PlayerID = None):
         self.nickname = nickname
         self.name = name
         self.club = club
         self.player_id = player_id if player_id else str(uuid.uuid4())
+        self.displayname = displayname
 
     def __repr__(self):
         return f"Player({self.nickname})"

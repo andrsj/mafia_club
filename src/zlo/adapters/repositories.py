@@ -15,7 +15,7 @@ class PlayerRepository:
     def get_by_nickname(self, nick: str) -> model.Player:
         return self._session.query(model.Player).filter_by(nickname=nick).first()
 
-    def get_by_id(self, player_id):
+    def get_by_id(self, player_id) -> model.Player:
         return self._session.query(model.Player).filter_by(player_id=player_id).first()
 
     def add(self, player: model.Player):

@@ -17,6 +17,6 @@ FOLDER_ID = '19UAtKHmQCr1YGkgD_b72mJuyDYftMIaZ'  # Рейтинг-Бланки
 SOURCE_FILE_ID = '1TSmU7pTWiW-TxgCs0RWqbOdI5VhRVC5Wtde2KQ79-xU'  # New
 
 LIST_OF_PLAYERS_SPREADSHEET = '1ZYS2QWlzwobBhpKpIIfwARRTVYPy26HT92t-0l1bRJ0'  # СписокГравців
-LIST_OF_ERRORS_SPREADSHEET = ''  # Errors
+LIST_OF_ERRORS_SPREADSHEET = '1rNX_PVdrTVr2z9N5jCcxoVWLGamByzz18lO6yyg33jQ'  # Errors
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_SECRET_FILE, SCOPES)

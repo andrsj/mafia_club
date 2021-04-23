@@ -16,6 +16,7 @@ from zlo.domain.infrastructure import UnitOfWorkManager
 from zlo.domain.config import DATE_FORMAT
 from zlo.credentials.config import credentials, API_VERSION, API_NAME
 from zlo.domain.utils import date_range_in_month, create_parser_for_blanks_checker, daterange
+from zlo.credentials.config import LIST_OF_ERRORS_SPREADSHEET
 
 from zlo.cli.setup_env_for_test import setup_env_with_test_database
 
@@ -241,6 +242,7 @@ if __name__ == '__main__':
                     name_sheet,
                     worksheet.title,
                     blank_error,
+                    blank_matrix[1][2],
                     get_url(worksheet.url)
                 ))
 
@@ -270,7 +272,7 @@ if __name__ == '__main__':
         if arguments.end_date_of_day and arguments.start_date_of_day:
             sleep(10)
 
-    errors_sheet = client.client.open_by_key('1rNX_PVdrTVr2z9N5jCcxoVWLGamByzz18lO6yyg33jQ')
+    errors_sheet = client.client.open_by_key(LIST_OF_ERRORS_SPREADSHEET)
     time_now = datetime.now()
 
     cells = []
@@ -305,7 +307,7 @@ if __name__ == '__main__':
                             "sheetId": errors_worksheet.id,
                             "dimension": "COLUMNS",
                             "startIndex": 0,
-                            "endIndex": 4
+                            "endIndex": 5
                         }
                     }
                 }

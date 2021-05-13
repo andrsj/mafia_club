@@ -17,6 +17,10 @@ class SheriffPlayRule(BaseRuleMMR):
 
         result = defaultdict(int)
 
+        if not any(map(is_sheriff, self.game_info.houses)):
+            print('Strange game', self.game_info.game.game_id)
+            return {}
+
         [sheriff] = [house for house in self.game_info.houses if is_sheriff(house)]
         result[sheriff.player_id] += self.bonus_mmr
 

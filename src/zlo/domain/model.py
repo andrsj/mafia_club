@@ -38,6 +38,7 @@ class Game:
     tournament: Optional[types.TournamentID]
     heading: Player
     advance_result: int
+    calculated: bool
 
     def update_game_result(self, result):
         self.result = result
@@ -53,7 +54,8 @@ class Game:
                 self.table == other.table,
                 self.tournament == other.tournament,
                 self.heading == other.heading,
-                self.advance_result == other.advance_result
+                self.advance_result == other.advance_result,
+                self.calculated == other.calculated
             )
         )
 

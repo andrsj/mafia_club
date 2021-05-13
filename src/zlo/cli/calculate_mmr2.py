@@ -54,7 +54,7 @@ if __name__ == '__main__':
     start = datetime(2021, 1, 1)
 
     # end = datetime.strptime(args.end_date_of_day, DATA_FORMAT)
-    end = datetime(2021, 4, 4)
+    end = datetime(2021, 5, 8)
 
     uowm = inject.instance(UnitOfWorkManager)
     with uowm.start() as tx:
@@ -69,10 +69,10 @@ if __name__ == '__main__':
         clubname='ZLO'  # ZLO | Школа Зло
     )
 
-    rating = {next(filter(lambda p: p.player_id == i, players)).nickname: j
+    rating = {next(filter(lambda p: p.player_id == i, players)).displayname: j
               for i, j in sorted(rating.items(), key=lambda x: x[1])}
 
-    detail_rating = {next(filter(lambda p: p.player_id == i, players)).nickname: j
+    detail_rating = {next(filter(lambda p: p.player_id == i, players)).displayname: j
                      for i, j in detail_rating.items()}
 
     rating = {i: j for i, j in rating.items() if detail_rating.get(i)}
@@ -80,13 +80,24 @@ if __name__ == '__main__':
     for i, j in sorted(rating.items(), key=lambda x: x[1]):
         print(i, j, len(detail_rating.get(i)))
 
-    # import csv
-    # with open('rating_ZLO.csv', 'w') as csv_file:
-    #     writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
-    #     writer.writeheader()
-    #     for i, j in sorted(rating.items(), key=lambda x: x[1]):
-    #         writer.writerow({
-    #             'Nickname': i,
-    #             'MMR': j,
-    #             'Games': len(detail_rating.get(i, []))
-    #         })
+    import csv
+    with open('rating_ZLO1.csv', 'w') as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
+        writer.writeheader()
+        for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
+            writer.writerow({
+                'Nickname': i,
+                'MMR': j,
+                'Games': len(detail_rating.get(i, []))
+            })
+
+    with open('rating_ZLO1-15.csv', 'w') as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
+        writer.writeheader()
+        for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
+            if len(detail_rating.get(i, [])) >= 15:
+                writer.writerow({
+                    'Nickname': i,
+                    'MMR': j,
+                    'Games': len(detail_rating.get(i, []))
+                })

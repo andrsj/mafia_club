@@ -80,7 +80,8 @@ class CreateOrUpdateGameHandler:
                     club=evt.club,
                     result=evt.result,
                     table=evt.table,
-                    advance_result=evt.advance_result
+                    advance_result=evt.advance_result,
+                    calculated=False
                 )
                 tx.games.add(game)
             else:

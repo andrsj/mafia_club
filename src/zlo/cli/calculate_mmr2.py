@@ -55,6 +55,8 @@ if __name__ == '__main__':
 
     # end = datetime.strptime(args.end_date_of_day, DATA_FORMAT)
     end = datetime(2021, 5, 8)
+    # 4.4.21
+    # 8.5.21
 
     uowm = inject.instance(UnitOfWorkManager)
     with uowm.start() as tx:
@@ -66,7 +68,8 @@ if __name__ == '__main__':
         start_date=start,
         # end_date=datetime.strptime(args.end_date_of_day, DATA_FORMAT),
         end_date=end,
-        clubname='ZLO'  # ZLO | Школа Зло
+        # clubname='ZLO'  # ZLO | Школа Зло
+        clubname='Школа Зло'
     )
 
     rating = {next(filter(lambda p: p.player_id == i, players)).displayname: j
@@ -77,27 +80,27 @@ if __name__ == '__main__':
 
     rating = {i: j for i, j in rating.items() if detail_rating.get(i)}
 
-    for i, j in sorted(rating.items(), key=lambda x: x[1]):
+    for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
         print(i, j, len(detail_rating.get(i)))
 
     import csv
-    with open('rating_ZLO1.csv', 'w') as csv_file:
+    with open('rating_school.csv', 'w') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
         writer.writeheader()
         for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
             writer.writerow({
-                'Nickname': i,
+                'Nickname': i.capitalize(),
                 'MMR': j,
                 'Games': len(detail_rating.get(i, []))
             })
 
-    with open('rating_ZLO1-15.csv', 'w') as csv_file:
+    with open('rating_school-15.csv', 'w') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
         writer.writeheader()
         for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
             if len(detail_rating.get(i, [])) >= 15:
                 writer.writerow({
-                    'Nickname': i,
+                    'Nickname': i.capitalize(),
                     'MMR': j,
                     'Games': len(detail_rating.get(i, []))
                 })

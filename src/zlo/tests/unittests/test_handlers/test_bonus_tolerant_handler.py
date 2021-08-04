@@ -1,4 +1,3 @@
-import contexts
 from nose.tools import assert_list_equal
 from zlo.domain.events import CreateOrUpdateBonusTolerant
 from zlo.domain.handlers import CreateOrUpdateBonusTolerantHandler

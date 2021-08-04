@@ -1,4 +1,3 @@
-import contexts
 from expects import expect, have_len
 from nose.tools import assert_list_equal
 
@@ -92,7 +91,3 @@ class WhenNominatedForBestIsIsUpdated(BaseTestHandler):
     def cleanup(self):
         self._uowm.sess.clean_all()
         self.cache.clean()
-
-
-if __name__ == '__main__':
-    contexts.main()

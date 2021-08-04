@@ -1,4 +1,3 @@
-import contexts
 from nose.tools import assert_list_equal
 from zlo.domain.model import Misses
 from zlo.domain.handlers import CreateOrUpdateMissesHandler

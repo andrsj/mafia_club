@@ -49,6 +49,18 @@ class SpreadSheetClient:
         }
         """
         worksheets_values = {}
+
+        # TODO rewrite this code down below to find normal RANGE ['NAME!A1:AC1000']
+        # TODO OR rewrite code on upper level to use FULL range name
+
+        # worksheet_range['range'] ?
+
+        # worksheet_range -> 'AAA!A1:AC1001'
+        # sheet -> 'TestBlankForEndToEnd'  [id: '14RY4cbKMFtzKw10gxaFnwBnO8_8favFLULRGnZqU8Rw']
+
+        # worksheet_range -> 'Стіл1Гра1'A1:AC1000'
+        # sheet -> '30_04_2021'
+
         for worksheet_range in response['valueRanges']:
             if 'values' in worksheet_range:
                 worksheets_values[worksheet_range['range'].split("'")[1]] = worksheet_range['values']

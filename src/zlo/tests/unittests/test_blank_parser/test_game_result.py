@@ -1,4 +1,3 @@
-import contexts
 from expects import expect, equal
 from zlo.domain.types import GameResult, AdvancedGameResult
 from zlo.sheet_parser.blank_version_2 import BlankParser

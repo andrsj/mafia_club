@@ -9,12 +9,12 @@ from zlo.domain import types
 @dataclass
 class Player:
 
-    def __init__(self, nickname: str, name: str, club: str, displayname: str, player_id: types.PlayerID = None):
+    def __init__(self, nickname: str, name: str, club: str, displayname: str = None, player_id: types.PlayerID = None):
         self.nickname = nickname
         self.name = name
         self.club = club
         self.player_id = player_id if player_id else str(uuid.uuid4())
-        self.displayname = displayname
+        self.displayname = displayname or nickname
 
     def __repr__(self):
         return f"Player({self.nickname})"
@@ -38,7 +38,7 @@ class Game:
     tournament: Optional[types.TournamentID]
     heading: Player
     advance_result: int
-    calculated: bool
+    calculated: bool = False
 
     def update_game_result(self, result):
         self.result = result
@@ -64,6 +64,7 @@ class Game:
                f"\tResult: {self.result}    Club: {self.club}\n" \
                f"\tTable: {self.table}    Heading: {self.heading}\n" \
                f"\tDate: {self.date}"
+
 
 @dataclass
 class House:

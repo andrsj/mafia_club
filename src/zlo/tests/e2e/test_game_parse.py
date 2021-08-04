@@ -16,6 +16,9 @@ from zlo import config
 from zlo.cli.feel_games_blank_2 import update_game_id, parse_and_write_in_db
 
 
+# TODO REFACTOR THIS SHIT [Not support real code]
+
+
 class WhenGameParserFromSheet:
 
     def given_auth_client_and_args_and_players_in_db(self):

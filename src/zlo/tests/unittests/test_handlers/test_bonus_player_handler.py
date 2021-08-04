@@ -1,4 +1,3 @@
-from expects import expect, equal
 from zlo.domain.handlers import CreateOrUpdateBonusFromPlayersHandler
 from zlo.domain.events import CreateOrUpdateBonusFromPlayers
 from zlo.domain.model import BonusFromPlayers

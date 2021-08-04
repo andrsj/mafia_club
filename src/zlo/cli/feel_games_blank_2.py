@@ -26,6 +26,7 @@ from zlo.cli.setup_env_for_test import setup_env_with_test_database
 def update_game_id(worksheet, game_id):
     worksheet.update_cell(8, 4, game_id)
 
+
 def parse_and_write_in_db(client_parser, args, list_files):
     handlers = (
         (args.houses, "parse_houses"),

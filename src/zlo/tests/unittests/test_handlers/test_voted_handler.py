@@ -1,7 +1,6 @@
 from collections import defaultdict
 from typing import Dict
 
-import contexts
 from nose.tools import assert_dict_equal, assert_list_equal
 from zlo.domain.events import CreateOrUpdateVoted
 from zlo.domain.handlers import CreateOrUpdateVotedHandler
@@ -109,7 +108,3 @@ class WhenVotedIsUpdated(BaseTestHandler):
     def cleanup(self):
         self._uowm.sess.clean_all()
         self.cache.clean()
-
-
-if __name__ == '__main__':
-    contexts.main()

@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 from expects import expect, equal
 from zlo.domain.types import GameResult, AdvancedGameResult

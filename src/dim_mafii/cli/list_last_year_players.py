@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 import inject
 from gspread.models import Cell
 
+from dim_mafii.credentials.config import LIST_OF_ACTIVE_PLAYERS
 from dim_mafii.domain.infrastructure import UnitOfWorkManager
 from dim_mafii.sheet_parser.client import SpreadSheetClient
 from dim_mafii.adapters.bootstrap import bootstrap
@@ -52,7 +53,7 @@ if __name__ == '__main__':
                 if players_date_dict[player.nickname] is None or players_date_dict[player.nickname] < game.date:
                     players_date_dict[player.nickname] = game.date
 
-    sheet = client.client.open_by_key('1gTW1-KIYN_xGAFUa8oFEuO616NGyTyn6dNGDRwi1PfE')
+    sheet = client.client.open_by_key(LIST_OF_ACTIVE_PLAYERS)
     worksheet = sheet.sheet1
 
     cells = [

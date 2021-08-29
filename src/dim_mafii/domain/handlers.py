@@ -74,14 +74,13 @@ class CreateOrUpdateGameHandler:
                 self._log.info(f"Create new game {evt}")
                 game = model.Game(
                     game_id=evt.game_id,
-                    tournament=evt.tournament,
-                    heading=player.player_id,
-                    date=evt.date,
                     club=evt.club,
-                    result=evt.result,
+                    date=evt.date,
                     table=evt.table,
+                    result=evt.result,
+                    heading=player.player_id,
+                    tournament=evt.tournament,
                     advance_result=evt.advance_result,
-                    calculated=False
                 )
                 tx.games.add(game)
             else:

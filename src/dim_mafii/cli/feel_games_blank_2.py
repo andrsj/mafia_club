@@ -57,6 +57,8 @@ def parse_and_write_in_db(client_parser, args, list_files):
     worksheets_values = client.get_matrixs_from_sheet(sheet, worksheets)
     for worksheet in sorted(worksheets, key=lambda w: w.title):
 
+        print(worksheet.title)
+
         # if the blank was specified in parser
         if args.blank_title and worksheet.title != args.blank_title:
             continue

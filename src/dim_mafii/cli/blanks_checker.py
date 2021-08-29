@@ -203,8 +203,8 @@ if __name__ == '__main__':
             )
         ]
 
-    if arguments.data:
-        name_sheets = [arguments.data]
+    if arguments.date:
+        name_sheets = [arguments.date]
 
     all_sheets_errors = []
     for name_sheet in name_sheets:
@@ -289,8 +289,8 @@ if __name__ == '__main__':
             title = f'{arguments.year} {arguments.month} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
         if arguments.end_date_of_day and arguments.start_date_of_day:
             title = f'From {arguments.start_date_of_day} to {arguments.end_date_of_day}'
-        if arguments.data:
-            title = f'{arguments.data} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
+        if arguments.date:
+            title = f'{arguments.date} {time_now.strftime("%d-%m-%Y %H:%M:%S")}'
         errors_worksheet = errors_sheet.add_worksheet(
             title,
             rows=len(all_sheets_errors),

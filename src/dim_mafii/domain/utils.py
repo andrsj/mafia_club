@@ -30,29 +30,38 @@ months = [
 def get_houses_from_list_of_house_ids(houses: List[House], ids: List[str]) -> List[House]:
     return list(filter(lambda h: h.house_id in ids, houses))
 
+
 def get_house_from_list_by_house_id(houses: List[House], house_id: str) -> Optional[House]:
     return next(filter(lambda h: h.house_id == house_id, houses), None)
+
 
 def is_sheriff(house: House) -> bool:
     return house.role == ClassicRole.sheriff.value
 
+
 def is_citizen(house: House) -> bool:
     return house.role in (ClassicRole.citizen.value, ClassicRole.sheriff.value)
+
 
 def is_mafia(house: House) -> bool:
     return house.role in (ClassicRole.don.value, ClassicRole.mafia.value)
 
+
 def is_mafia_win(game: Game) -> bool:
     return game.result == GameResult.mafia.value
+
 
 def is_citizen_win(game: Game) -> bool:
     return game.result == GameResult.citizen.value
 
+
 def get_spreadsheet_url(sheet_id: str):
     return f'https://docs.google.com/spreadsheets/d/{sheet_id}'
 
+
 def get_folder_url(folder_id: str):
     return f'https://drive.google.com/drive/folders/{folder_id}'
+
 
 def get_all_files_in_folder(api_files: Resource, folder_id) -> List[Dict]:
     response = api_files.list(q=f"parents = '{folder_id}'").execute()
@@ -65,6 +74,7 @@ def get_all_files_in_folder(api_files: Resource, folder_id) -> List[Dict]:
         nextPageToken = response.get('nextPageToken')
 
     return files
+
 
 def drive_file_list(files: Resource, fields: str = "files(id, mimeType, name, permissions), nextPageToken"):
     """
@@ -91,13 +101,16 @@ def drive_file_list(files: Resource, fields: str = "files(id, mimeType, name, pe
 
     return files_list
 
+
 def get_absolute_range(title):
     return f"'{title}'!A1:AC1001"
+
 
 def get_submatrix(rows: List[List]) -> List[List]:
     max_len = len(max(rows, key=len))
     all_values = [row + [''] * (max_len - len(row)) for row in rows]
     return [row[1:12] for row in all_values[1:46]]
+
 
 def get_url(url: str):
     """
@@ -113,14 +126,17 @@ def get_url(url: str):
     id_sheet = url.split('/')[-1]
     return f'https://docs.google.com/spreadsheets/d/{id_sheet}'
 
+
 @dataclass
 class EventHouseModel:
     day: int
     house_id: str
 
+
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days + 1)):
         yield start_date + timedelta(n)
+
 
 def date_range_in_month(year, month):
     month = months.index(month)
@@ -130,14 +146,17 @@ def date_range_in_month(year, month):
 
     return daterange(start_date, end_date)
 
+
 def get_month(date_: date) -> str:
     # Get string month from date
     return months[date_.month - 1]
+
 
 def get_the_specified_days_by_dates(start_date: datetime, end_date: datetime) -> List[datetime]:
     dates = daterange(start_date, end_date)
     # 1 - Tuesday, 4 - Friday
     return [one_date for one_date in dates if one_date.weekday() in [1, 4]]
+
 
 def create_parser_for_blanks_checker():
     parser = argparse.ArgumentParser(description='Generate spreadsheets for new game in date range')
@@ -164,12 +183,13 @@ def create_parser_for_blanks_checker():
         help='End date (format: DD/MM/YYYY)'
     )
     parser.add_argument(
-        '--data',
-        dest='data',
+        '--date',
+        dest='date',
         help='Spreadsheet by date (Text format DD/MM/YYYY)'
     )
 
     return parser
+
 
 def create_parser_for_date_range():
     parser = argparse.ArgumentParser(description='Generate spreadsheets for new game in date range')
@@ -186,6 +206,7 @@ def create_parser_for_date_range():
     )
 
     return parser
+
 
 def create_parser_for_blank_feeling():
     parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')

@@ -182,9 +182,9 @@ class DatabaseSchema:
             Column("result", Integer, default=0),
             Column('advance_result', Integer),
             # Column("club", String(40)),
-            Column("club",  ForeignKey('clubs.name', name='fk_clubname_for_games')),
+            Column("club",  ForeignKey('clubs.name', name='fk_clubname_for_games'), nullable=False),
             Column("season", ForeignKey('seasons.season_id', name='fk_season_game')),
-            Column("calculated", Boolean, nullable=False),
+            Column("calculated", Boolean, nullable=False, default=False),
             Column("table", Integer, default=None),
             Column("heading", ForeignKey("players.player_id")),
             Column("tournament", String(40))

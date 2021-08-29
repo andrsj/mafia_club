@@ -33,14 +33,17 @@ def get_all_files_in_folder(folder_id) -> List[Dict]:
 
     return files
 
+
 def filter_folders(files: List[Dict]) -> filter:
     return filter(lambda f: f['mimeType'] == 'application/vnd.google-apps.folder', files)
+
 
 def get_file_by_name(files, filename: str) -> Optional[Dict]:
     for file_info in files:
         if file_info['name'].lower() == filename.lower():
             return file_info
     return None
+
 
 def copy_file(source_file_id, folder_id, new_name):
     file_metadata = {
@@ -52,6 +55,7 @@ def copy_file(source_file_id, folder_id, new_name):
     file_resource = drive.files().copy(fileId=source_file_id, body=file_metadata).execute()
     return file_resource
 
+
 def create_folder_on_drive(parent_folder_id, folder_name):
     body = {
         'name': folder_name,
@@ -60,6 +64,7 @@ def create_folder_on_drive(parent_folder_id, folder_name):
     }
     folder_info = drive.files().create(body=body).execute()
     return folder_info
+
 
 def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
     # Format all requests for one batch update:
@@ -147,6 +152,7 @@ def generate_blanks_for_spreadsheet(spreadsheet, datetime_of_day: datetime):
     spreadsheet.batch_update(body={
         'requests': list_requests
     })
+
 
 def create_copy_spreadsheet(datetime_of_day: datetime):
     date_string = datetime_of_day.strftime(DATE_FORMAT)

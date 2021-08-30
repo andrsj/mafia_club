@@ -62,4 +62,3 @@ uritemplate==3.0.1
 urllib3==1.25.8
 webencodings==0.5.1
 Werkzeug==1.0.1
--e git+git@gitlab.com:zlo_mafia_club/guiding.git@54043806d856737002f11883ed80d642b1306cd3#egg=zlo&subdirectory=src

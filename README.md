@@ -3,12 +3,14 @@
 ## [Copy of spreadsheet](https://docs.google.com/spreadsheets/d/1TSmU7pTWiW-TxgCs0RWqbOdI5VhRVC5Wtde2KQ79-xU/edit#gid=1765678933)
 
 ### Перший запуск роботи інтерфейсу
-1. Записати *credentials* для GoogleAPI в `src/dim_mafii/credentials/***.json`
-2. `$: make up-test` (Запуск бази (Не дивуємося що це тестова база))
-3. `$: make run-migrations` (Запуск міграцій тестової бази даних)
-4. `$: docker exec -it test_zlo_db psql -U test_zlo` (Прямий доступ до БД, можна і через локальний клієнт `psql`)
-5. `make blanks-create-or-update-players` (Записати гравців в БД з бланку гравців)
-6. Done, можна продовжувати роботу з скриптами (Всі скрипти в директорії `src/dim_mafii/cli`)
+0. `$: python3 -m venv <env>; source <env>/bin/activate` (Virtual Environment)
+1. `$: pip install -r requirements.txt; pip install -e src` (Встановлення локальних і трьохсторонніх бібліотек)
+2. Записати **credentials** для GoogleAPI в `src/dim_mafii/credentials/***.json`
+3. `$: make up-test` (Запуск бази (Не дивуємося що це тестова база))
+4. `$: make run-migrations` (Запуск міграцій тестової бази даних)
+5. `$: docker exec -it test_zlo_db psql -U test_zlo` (Прямий доступ до БД, можна і через локальний клієнт `psql`)
+6. `make blanks-create-or-update-players` (Записати гравців в БД з бланку гравців)
+7. Done, можна продовжувати роботу з скриптами (Всі скрипти в директорії `src/dim_mafii/cli`)
 
 ### CLI scripts які записані в `makefile`
 - `make update-fixtures` - Оновити фікстури для unit-tests

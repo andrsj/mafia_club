@@ -62,3 +62,15 @@ blanks-feel-games-month:
 
 blanks-feel-games-range:
 	python src/dim_mafii/cli/feel_games_blank_2.py --start=$(start) --end=$(end) --full
+
+w_dump:
+	cat $(name) | docker exec -i test_zlo_db psql -U test_zlo
+
+r_dump:
+	docker exec test_zlo_db pg_dumpall -U test_zlo > $(name)
+
+ri_dump:
+	docker exec test_zlo_db pg_dump --column-inserts --data-only test_zlo -U test_zlo > $(name)
+
+db:
+	docker exec -it test_zlo_db psql -U test_zlo

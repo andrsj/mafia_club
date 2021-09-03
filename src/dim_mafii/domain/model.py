@@ -431,3 +431,8 @@ class GameInfo:
     nominated_for_best: List[NominatedForBest] = field(default_factory=list)
     bonuses_from_players: List[BonusFromPlayers] = field(default_factory=list)
     bonuses_for_tolerant: List[BonusTolerantFromPlayers] = field(default_factory=list)
+
+
+@dataclass
+class Club:
+    name: str

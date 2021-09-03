@@ -132,6 +132,10 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
     def rating(self):
         return repositories.RatingRepository(self.session)
 
+    @property
+    def clubs(self):
+        return repositories.ClubRepository(self.session)
+
 
 class SqlAlchemyUnitOfWorkManager(UnitOfWorkManager):
 
@@ -438,8 +442,9 @@ class DatabaseSchema:
                 'name',
                 String,
                 unique=True,
-                nullable=False
-            )
+                nullable=False,
+                primary_key=True
+            ),
         )
 
 
@@ -469,6 +474,7 @@ def _configure_mappings(metadata):
 
     mapper(model.Season, meta.season)
     mapper(model.Rating, meta.rating)
+    mapper(model.Club, meta.clubs)
 
     return metadata
 

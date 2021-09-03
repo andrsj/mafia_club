@@ -22,6 +22,7 @@ class ClassicRole(enum.Enum):
     sheriff = 2
     don = 3
 
+
 class GameResult(enum.Enum):
     unfinished = 0
     citizen = 1
@@ -139,3 +140,12 @@ class Result:
         if game_result == game_result.mafia and game_role in (ClassicRole.mafia, ClassicRole.don):
             return True
         return False
+
+
+@dataclass
+class BlankError:
+    spreadsheet_name: str
+    worksheet_name: str
+    information: str
+    heading: str
+    worksheet_url: str

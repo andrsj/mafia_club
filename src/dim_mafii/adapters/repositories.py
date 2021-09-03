@@ -340,3 +340,11 @@ class SeasonRepository:
 
     def get_by_name(self, name: str):
         self._session.query(model.Rating).filter_by(name=name).first()
+
+
+class ClubRepository:
+    def __init__(self, session: Session):
+        self._session = session
+
+    def get_clubs(self) -> List[model.Club]:
+        return self._session.query(model.Club).all()

@@ -162,6 +162,11 @@ def create_parser_for_blanks_checker():
     parser = argparse.ArgumentParser(description='Generate spreadsheets for new game in date range')
 
     parser.add_argument(
+        '--name',
+        dest='name',
+        help='Searching by name'
+    )
+    parser.add_argument(
         '--month',
         dest='month',
         help='Month of blanks'

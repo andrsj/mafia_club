@@ -1,7 +1,10 @@
 include .env
 
-.PHONY: 
-	stop up build run-migrations
+all: stop build up-test pause run-migrations
+.PHONY: all
+
+pause:
+	sleep 3s
 
 stop: 
 	docker-compose down

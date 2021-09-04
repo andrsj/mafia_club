@@ -62,7 +62,7 @@ def main():
     try:
         new_url = check_spreadsheets_for_errors(manager, names_spreadsheets, status)
     except APIError:
-        print('Ooops, problem with Google API')
+        print('Ooops, problem with Google API, plz rerun this script a little bit later')
         return
 
     if new_url:

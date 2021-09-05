@@ -1,10 +1,13 @@
+from argparse import Namespace
 from typing import Optional, Dict, List, Tuple
 
 import inject
 
+from dim_mafii.adapters.infrastructure import MessageBus
 from dim_mafii.domain.infrastructure import UnitOfWorkManager
 from dim_mafii.domain.types import GameResult, AdvancedGameResult, ClassicRole, BlankError
 from dim_mafii.sheet_parser.client2 import SpreadSheetManager
+from dim_mafii.sheet_parser.blank_version_2 import BlankParser
 
 
 class MatrixParser:
@@ -498,3 +501,104 @@ def check_spreadsheets_for_errors(
     if all_errors:
         url = manager.write_game_errors(all_errors, status)
         return url
+
+
+def parse_and_write_in_db_games(manager: SpreadSheetManager, list_of_spreadsheets_titles: List[str], args: Namespace):
+    map_spreadsheets_name_ids = manager.get_map_spreadsheets_id_by_names(list_of_spreadsheets_titles)
+
+    if not map_spreadsheets_name_ids:
+        # TODO rewrite with logger on next Pull Request
+        print('Not found ANY of these spreadsheets')
+        return
+
+    for spreadsheet_name in map_spreadsheets_name_ids:
+        # TODO rewrite with logger on next Pull Request
+        print(spreadsheet_name, '\n')
+
+        spreadsheet_id = map_spreadsheets_name_ids[spreadsheet_name]
+        spreadsheet = manager.get_spreadsheet_by_id(spreadsheet_id)
+
+        all_matrix: Dict[str: List[List]] = manager.get_matrix_from_sheet(spreadsheet)
+
+        for blank_title in all_matrix:
+            normalized_matrix = manager.get_sub_matrix(all_matrix[blank_title])
+            matrix_parser = MatrixParser(normalized_matrix)
+            blank_checker = BlankChecker(matrix_parser)
+
+            if blank_checker.check_empty_blank():
+                # TODO rewrite with logger on next Pull Request
+                print('Empty blank:', blank_title)
+                continue
+
+            if blank_checker.game_info_is_correct():
+                # TODO rewrite with logger on next Pull Request
+                print('Correct blank:', blank_title)
+
+                matrix = manager.get_sub_matrix(all_matrix[blank_title])
+                result = filling_one_game_in_db(matrix, spreadsheet.title, blank_title, args)
+                print(f"\033[92m{result}\033[0m")
+            else:
+                print('\033[91m'
+                      f"Incorrect blank: '{blank_title}' - this blank will skipped\n"
+                      f"To see mistakes - check blank with another script"
+                      '\033[0m')
+                continue
+
+
+def filling_one_game_in_db(
+    blank_matrix: List[List],
+    sheet_title: str,
+    blank_title: str,
+    args: Namespace
+):
+
+    handlers = (
+        (args.houses, "parse_houses"),
+        (args.voted, "parse_voted"),
+        (args.kills, "parse_kills"),
+        (args.breaks, "parse_breaks"),
+        (args.misses, "parse_misses"),
+        (args.devises, "parse_devises"),
+        (args.best_moves, "parse_best_move"),
+        (args.don_checks, "parse_don_checks"),
+        (args.disqualifieds, "parse_disqualified"),
+        (args.hand_of_mafia, "parse_hand_of_mafia"),
+        (args.sheriff_checks, "parse_sheriff_checks"),
+        (args.sheriff_versions, "parse_sheriff_versions"),
+        (args.nominated_for_best, "parse_nominated_for_best"),
+        (args.bonus_from_heading, "get_bonus_points_from_heading"),
+        (args.bonus_from_players, "get_bonus_points_from_houses_data"),
+        (args.bonus_tolerant, "get_bonus_tolerant_points_from_houses_data"),
+    )
+
+    bus = inject.instance(MessageBus)
+
+    blank_parser = BlankParser(blank_matrix)
+    game_info = blank_parser.parse_game_info(sheet_title)
+    if blank_parser.if_game_is_new():
+        # TODO Update GAME ID
+        ...
+    else:
+        # If game already has GameID
+        if args.ready:
+            return
+
+    # If arguments for updating game info or full game
+    if args.full or args.games:
+        bus.publish(game_info)
+
+    for arg, method_name in handlers:
+        if arg or args.full:
+            method = getattr(blank_parser, method_name)
+            event = method()
+
+            # Check if it's list of events or one event
+            if event is None:
+                continue
+            if not isinstance(event, list):
+                bus.publish(event)
+            elif isinstance(event, list):
+                for event_ in event:
+                    bus.publish(event_)
+
+    return f"Blank {blank_title} was saved"

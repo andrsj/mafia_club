@@ -217,13 +217,6 @@ def create_parser_for_blank_feeling():
     parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
 
     parser.add_argument(
-        '--no-check',
-        dest='check',
-        help='Argument for skipping check blanks',
-        action='store_false'
-    )
-
-    parser.add_argument(
         '--month',
         dest='month',
         help='Parse all blanks in month'
@@ -260,10 +253,9 @@ def create_parser_for_blank_feeling():
         type=str,
         required=False
     )
-
     parser.add_argument(
-        "--blank",
-        dest='blank_title',
+        "--date",
+        dest='date',
         type=str,
         required=False
     )

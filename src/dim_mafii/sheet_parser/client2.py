@@ -241,6 +241,25 @@ class SpreadSheetManager:
             )
         spreadsheet.batch_update(body={'requests': requests})
 
+    def write_games_id_for_blanks(self, spreadsheet: Spreadsheet, map_blank_id: Dict[str, str]):
+        requests = []
+        worksheets = spreadsheet.worksheets()
+
+        for worksheet in worksheets:
+            if worksheet.title not in map_blank_id:
+                # Skip already marked games
+                continue
+
+            requests.append(
+                self.create_body_request_for_marking_blank(
+                    worksheet=worksheet,
+                    column=4,
+                    row=8,
+                    value=map_blank_id.get(worksheet.title, '')
+                )
+            )
+        spreadsheet.batch_update(body={'requests': requests})
+
     @staticmethod
     def create_body_request_for_marking_blank(worksheet: Worksheet, column: int, row: int, value: str):
         return {

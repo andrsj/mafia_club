@@ -61,10 +61,10 @@ check-for-errors-by-date-range:
 	python src/dim_mafii/cli/blanks_checker.py --start=$(start) --end=$(end)
 
 fill-games-month:
-	python src/dim_mafii/cli/feel_games_blank_2.py --month=$(month) --year=$(year) --full
+	python src/dim_mafii/cli/fill_games_blank_2.py --month=$(month) --year=$(year) --full
 
 fill-games-range:
-	python src/dim_mafii/cli/feel_games_blank_2.py --start=$(start) --end=$(end) --full
+	python src/dim_mafii/cli/fill_games_blank_2.py --start=$(start) --end=$(end) --full
 
 w_dump:
 	cat $(name) | docker exec -i test_zlo_db psql -U test_zlo

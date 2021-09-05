@@ -1,3 +1,4 @@
+import uuid
 from argparse import Namespace
 from typing import Optional, Dict, List, Tuple
 
@@ -247,7 +248,6 @@ class BlankChecker:
             self.check_winner,
             self.check_club,
             self.check_kills_with_votes,
-            # TODO self.check_bonuses
             self.check_correct_kicks,
             self.check_mafia_hand,
             self.check_count_players_of_end_game
@@ -343,10 +343,6 @@ class BlankChecker:
                 errors.append(f"Відсутній гравець в базі з ніком '{nickname}' за слотом {i}")
 
         return errors
-
-    def check_bonuses(self):
-        # TODO Check type of bonuses [int slot OR float value]
-        ...
 
     def check_correct_kicks(self) -> List[str]:
         ten_slots = {i: 0 for i in list(range(1, 11))}
@@ -518,7 +514,9 @@ def parse_and_write_in_db_games(manager: SpreadSheetManager, list_of_spreadsheet
         spreadsheet_id = map_spreadsheets_name_ids[spreadsheet_name]
         spreadsheet = manager.get_spreadsheet_by_id(spreadsheet_id)
 
-        all_matrix: Dict[str: List[List]] = manager.get_matrix_from_sheet(spreadsheet)
+        all_matrix: Dict[str, List[List]] = manager.get_matrix_from_sheet(spreadsheet)
+
+        map_blank_ids = {}  # There will be all NEW [without game ID] games
 
         for blank_title in all_matrix:
             normalized_matrix = manager.get_sub_matrix(all_matrix[blank_title])
@@ -530,19 +528,33 @@ def parse_and_write_in_db_games(manager: SpreadSheetManager, list_of_spreadsheet
                 print('Empty blank:', blank_title)
                 continue
 
-            if blank_checker.game_info_is_correct():
-                # TODO rewrite with logger on next Pull Request
-                print('Correct blank:', blank_title)
+            if not matrix_parser.get_game_id():
+                new_game_id = str(uuid.uuid4())
+                map_blank_ids[blank_title] = new_game_id
+                normalized_matrix[6][2] = new_game_id
 
-                matrix = manager.get_sub_matrix(all_matrix[blank_title])
-                result = filling_one_game_in_db(matrix, spreadsheet.title, blank_title, args)
-                print(f"\033[92m{result}\033[0m")
+            if blank_checker.game_info_is_correct():
+                result = filling_one_game_in_db(normalized_matrix, spreadsheet.title, blank_title, args)
+
+                # TODO rewrite with logger on next Pull Request
+                print(result)
+
             else:
-                print('\033[91m'
-                      f"Incorrect blank: '{blank_title}' - this blank will skipped\n"
-                      f"To see mistakes - check blank with another script"
-                      '\033[0m')
+                # TODO rewrite with logger on next Pull Request
+                print(f"Incorrect blank: '{blank_title}' - this blank will skipped\n"
+                      f"To see mistakes - check blank with another script\n")
+
                 continue
+
+        # Write all new game's IDs
+        if map_blank_ids:
+            manager.write_games_id_for_blanks(spreadsheet, map_blank_ids)
+            # TODO rewrite with logger on next Pull Request
+            print(f'Marked ids:', ','.join([i for i in map_blank_ids]))
+
+        print()
+
+    print()
 
 
 def filling_one_game_in_db(
@@ -575,13 +587,6 @@ def filling_one_game_in_db(
 
     blank_parser = BlankParser(blank_matrix)
     game_info = blank_parser.parse_game_info(sheet_title)
-    if blank_parser.if_game_is_new():
-        # TODO Update GAME ID
-        ...
-    else:
-        # If game already has GameID
-        if args.ready:
-            return
 
     # If arguments for updating game info or full game
     if args.full or args.games:

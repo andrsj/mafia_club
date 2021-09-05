@@ -20,17 +20,17 @@
 - `make db` - Прямий вхід в базу (коротка команда)
 - `make update-fixtures` - Оновити фікстури для tests
 - `make players` - записати (оновити) таблицю з гравцями
-- !`make check-for-errors month=** year=**` - Перевірити бланк на місяць і рік (Alias для `by-month`):\
-- !`make check-for-errors-by-month month=** year=**` - Перевірити бланки в межі одного місяця
-- `make check-for-errors-for-date date=**` - Перевірити бланки за датою
-- `make check-for-errors-by-date-range` - Перевірити бланки в межах дат
+- !`make check-for-errors month=ABC year=1234` - Перевірити бланк на місяць і рік (Alias для `by-month`):\
+- !`make check-for-errors-by-month month=ABC year=1234` - Перевірити бланки в межі одного місяця
+- `make check-for-errors-for-date date=11_11_1111` - Перевірити бланки за датою
+- `make check-for-errors-by-date-range start=11_11_1111 end=22_22_2222` - Перевірити бланки в межах дат
 Рік - чотирьохзначне число (`year=2021`)\
 Місяць - україньска назва (Для прикладу: `month=Січень`)
-- `make create-sheets-by-range start=** end=**` - створити бланки від початкової дати до кінцевої\
+- `make create-sheets-by-range start=11_11_1111 end=22_22_2222` - створити бланки від початкової дати до кінцевої\
 Дата вказується в тому форматі, яка зазначена в конфігурації (`src/dim_mafii/domain/config.py`)\
 Для прикладу: `start=01_01_1999` якщо `DATE_FORMAT = "%d_%m_%Y"`
-- !`make fill-games-month month=** year=**` - Записати ігри в базу в межах одного місяця
-- !`make fill-games-range start=** end=**` - Записати ігри в базу в межах двох дат  
+- !`make fill-games-month month=ABC year=1234` - Записати ігри в базу в межах одного місяця
+- !`make fill-games-range start=11_11_1111 end=22_22_2222` - Записати ігри в базу в межах двох дат  
 
 ---
 *! Must have scripts

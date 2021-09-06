@@ -403,7 +403,7 @@ class BlankChecker:
                     return ['Не вірна к-сть гравців, що вийшла при 3х3']
 
                 # If citizens more than mafias
-                if not len([slot for slot in ten_slots if slot not in mafias_slots]) <= 3:
+                if len([slot for slot in ten_slots if slot not in mafias_slots]) > 3:
                     return ['К-сть мирних більша за мафів при 3х3']
 
             elif adv_res.value == AdvancedGameResult.two_on_two.value:
@@ -411,19 +411,20 @@ class BlankChecker:
                     return ['Не вірна к-сть гравців, що вийшла при 2х2']
 
                 # If citizens more than mafias
-                if not len([slot for slot in ten_slots if slot not in mafias_slots]) <= 2:
-                    return ['К-сть мирних і мафів різна при 2х2']
+                if len([slot for slot in ten_slots if slot not in mafias_slots]) > 2:
+                    return ['К-сть мирних більша за мафів при 2х2']
 
             elif adv_res.value == AdvancedGameResult.one_on_one:
                 if len(ten_slots) > 2:
                     return ['Не вірна к-сть гравців, що вийшла при 1х1']
 
                 # If citizens more than mafias
-                if not len([slot for slot in ten_slots if slot not in mafias_slots]) <= 1:
-                    return ['К-сть мирних і мафів різна при 1х1']
+                if len([slot for slot in ten_slots if slot not in mafias_slots]) > 1:
+                    return ['К-сть мирних більша за мафів при 1х1']
 
             elif adv_res.value in (AdvancedGameResult.clear_citizen.value, AdvancedGameResult.guessing_game.value):
-                if len([slot for slot in mafias_slots if slot not in ten_slots]) != 3:
+                # If one or more mafias in end game
+                if len([slot for slot in mafias_slots if slot not in ten_slots]):
                     return ['При виграші мирних не всі мафіозники вийшли з гри']
 
 

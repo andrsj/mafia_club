@@ -424,7 +424,7 @@ class BlankChecker:
 
             elif adv_res.value in (AdvancedGameResult.clear_citizen.value, AdvancedGameResult.guessing_game.value):
                 # If one or more mafias in end game
-                if len([slot for slot in mafias_slots if slot not in ten_slots]):
+                if len([slot for slot in mafias_slots if slot in ten_slots]):
                     return ['При виграші мирних не всі мафіозники вийшли з гри']
 
 

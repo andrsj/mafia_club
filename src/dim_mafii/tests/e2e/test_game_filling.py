@@ -10,40 +10,15 @@ from dim_mafii.credentials.config import LIST_OF_PLAYERS_SPREADSHEET
 from dim_mafii.domain.blank_worker import filling_one_game_in_db
 from dim_mafii import config
 from dim_mafii.adapters import orm
+from dim_mafii.domain.utils import create_parser_for_blank_feeling
 from dim_mafii.sheet_parser.client2 import SpreadSheetManager
 from dim_mafii.tests import fixtures
 from dim_mafii.tests.fixture import get_excepted_models, TEST_VALUE_FOR_DATE
 
 
-class Arguments:
-    houses = False
-    voted = False
-    kills = False
-    breaks = False
-    misses = False
-    devises = False
-    best_moves = False
-    don_checks = False
-    disqualifieds = False
-    hand_of_mafia = False
-    sheriff_checks = False
-    sheriff_versions = False
-    nominated_for_best = False
-    bonus_from_heading = False
-    bonus_from_players = False
-    bonus_tolerant = False
-    date = ""
-    sheet = ""
-    month = ""
-    year = 0
-    start = ""
-    end = ""
-    ready = False
-    full = False
-
-
 class BlankParserMixin:
-    args = Arguments
+    parser = create_parser_for_blank_feeling()
+    args = parser.parse_args(['--full'])
 
     @staticmethod
     def get_matrix_data(file_name):
@@ -69,7 +44,6 @@ class WhenCleanCitizenWritten(BlankParserMixin):
         sqlalchemy = orm.make_sqlalchemy(postgres_url)
         self.unit_of_work = sqlalchemy.unit_of_work_manager()
 
-        self.args.full = True
         self.matrix = self.get_matrix_data(self.title)
 
         manager = SpreadSheetManager()

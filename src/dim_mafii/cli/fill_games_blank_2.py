@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+from gspread.exceptions import APIError
+
 from dim_mafii.adapters.bootstrap import bootstrap
 from dim_mafii.cli.setup_env_for_test import setup_env_with_test_database
 from dim_mafii.domain.blank_worker import parse_and_write_in_db_games
@@ -49,7 +51,10 @@ def main():
 
     manager = SpreadSheetManager()
 
-    parse_and_write_in_db_games(manager, spreadsheet_names, arguments)
+    try:
+        parse_and_write_in_db_games(manager, spreadsheet_names, arguments)
+    except APIError as e:
+        print(f'Oooops, API Error [{e.response}], plz rerun script a little bit later')
 
 
 if __name__ == '__main__':

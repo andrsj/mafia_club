@@ -397,6 +397,9 @@ class BlankChecker:
 
             adv_res: AdvancedGameResult = self.parser.get_advanced_result()
 
+            if adv_res is None:
+                return ['Не позначено переможця гри']
+
             if adv_res.value == AdvancedGameResult.three_on_three.value:
                 if len(ten_slots) > 6:
                     return ['Не вірна к-сть гравців, що вийшла при 3х3']

@@ -5,7 +5,7 @@ from typing import List, Dict
 
 import inject
 from dim_mafii.domain.types import GameID
-from dim_mafii.domain.utils import EventHouseModel
+from dim_mafii.domain.model import EventHouseModel
 from dim_mafii.domain import events, model
 from dim_mafii import domain
 from dim_mafii.domain.infrastructure import UnitOfWorkManager, HouseCacheMemory
@@ -177,7 +177,7 @@ class CreateOrUpdateBestMoveHandler(BaseHandler):
                 best_move.killed_house = killed_house.house_id
                 best_move.best_1 = best_1_house.house_id
                 best_move.best_2 = best_2_house.house_id
-                best_move.best_3 = best_3_house.house_id
+                best_move.best_3 = best_3_house.house_id if best_3_house else None
             tx.commit()
 
 

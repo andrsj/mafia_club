@@ -66,6 +66,9 @@ fill-games-month:
 fill-games-range:
 	python src/dim_mafii/cli/fill_games_blank_2.py --start=$(start) --end=$(end) --full
 
+mmr-range:
+	python src/dim_mafii/cli/calculate_mmr2.py --start $(start) --end $(end) --club "$(club)"
+
 w_dump:
 	cat $(name) | docker exec -i test_zlo_db psql -U test_zlo
 
@@ -77,3 +80,10 @@ ri_dump:
 
 db:
 	docker exec -it test_zlo_db psql -U test_zlo
+
+show-game_by_id:
+	python src/dim_mafii/cli/show_game.py --game_id $(id)
+
+show-game_by_date:
+	python src/dim_mafii/cli/show_game.py --date $(date)
+

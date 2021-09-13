@@ -1,45 +1,16 @@
 import os
-from uuid import UUID
-from typing import Dict
+import csv
 from datetime import datetime
-from collections import defaultdict
 
 import inject
 
-from dim_mafii.domain.utils import create_parser_for_date_range
+from dim_mafii.domain.utils import create_parser_for_rating
 from dim_mafii.domain.infrastructure import UnitOfWorkManager
-from dim_mafii.domain.mmr_calculators.general_calculator import GameMMRCalculator
 from dim_mafii.adapters.bootstrap import bootstrap
 from dim_mafii.domain.config import DATE_FORMAT
+from dim_mafii.domain.mmr_calculators.general_calculator import get_mmr
 
 from dim_mafii.cli.setup_env_for_test import setup_env_with_test_database
-
-
-@inject.params(
-    uowm=UnitOfWorkManager
-)
-def get_mmr(uowm: UnitOfWorkManager, start_date: datetime, end_date: datetime, clubname: str):
-    with uowm.start() as tx:
-        players = tx.players.all()
-        games = tx.games.get_by_datetime_range(start_date=start_date, end_date=end_date)
-        houses = tx.houses.get_all_houses()
-
-    mmr = 1500 if clubname == 'ZLO' else 1000
-    houses = [house for house in houses if house.game_id in (game.game_id for game in games)]
-    players = [player for player in players if player.player_id in (house.player_id for house in houses)]
-    final_result: Dict[UUID, int] = {player.player_id: mmr for player in players}
-    detail_rating = defaultdict(list)
-
-    gameMMRcalculator = GameMMRCalculator(uowm=uowm)
-    for game in filter(lambda g: g.club == clubname, games):
-
-        delta_rating = gameMMRcalculator.calculate_mmr(game, final_result)
-
-        for uuid in delta_rating:
-            detail_rating[uuid].append(delta_rating[uuid])
-            final_result[uuid] += delta_rating[uuid]
-
-    return final_result, detail_rating
 
 
 if __name__ == '__main__':
@@ -47,16 +18,15 @@ if __name__ == '__main__':
     setup_env_with_test_database(cfg)
     bootstrap(cfg)
 
-    # parser = create_parser_for_date_range()
-    # args = parser.parse_args()
+    parser = create_parser_for_rating()
+    args = parser.parse_args()
 
-    # start = datetime.strptime(args.start_date_of_day, DATA_FORMAT)
-    start = datetime(2021, 1, 1)
+    start = datetime.strptime(args.start_date_of_day, DATE_FORMAT)
 
-    # end = datetime.strptime(args.end_date_of_day, DATA_FORMAT)
-    end = datetime(2021, 5, 8)
-    # 4.4.21
-    # 8.5.21
+    end = datetime.strptime(args.end_date_of_day, DATE_FORMAT)
+    # 01.01.2021 - 04.04.2021 - First MMR
+    # 01.01.2021 - 08.05.2021 - Second MMR
+    # 01.01.2021 - 31.08.2021 - Third MMR
 
     uowm = inject.instance(UnitOfWorkManager)
     with uowm.start() as tx:
@@ -64,12 +34,9 @@ if __name__ == '__main__':
 
     rating, detail_rating = get_mmr(
         uowm,
-        # start_date=datetime.strptime(args.start_date_of_day, DATA_FORMAT),
         start_date=start,
-        # end_date=datetime.strptime(args.end_date_of_day, DATA_FORMAT),
         end_date=end,
-        # clubname='ZLO'  # ZLO | Школа Зло
-        clubname='Школа Зло'
+        club_name=args.club
     )
 
     rating = {next(filter(lambda p: p.player_id == i, players)).displayname: j
@@ -83,8 +50,7 @@ if __name__ == '__main__':
     for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
         print(i, j, len(detail_rating.get(i)))
 
-    import csv
-    with open('rating_school.csv', 'w') as csv_file:
+    with open('rating_{}.csv'.format(args.club), 'w') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
         writer.writeheader()
         for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):
@@ -94,7 +60,7 @@ if __name__ == '__main__':
                 'Games': len(detail_rating.get(i, []))
             })
 
-    with open('rating_school-15.csv', 'w') as csv_file:
+    with open('rating_{}-15.csv'.format(args.club), 'w') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=['Nickname', 'MMR', 'Games'])
         writer.writeheader()
         for i, j in sorted(rating.items(), key=lambda x: x[1], reverse=True):

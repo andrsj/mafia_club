@@ -31,7 +31,9 @@
 Для прикладу: `start=01_01_1999` якщо `DATE_FORMAT = "%d_%m_%Y"`
 - !`make fill-games-month month=ABC year=1234` - Записати ігри в базу в межах одного місяця
 - !`make fill-games-range start=11_11_1111 end=22_22_2222` - Записати ігри в базу в межах двох дат  
-
+- !`make mmr-range start=11_11_1111 end=22_22_2222 club=ABC` - Порахувати MMR для клубу в межах дат
+- `make show-game_by_id id=123asd456qwe...` - Показати гру в базі з таким ID
+- `make show-game_by_date date=11_11_1111` - Показати ігри в базі за такою датою
 ---
 *! Must have scripts
 
@@ -51,8 +53,7 @@
 - `cli/save_players_to_json.py` - Зберегти гравців в `dim_mafii/tests/fixtures/players.json`
 - `cli/setup_end_for_test.py` - Тимчасовий код для використання тестової бази
 - `cli/show_game.py` - Демонстрація усієї гри в консоль
-
+- `cli/change_club_names_blanks.py` - Зміна назв клубів на актуальні
 ---
 
 *(Вже не актуально або це був тимчасовий скрипт, можливо потім буде використовуватися)
-

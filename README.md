@@ -1,6 +1,6 @@
 # Інтерфейс для введення ігор
 
-## [Copy of spreadsheet](https://docs.google.com/spreadsheets/d/1TSmU7pTWiW-TxgCs0RWqbOdI5VhRVC5Wtde2KQ79-xU/edit#gid=1765678933)
+## [Copy of spreadsheet](https://docs.google.com/spreadsheets/d/1iTQACTebR7fkn-oU2yrhnAlxbaSi3vgdwhX4CSWZStA/edit?usp=sharing)
 
 ### Перший запуск роботи інтерфейсу
 0. `$: python3 -m venv <env>; source <env>/bin/activate` (Virtual Environment)
@@ -44,13 +44,13 @@
 `clubname` - фільтрація ігор по клубах (Рейтингова|Школа), \
 `filename` - назва CSV file\
 `start | end` - початкова і кінцева дата фільтрації ЗАПИСАНИХ ігор)
-- *`cli/calculate_rating.py` - Статистика ігор - [Spreadsheet](https://docs.google.com/spreadsheets/d/1xmkkaNULRmD6pJeB6kdz_SPEOi76DrIFirP4fou1k5Y/edit#gid=1696394479)
+- *`cli/calculate_rating.py` - Статистика ігор - [Spreadsheet](https://docs.google.com/spreadsheets/d/1UKx8qht_Q-oCpfQQ-CZhAYO4m4bRRZgHruoDIe6eaP8/edit?usp=sharing)
 - *`cli/feel_games_and_houses.py` - Дуже старий скрипт запису ігор для старого формату бланків
 - *`cli/fix_name_club.py` - Зміна назви клубів (Не актуальний, так як назви клубів записані в міграціях)
 - *`cli/generate_statistic` - Стара версія статистики (Не актуально)
-- *`cli/get_all_nicknames_in_games.py` - Отримати список всіх гравців, що ГРАЛИ в іграх в конкретному місяці - [Spreadsheet](https://docs.google.com/spreadsheets/d/1LlgeZ8AmgRIV-WN9qjwT-q3k4FtwoVKigy5islO6BjA/edit#gid=1773681275)
+- *`cli/get_all_nicknames_in_games.py` - Отримати список всіх гравців, що ГРАЛИ в іграх в конкретному місяці - [Spreadsheet](https://docs.google.com/spreadsheets/d/13RzC_2_SRfByHojjPCofzdZMf76oAuyoaSPvajr3fHM/edit?usp=sharing)
 - *`cli/list_last_year_players.py` - Отримати список гравців, які грали в ігри на протязі останнього року
-- `cli/save_players_to_json.py` - Зберегти гравців в `dim_mafii/tests/fixtures/players.json`
+- `cli/save_players_to_json.py` - Зберегти гравців в `dim_mafii/tests/fixtures/players.json` для Unit тестів
 - `cli/setup_end_for_test.py` - Тимчасовий код для використання тестової бази
 - `cli/show_game.py` - Демонстрація усієї гри в консоль
 - `cli/change_club_names_blanks.py` - Зміна назв клубів на актуальні

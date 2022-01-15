@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='zlo',
+    name='dim_mafii',
     version='0.1',
-    packages=['zlo'],
+    packages=['dim_mafii'],
 )

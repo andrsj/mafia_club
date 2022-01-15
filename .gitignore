@@ -3,6 +3,10 @@
 env
 __pycache__
 *.sql
+token.py
 
 zlomafiaclub-bf747a844d45.json
 /*.py
+Errors.txt
+**/cli/*.json
+**/cli/*.csv

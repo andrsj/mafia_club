@@ -1,0 +1,8 @@
+setup.py
+dim_mafii/__init__.py
+dim_mafii/config.py
+dim_mafii/run.py
+dim_mafii.egg-info/PKG-INFO
+dim_mafii.egg-info/SOURCES.txt
+dim_mafii.egg-info/dependency_links.txt
+dim_mafii.egg-info/top_level.txt

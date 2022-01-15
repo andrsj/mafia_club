@@ -1,8 +1,0 @@
-setup.py
-zlo/__init__.py
-zlo/config.py
-zlo/run.py
-zlo.egg-info/PKG-INFO
-zlo.egg-info/SOURCES.txt
-zlo.egg-info/dependency_links.txt
-zlo.egg-info/top_level.txt

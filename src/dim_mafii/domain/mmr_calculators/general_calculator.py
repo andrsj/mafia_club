@@ -1,6 +1,10 @@
 from uuid import UUID
 from typing import Dict
+from datetime import datetime
 from collections import defaultdict
+
+
+import inject
 
 
 from dim_mafii.domain import mmr_calculators as mmr
@@ -63,3 +67,30 @@ class GameMMRCalculator:
                 delta_rating[uuid] += delta_by_one_rule[uuid]
 
         return delta_rating
+
+
+@inject.params(
+    uowm=UnitOfWorkManager
+)
+def get_mmr(uowm: UnitOfWorkManager, start_date: datetime, end_date: datetime, club_name: str):
+    with uowm.start() as tx:
+        players = tx.players.all()
+        games = tx.games.get_by_datetime_range(start_date=start_date, end_date=end_date)
+        houses = tx.houses.get_all_houses()
+
+    mmr = 1500 if club_name == 'Дім Мафії' else 1000
+    houses = [house for house in houses if house.game_id in (game.game_id for game in games)]
+    players = [player for player in players if player.player_id in (house.player_id for house in houses)]
+    final_result: Dict[UUID, int] = {player.player_id: mmr for player in players}
+    detail_rating = defaultdict(list)
+
+    gameMMRcalculator = GameMMRCalculator(uowm=uowm)
+    for game in filter(lambda g: g.club == club_name, games):
+
+        delta_rating = gameMMRcalculator.calculate_mmr(game, final_result)
+
+        for uuid in delta_rating:
+            detail_rating[uuid].append(delta_rating[uuid])
+            final_result[uuid] += delta_rating[uuid]
+
+    return final_result, detail_rating

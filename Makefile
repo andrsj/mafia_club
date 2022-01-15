@@ -39,32 +39,35 @@ run-all-tests:
 update-fixtures: 
 	python src/dim_mafii/cli/create_fixtures_from_sheet.py --sheet ТестовийБланкНеДляПротоколуіРейтингу
 
-blanks-check-for-errors: 
+check-for-errors: 
 	python src/dim_mafii/cli/blanks_checker.py --month=$(month) --year=$(year)
 
-blanks-create-or-update-players: 
+players: 
 	python src/dim_mafii/cli/create_or_update_players.py
 
 blanks-get-all-nicknames:
 	python src/dim_mafii/cli/get_all_nicknames_in_games.py --month=$(month) --year=$(year)
 
-blanks-create-sheet-by-range:
+create-sheets-by-range:
 	python src/dim_mafii/cli/generate_sheets.py --start=$(start) --end=$(end)
 
-blanks-check-for-errors-by-month:
+check-for-errors-by-month:
 	python src/dim_mafii/cli/blanks_checker.py --month=$(month) --year=$(year)
 
-blanks-check-for-errors-for-date:
+check-for-errors-for-date:
 	python src/dim_mafii/cli/blanks_checker.py --date=$(date)
 
-blanks-check-for-errors-by-date-range:
+check-for-errors-by-date-range:
 	python src/dim_mafii/cli/blanks_checker.py --start=$(start) --end=$(end)
 
-blanks-feel-games-month:
-	python src/dim_mafii/cli/feel_games_blank_2.py --month=$(month) --year=$(year) --full
+fill-games-month:
+	python src/dim_mafii/cli/fill_games_blank_2.py --month=$(month) --year=$(year) --full
 
-blanks-feel-games-range:
-	python src/dim_mafii/cli/feel_games_blank_2.py --start=$(start) --end=$(end) --full
+fill-games-range:
+	python src/dim_mafii/cli/fill_games_blank_2.py --start=$(start) --end=$(end) --full
+
+mmr-range:
+	python src/dim_mafii/cli/calculate_mmr2.py --start $(start) --end $(end) --club "$(club)"
 
 w_dump:
 	cat $(name) | docker exec -i test_zlo_db psql -U test_zlo
@@ -77,3 +80,10 @@ ri_dump:
 
 db:
 	docker exec -it test_zlo_db psql -U test_zlo
+
+show-game_by_id:
+	python src/dim_mafii/cli/show_game.py --game_id $(id)
+
+show-game_by_date:
+	python src/dim_mafii/cli/show_game.py --date $(date)
+

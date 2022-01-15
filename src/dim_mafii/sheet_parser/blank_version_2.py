@@ -24,14 +24,10 @@ class WrongRoleValue(ValueError):
 class BlankParser:
     def __init__(self, matrix):
         self._matrix = matrix
+        if not self._matrix[6][2]:
+            raise ValueError('Not found game ID')
         self._game_id = self._matrix[6][2]
-        self._new_game = False
-        if not self._game_id:
-            self._game_id = str(uuid.uuid4())
-            self._new_game = True
 
-    def if_game_is_new(self):
-        return self._new_game
 
     def parse_game_result(self):
         """

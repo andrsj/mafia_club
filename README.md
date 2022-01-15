@@ -8,8 +8,8 @@
 2. Записати **credentials** для GoogleAPI в `src/dim_mafii/credentials/***.json`
 3. `$: make up-test` (Запуск бази (Не дивуємося що це тестова база))
 4. `$: make run-migrations` (Запуск міграцій тестової бази даних)
-5. `$: docker exec -it test_zlo_db psql -U test_zlo` (Прямий доступ до БД, можна і через локальний клієнт `psql`)
-6. `make blanks-create-or-update-players` (Записати гравців в БД з бланку гравців)
+5. `$: make db` (Прямий доступ до БД, без потреби паролю)
+6. `$: make players` (Записати гравців в БД з бланку гравців)
 7. Done, можна продовжувати роботу з скриптами (Всі скрипти в директорії `src/dim_mafii/cli`)
 
 ### CLI scripts які записані в `makefile`
@@ -18,23 +18,24 @@
 - `make r_dump name=**` - Записати dump `sql` з бази
 - `make ri_dump name=**` - Записати dump `sql` (тільки вміст) з бази
 - `make db` - Прямий вхід в базу (коротка команда)
-- `make update-fixtures` - Оновити фікстури для unit-tests
-- `make blanks-create-or-update-players` - записати (оновити) таблицю з гравцями
-- `make blanks-check-for-errors month=** year=**` - Перевірити бланк на місяць і рік (Alias для `by-month`):\
-- `make blanks-check-for-errors-by-month month=** year=**` - Перевірити бланки в межі одного місяця
-- `make blanks-check-for-errors-for-date date=**` - Перевірити бланки за датою
-- `make blanks-check-for-errors-by-date-range` - Перевірити бланки в межах дат
+- `make update-fixtures` - Оновити фікстури для tests
+- `make players` - записати (оновити) таблицю з гравцями
+- !`make check-for-errors month=ABC year=1234` - Перевірити бланк на місяць і рік (Alias для `by-month`):\
+- !`make check-for-errors-by-month month=ABC year=1234` - Перевірити бланки в межі одного місяця
+- `make check-for-errors-for-date date=11_11_1111` - Перевірити бланки за датою
+- `make check-for-errors-by-date-range start=11_11_1111 end=22_22_2222` - Перевірити бланки в межах дат
 Рік - чотирьохзначне число (`year=2021`)\
 Місяць - україньска назва (Для прикладу: `month=Січень`)
-- `make blanks-create-sheet-by-range start=** end=**` - створити бланки від початкової дати до кінцевої\
+- `make create-sheets-by-range start=11_11_1111 end=22_22_2222` - створити бланки від початкової дати до кінцевої\
 Дата вказується в тому форматі, яка зазначена в конфігурації (`src/dim_mafii/domain/config.py`)\
 Для прикладу: `start=01_01_1999` якщо `DATE_FORMAT = "%d_%m_%Y"`
-- *`make blanks-feel-games-month month=** year=**` - Записати ігри в базу в межах одного місяця
-- *`make blanks-feel-games-range start=** end=**` - Записати ігри в базу в межах двох дат  
-
+- !`make fill-games-month month=ABC year=1234` - Записати ігри в базу в межах одного місяця
+- !`make fill-games-range start=11_11_1111 end=22_22_2222` - Записати ігри в базу в межах двох дат  
+- !`make mmr-range start=11_11_1111 end=22_22_2222 club=ABC` - Порахувати MMR для клубу в межах дат
+- `make show-game_by_id id=123asd456qwe...` - Показати гру в базі з таким ID
+- `make show-game_by_date date=11_11_1111` - Показати ігри в базі за такою датою
 ---
-
-*(Need to fix **In progress!**: поправити перевірку і змінити або правило перевірки клубу гри, або назви клубів)
+*! Must have scripts
 
 ### Скрипти, що НЕ записані в `makefile`
 - *`cli/calculate_mmr.py` - Стара версія скрипта обрахування MMR (Можливо ще знадобиться, але малоймовірно)
@@ -52,8 +53,7 @@
 - `cli/save_players_to_json.py` - Зберегти гравців в `dim_mafii/tests/fixtures/players.json`
 - `cli/setup_end_for_test.py` - Тимчасовий код для використання тестової бази
 - `cli/show_game.py` - Демонстрація усієї гри в консоль
-
+- `cli/change_club_names_blanks.py` - Зміна назв клубів на актуальні
 ---
 
 *(Вже не актуально або це був тимчасовий скрипт, можливо потім буде використовуватися)
-

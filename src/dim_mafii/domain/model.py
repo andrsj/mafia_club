@@ -436,3 +436,8 @@ class GameInfo:
 @dataclass
 class Club:
     name: str
+
+@dataclass
+class EventHouseModel:
+    day: int
+    house_id: str

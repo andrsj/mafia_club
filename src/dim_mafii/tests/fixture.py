@@ -2,11 +2,24 @@ import datetime
 import random
 from typing import List, NamedTuple
 
+from dim_mafii.domain.config import DATE_FORMAT
 from dim_mafii.domain.model import Player, House, Game
 from dim_mafii.domain.types import ClassicRole, GameResult, AdvancedGameResult
 from dim_mafii.adapters.orm import SqlAlchemyUnitOfWork
 from dim_mafii.tests.fakes import FakeUnitOfWorkManager
 from dim_mafii.domain import model
+
+TEST_VALUE_FOR_DATE = '01_01_1999'
+
+
+def get_int_or_zero_from_str(value: str) -> int:
+    result = 0
+    try:
+        result = int(value)
+    except ValueError:
+        ...
+    finally:
+        return result
 
 
 # This is default players to test some basic logic
@@ -63,6 +76,7 @@ DEFAULT_PLAYERS = [
     )
 ]
 
+
 def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
     """
     Use default players to generate slots for game
@@ -98,6 +112,7 @@ def generate_ten_slots_for_game(game_id, randomize_roles=False) -> List[House]:
 
     return houses
 
+
 def prepare_game(
     uow: FakeUnitOfWorkManager,
     date=None,
@@ -126,9 +141,11 @@ def prepare_game(
     uow.sess.games.add(game)
     return game
 
+
 def get_house_mapper(game_id, tx: SqlAlchemyUnitOfWork):
     houses = tx.houses.get_by_game_id(game_id)
     return {house.slot: house.house_id for house in houses}
+
 
 def get_result_game(matrix):
     if matrix[1][9]:
@@ -161,28 +178,28 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
 
     # Game model
     res, advance_res = get_result_game(matrix)
-    heading = tx.players.get_by_nickname(matrix[1][2])
+    heading = tx.players.get_by_nickname(matrix[1][2].lower().strip())
     game = model.Game(
         game_id=game_id,
-        date=datetime.datetime.strptime(matrix[0][2], '%Y-%m-%d'),
+        date=datetime.datetime.strptime(TEST_VALUE_FOR_DATE, DATE_FORMAT),
         result=res,
         club=matrix[3][2],
-        table=int(matrix[4][5]),
-        tournament=matrix[4][2],
+        table=get_int_or_zero_from_str(matrix[4][5]),
+        tournament=matrix[4][2] or None,
         heading=heading.player_id,
         advance_result=advance_res
     )
 
     # House models
-    players = [tx.players.get_by_nickname(row[2]) for row in matrix[10:20]]
-    players_mapper = {player.nickname: player.player_id for player in players}
+    players = [tx.players.get_by_nickname(row[2].strip().lower()) for row in matrix[10:20]]
+    players_mapper = {player.nickname.lower().strip(): player.player_id for player in players}
     role_mapper = {'': 0, 'М': 1, 'Ш': 2, 'Д': 3}
     houses = [
         model.House(
             game_id=game_id,
             house_id='',
-            player_id=players_mapper.get(row[2]),
-            role=role_mapper.get(row[0]),
+            player_id=players_mapper.get(row[2].strip().lower()),
+            role=ClassicRole(role_mapper.get(row[0])).value,
             slot=index,
             bonus_mark=float(row[7]) if row[7] else 0.0,
             fouls=len(row[3] + row[4] + row[5] + row[6])
@@ -199,7 +216,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
         model.Kills(
             game_id=game_id,
             kill_id='',
-            killed_house_id=house_mapper.get(int(slot)),
+            killed_house_id=house_mapper.get(get_int_or_zero_from_str(slot)),
             circle_number=day
         )
         for day, slot in enumerate(matrix[33][2:11], start=1)
@@ -211,7 +228,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
         model.Voted(
             game_id=game_id,
             voted_id='',
-            house_id=house_mapper.get(int(slot)),
+            house_id=house_mapper.get(get_int_or_zero_from_str(slot)),
             day=day
         )
         for day, slot in enumerate(matrix[44][2:11], start=1)
@@ -223,7 +240,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
         model.Misses(
             game_id=game_id,
             miss_id='',
-            house_id=house_mapper.get(int(slot)),
+            house_id=house_mapper.get(get_int_or_zero_from_str(slot)),
             circle_number=day
         )
         for day, slot in enumerate(matrix[34][2:11], start=1)
@@ -233,10 +250,10 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
     best_move = model.BestMove(
         game_id=game_id,
         best_move_id='',
-        best_1=house_mapper.get(int(matrix[22][2])),
-        best_2=house_mapper.get(int(matrix[22][3])),
-        best_3=house_mapper.get(int(matrix[22][4])),
-        killed_house=house_mapper.get(int(matrix[22][1])),
+        best_1=house_mapper.get(get_int_or_zero_from_str(matrix[22][2])),
+        best_2=house_mapper.get(get_int_or_zero_from_str(matrix[22][3])),
+        best_3=house_mapper.get(get_int_or_zero_from_str(matrix[22][4])),
+        killed_house=house_mapper.get(get_int_or_zero_from_str(matrix[22][1])),
     )
 
     don_checks = [
@@ -244,7 +261,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
             game_id=game_id,
             don_check_id='',
             circle_number=day,
-            checked_house_id=house_mapper.get(int(slot))
+            checked_house_id=house_mapper.get(get_int_or_zero_from_str(slot))
         )
         for day, slot in enumerate(matrix[40][2:11], start=1)
         if slot.isdigit()
@@ -253,15 +270,15 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
     hand_of_mafia = model.HandOfMafia(
         game_id=game_id,
         hand_of_mafia_id='',
-        house_hand_id=house_mapper.get(int(matrix[6][8])),
-        victim_id=house_mapper.get(int(matrix[6][9]))
+        house_hand_id=house_mapper.get(get_int_or_zero_from_str(matrix[6][8])),
+        victim_id=house_mapper.get(get_int_or_zero_from_str(matrix[6][9]))
     )
 
     disqualifieds = [
         model.Disqualified(
             game_id=game_id,
             disqualified_id='',
-            house=house_mapper.get(int(slot))
+            house=house_mapper.get(get_int_or_zero_from_str(slot))
         )
         for slot in matrix[21][7:]
         if slot.isdigit()
@@ -271,7 +288,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
         model.SheriffChecks(
             game_id=game_id,
             sheriff_check_id='',
-            checked_house_id=house_mapper.get(int(slot)),
+            checked_house_id=house_mapper.get(get_int_or_zero_from_str(slot)),
             circle_number=day
         )
         for day, slot in enumerate(matrix[37][2:], start=1)
@@ -282,7 +299,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
         model.SheriffVersion(
             game_id=game_id,
             sheriff_version_id='',
-            house=house_mapper.get(int(slot))
+            house=house_mapper.get(get_int_or_zero_from_str(slot))
         )
         for slot in matrix[22][7:]
         if slot.isdigit()
@@ -292,7 +309,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
         model.NominatedForBest(
             game_id=game_id,
             nominated_for_best_id='',
-            house=house_mapper.get(int(slot))
+            house=house_mapper.get(get_int_or_zero_from_str(slot))
         )
         for slot in matrix[24][2:]
         if slot.isdigit()
@@ -303,7 +320,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
             game_id=game_id,
             bonus_id='',
             bonus_from=house_mapper.get(slot),
-            bonus_to=house_mapper.get(int(row[8]))
+            bonus_to=house_mapper.get(get_int_or_zero_from_str(row[8]))
         )
         for slot, row in enumerate(matrix[10:20], start=1)
         if row[8].isdigit()
@@ -314,7 +331,7 @@ def get_excepted_models(matrix, tx: SqlAlchemyUnitOfWork):
             game_id=game_id,
             bonus_id='',
             house_from_id=house_mapper.get(slot),
-            house_to_id=house_mapper.get(int(row[9]))
+            house_to_id=house_mapper.get(get_int_or_zero_from_str(row[9]))
         )
         for slot, row in enumerate(matrix[10:20], start=1)
         if row[9].isdigit()

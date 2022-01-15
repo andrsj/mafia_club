@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import timedelta, date, datetime
 from calendar import monthrange
 from typing import List, Dict, Optional
@@ -7,7 +6,7 @@ import argparse
 
 from googleapiclient.discovery import Resource
 
-
+from dim_mafii.domain.config import DATE_FORMAT
 from dim_mafii.domain.model import House, Game
 from dim_mafii.domain.types import GameResult, ClassicRole
 
@@ -127,12 +126,6 @@ def get_url(url: str):
     return f'https://docs.google.com/spreadsheets/d/{id_sheet}'
 
 
-@dataclass
-class EventHouseModel:
-    day: int
-    house_id: str
-
-
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days + 1)):
         yield start_date + timedelta(n)
@@ -169,7 +162,8 @@ def create_parser_for_blanks_checker():
     parser.add_argument(
         '--month',
         dest='month',
-        help='Month of blanks'
+        help='Month of blanks',
+        choices=months
     )
     parser.add_argument(
         '--year',
@@ -202,12 +196,36 @@ def create_parser_for_date_range():
     parser.add_argument(
         '--start',
         dest='start_date_of_day',
-        help='Start date (format: DD/MM/YYYY)'
+        help=f'Start date (format: {DATE_FORMAT})'
     )
     parser.add_argument(
         '--end',
         dest='end_date_of_day',
-        help='End date (format: DD/MM/YYYY)'
+        help=f'End date (format: {DATE_FORMAT})'
+    )
+
+    return parser
+
+
+def create_parser_for_rating():
+    parser = argparse.ArgumentParser(description='Generate spreadsheets for new game in date range')
+
+    parser.add_argument(
+        '--start',
+        dest='start_date_of_day',
+        help=f'Start date (format: {DATE_FORMAT})'
+    )
+    parser.add_argument(
+        '--end',
+        dest='end_date_of_day',
+        help=f'End date (format: {DATE_FORMAT})'
+    )
+    parser.add_argument(
+        '--club',
+        dest='club',
+        help='Choice for clubs',
+        # TODO Move from HARDCODE?
+        choices=['Дім Мафії', 'Школа Мафії']
     )
 
     return parser
@@ -217,16 +235,10 @@ def create_parser_for_blank_feeling():
     parser = argparse.ArgumentParser(description='Parse data from spreadsheet and fill tables')
 
     parser.add_argument(
-        '--no-check',
-        dest='check',
-        help='Argument for skipping check blanks',
-        action='store_false'
-    )
-
-    parser.add_argument(
         '--month',
         dest='month',
-        help='Parse all blanks in month'
+        help='Parse all blanks in month',
+        choices=months
     )
     parser.add_argument(
         '--year',
@@ -260,10 +272,9 @@ def create_parser_for_blank_feeling():
         type=str,
         required=False
     )
-
     parser.add_argument(
-        "--blank",
-        dest='blank_title',
+        "--date",
+        dest='date',
         type=str,
         required=False
     )
